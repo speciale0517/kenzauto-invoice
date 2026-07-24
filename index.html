@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ケンズオート 請求書アプリ</title>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0; background:#eeeeea; font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif; color:#222;}
+  button{cursor:pointer; font-family:inherit;}
+  input, select{font-family:inherit; font-size:14px;}
+
+  /* ── トップナビ ── */
+  .topnav{position:sticky; top:0; z-index:60; background:#1c2430; color:#fff;
+    padding:10px 16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .topnav h1{font-size:14px; font-weight:700; margin:0;}
+  .tabs{display:flex; gap:4px; margin-left:8px;}
+  .tabs button{padding:8px 16px; border:none; border-radius:5px; font-size:13px; font-weight:600;
+    background:#2b3444; color:#bbb;}
+  .tabs button.active{background:#3a4658; color:#fff;}
+  .topnav .spacer{flex:1;}
+  .btn-primary{padding:8px 16px; border:none; border-radius:5px; font-size:13px; font-weight:700;
+    background:linear-gradient(135deg,#e7c578,#b8942c); color:#1c2430;}
+  .btn-ghost{padding:8px 14px; border:1px solid #555; border-radius:5px; font-size:13px; font-weight:600;
+    background:transparent; color:#ddd;}
+  .toast{position:fixed; top:56px; left:50%; transform:translateX(-50%); background:#1c2430; color:#fff;
+    padding:8px 18px; border-radius:20px; font-size:13px; z-index:200; box-shadow:0 4px 16px rgba(0,0,0,.3);
+    opacity:0; pointer-events:none; transition:opacity .25s;}
+  .toast.show{opacity:1;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ── 請求書作成：2ペイン ── */
+  #view-create.active{display:flex; gap:0; align-items:flex-start;}
+  .form-pane{width:46%; min-width:380px; max-width:560px; padding:16px 16px 60px; height:calc(100vh - 46px); overflow-y:auto;}
+  .preview-pane{flex:1; position:sticky; top:46px; height:calc(100vh - 46px); overflow-y:auto;
+    display:flex; flex-direction:column; align-items:center; padding:20px 12px; background:#e2e2dd;}
+  @media (max-width:900px){
+    #view-create{flex-direction:column;}
+    .form-pane, .preview-pane{width:100%; max-width:none; height:auto; position:static;}
+  }
+
+  .fsec{background:#fff; border-radius:8px; padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .fsec h2{font-size:13px; font-weight:700; margin:0 0 10px; color:#1c2430; border-left:4px solid #b8942c; padding-left:8px;}
+  .frow{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+  .frow label{width:96px; flex-shrink:0; font-size:12px; color:#555;}
+  .frow input[type=text], .frow input[type=date], .frow input[type=number], .frow select{
+    flex:1; padding:7px 9px; border:1px solid #ccc; border-radius:4px; font-size:14px; width:100%; min-height:36px;}
+  .frow2{display:flex; gap:8px;}
+  .frow2 .frow{flex:1;}
+  .seg{display:flex; border:1px solid #999; border-radius:5px; overflow:hidden;}
+  .seg button{flex:1; padding:8px; border:none; background:#f4f4f0; font-size:13px; font-weight:600; color:#555;}
+  .seg button.active{background:#1c2430; color:#fff;}
+
+  /* 明細テーブル（フォーム側） */
+  .item-form-table{width:100%; border-collapse:collapse; font-size:12px;}
+  .item-form-table th{background:#f4f4f0; padding:5px 4px; font-size:11px; color:#666; text-align:center; border-bottom:1px solid #ddd;}
+  .item-form-table td{padding:3px 3px; border-bottom:1px solid #eee;}
+  .item-form-table input{width:100%; padding:5px 4px; border:1px solid #ddd; border-radius:3px; font-size:12px;}
+  .item-form-table input.num{text-align:right;}
+  .item-form-table .sub{text-align:right; font-size:12px; color:#333; padding-right:6px;}
+  .item-form-table .del{background:#f8d8d8; color:#a33; border:none; border-radius:3px; width:24px; height:24px; font-size:13px;}
+  .add-row-btn{margin-top:8px; padding:7px 14px; border:1px dashed #999; border-radius:5px; background:#fafaf7; font-size:12px; color:#555; width:100%;}
+  .items-warning{font-size:11px; color:#a33; margin-top:6px;}
+
+  .action-bar{display:flex; gap:8px; margin-top:4px;}
+  .action-bar button{flex:1; padding:12px; border:none; border-radius:6px; font-size:14px; font-weight:700;}
+  .action-bar .save{background:#2A5D8F; color:#fff;}
+  .action-bar .print{background:linear-gradient(135deg,#e7c578,#b8942c); color:#1c2430;}
+  .action-bar .share{background:#3a4658; color:#fff;}
+  .action-bar button:disabled{opacity:.6; cursor:not-allowed;}
+
+  /* ── 台帳ビュー ── */
+  #view-ledger{padding:20px;}
+  .ledger-table{width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .ledger-table th{background:#1c2430; color:#fff; padding:9px 10px; font-size:12px; text-align:left;}
+  .ledger-table td{padding:9px 10px; font-size:13px; border-bottom:1px solid #eee;}
+  .ledger-table tr:last-child td{border-bottom:none;}
+  .ledger-table .amt{text-align:right; font-weight:700;}
+  .ledger-actions button{margin-right:4px; padding:5px 10px; font-size:11px; border:1px solid #ccc; border-radius:4px; background:#fff;}
+  .ledger-actions button.active{background:#1c2430; color:#fff; border-color:#1c2430;}
+  .ledger-empty{padding:40px; text-align:center; color:#999; font-size:13px;}
+  .ledger-preview-row td{background:#e2e2dd; padding:28px; border-bottom:1px solid #eee;}
+  .ledger-preview-wrap{display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .ledger-preview-actions{display:flex; gap:8px;}
+  .ledger-preview-actions button{padding:10px 20px; border:none; border-radius:6px; font-size:13px; font-weight:700; cursor:pointer;}
+  .ledger-preview-actions .save{background:#2A5D8F; color:#fff;}
+  .ledger-preview-actions .zoom{background:#3a4658; color:#fff;}
+  .ledger-preview-actions .print{background:linear-gradient(135deg,#e7c578,#b8942c); color:#1c2430;}
+  .ledger-preview-actions .share{background:#5b3a90; color:#fff;}
+  .ledger-preview-actions button:disabled{opacity:.6; cursor:not-allowed;}
+
+  /* ── 顧客カルテビュー ── */
+  #view-customers.active{display:flex; gap:0; align-items:flex-start;}
+  .cust-list-pane{width:360px; min-width:300px; padding:16px; height:calc(100vh - 46px); overflow-y:auto; border-right:1px solid #ddd; background:#f7f7f4;}
+  .cust-detail-pane{flex:1; padding:16px; height:calc(100vh - 46px); overflow-y:auto;}
+  @media (max-width:900px){
+    #view-customers{flex-direction:column;}
+    .cust-list-pane, .cust-detail-pane{width:100%; height:auto; border-right:none;}
+  }
+  .cust-search{width:100%; padding:9px 12px; border:1px solid #ccc; border-radius:6px; font-size:14px; margin-bottom:10px;}
+  .cust-item{padding:10px 12px; border-radius:6px; margin-bottom:6px; background:#fff; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.06);}
+  .cust-item.selected{background:#1c2430; color:#fff;}
+  .cust-item .cn{font-weight:700; font-size:13px;}
+  .cust-item .ci{font-size:11px; color:#888;}
+  .cust-item.selected .ci{color:#bbb;}
+  .cust-veh-tag{display:inline-block; font-size:10px; background:#eee; color:#555; border-radius:10px; padding:2px 8px; margin:4px 4px 0 0; cursor:pointer;}
+  .cust-item.selected .cust-veh-tag{background:#3a4658; color:#fff;}
+  .cust-veh-tag.soon{background:#f3c563; color:#553; font-weight:700;}
+
+  /* ── 顧客カルテ：車両タブ ── */
+  .veh-tabs{display:flex; gap:6px; flex-wrap:wrap; margin:16px 0 10px;}
+  .veh-tabs button{padding:8px 14px; border:1px solid #ccc; border-radius:16px; background:#fff; font-size:12px; font-weight:600; color:#555; min-height:36px;}
+  .veh-tabs button.active{background:#1c2430; color:#fff; border-color:#1c2430;}
+  .veh-tabs button.add-veh-tab{border-style:dashed; color:#2A5D8F; background:#fafaf7;}
+
+  /* ── 宛名サジェスト ── */
+  .suggest-box{position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #ccc;
+    border-radius:0 0 6px 6px; box-shadow:0 6px 16px rgba(0,0,0,.15); z-index:80; max-height:240px; overflow-y:auto; display:none;}
+  .suggest-box.open{display:block;}
+  .suggest-item{padding:8px 12px; font-size:13px; cursor:pointer; border-bottom:1px solid #f0f0f0;}
+  .suggest-item:hover, .suggest-veh:hover{background:#f4f4f0;}
+  .suggest-item .si-sub{font-size:11px; color:#888;}
+  .suggest-item.new{color:#2A5D8F; font-weight:700;}
+  .suggest-veh{padding:8px 12px; font-size:12px; cursor:pointer; border-bottom:1px solid #f0f0f0;}
+
+  /* ── 車検リマインドビュー ── */
+  #view-reminder{padding:20px;}
+  .reminder-controls{display:flex; align-items:center; gap:14px; margin-bottom:14px; flex-wrap:wrap;}
+  .reminder-controls .seg{width:auto;}
+  .reminder-controls .seg button{padding:8px 16px;}
+  .reminder-custom{display:flex; align-items:center; gap:6px; font-size:13px; color:#555;}
+  .reminder-custom input{width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; font-size:13px;}
+  .reminder-table{width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .reminder-table th{background:#1c2430; color:#fff; padding:9px 10px; font-size:12px; text-align:left;}
+  .reminder-table td{padding:9px 10px; font-size:13px; border-bottom:1px solid #eee; vertical-align:middle;}
+  .reminder-table tr:last-child td{border-bottom:none;}
+  .reminder-table tr.overdue td{background:#fdecec;}
+  .rem-days{font-weight:700;}
+  .rem-days.overdue{color:#c33;}
+  .rem-days.soon{color:#b8942c;}
+  .reminder-actions button{margin-right:4px; padding:6px 10px; font-size:11px; border:1px solid #ccc; border-radius:4px; background:#fff;}
+  .reminder-actions button:disabled{opacity:.4; cursor:not-allowed;}
+  .reminder-empty{padding:40px; text-align:center; color:#999; font-size:13px;}
+
+  /* ── 設定ビュー ── */
+  #view-settings{padding:20px; max-width:520px;}
+
+  /* ── A4 帳票（フェーズ0の実証済みスタイルを移植） ── */
+  #docWrap{background:#fff; box-shadow:0 6px 28px rgba(0,0,0,.28); flex-shrink:0;}
+  #doc, .doc-box{position:relative; width:595px; height:842px; background:#fff; box-sizing:border-box;
+    padding:11px 23px 8px; font-family:'Hiragino Mincho ProN','Yu Mincho','YuMincho','MS Mincho',serif;
+    color:#111; font-size:9.2px; line-height:1.3;}
+  #doc table, .doc-box table{border-collapse:collapse; width:100%;}
+  .doc-box{box-shadow:0 6px 28px rgba(0,0,0,.22); margin:0 auto;}
+  .hd-row{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2px;}
+  .hd-left{font-size:9px; line-height:1.6;}
+  .hd-title{text-align:center; flex:1;}
+  .hd-title .t1{font-size:17.5px; font-weight:700; letter-spacing:.5em; padding-left:.5em;}
+  .hd-right table{width:170px; font-size:8.7px;}
+  .hd-right td{border:1px solid #111; padding:1px 4px;}
+  .hd-right td.lbl{background:#f2f2ee; width:52px; color:#333;}
+  .hd-right td.val-kubun{font-size:7.4px;}
+  .parties{display:flex; justify-content:space-between; margin:3px 0 5px; gap:14px;}
+  .p-col{width:48%; font-size:8.7px; line-height:1.4;}
+  .p-col .name{font-size:11.5px; font-weight:700; border-bottom:1.4px solid #111; padding-bottom:2px; margin:1px 0 2px; display:inline-block;}
+  .p-col .person{font-size:8.3px; color:#333;}
+  .p-col .code{font-size:8.5px; color:#333; margin-top:2px;}
+  .p-col.right{text-align:left;}
+  .p-col.right .kikan{font-size:7.8px; color:#555;}
+  .p-col.right .shopname{font-size:11.5px; font-weight:700; margin:1px 0;}
+  .ph{color:#b23; font-size:7.8px;}
+  .veh-table{margin-bottom:3px; font-size:8.5px;}
+  .veh-table td{border:1px solid #111; padding:1.5px 4px;}
+  .veh-table tr:first-child td{background:#f2f2ee; color:#333; font-size:8px; text-align:center;}
+  .items-table{margin-bottom:1.5px; font-size:8.5px; table-layout:fixed;}
+  .items-table.dense{font-size:7.4px;}
+  .items-table col.c-name{width:auto;}
+  .items-table col.c-num{width:58px;}
+  .items-table th{border:1px solid #111; background:#e8e8e2; padding:2px 3px; font-weight:700; text-align:center;}
+  .items-table td{border:1px solid #111; padding:1px 4px; height:auto;}
+  .items-table.dense td{padding:0.3px 3px;}
+  .items-table td.num{text-align:right;}
+  .foot-row{display:flex; justify-content:space-between; gap:12px; margin-top:1px;}
+  .foot-l{width:56%; font-size:8.7px;}
+  .foot-r{width:42%; font-size:8.7px;}
+  .cost-table td{border:1px solid #111; padding:1px 5px;}
+  .cost-table td.lbl{background:#f8f8f6; color:#444;}
+  .cost-table td.val{text-align:right; width:70px;}
+  .small-sum td{border:1px solid #111; padding:1px 5px; font-size:8.3px;}
+  .small-sum td.lbl{background:#f8f8f6; color:#555;}
+  .small-sum td.val{text-align:right; width:72px;}
+  .next-box{font-size:8.3px; margin-top:2px; line-height:1.25;}
+  .thanks{font-size:7.5px; color:#333; line-height:1.2; margin-top:2px;}
+  .bank{font-size:7.5px; color:#333; line-height:1.15; margin-top:1px; border-top:1px solid #ddd; padding-top:1px;}
+  .r-table{margin-bottom:4px;}
+  .r-table td{border:1px solid #111; padding:1.5px 5px;}
+  .r-table td.lbl{background:#f8f8f6; color:#444; width:60px;}
+  .r-table td.val{text-align:right;}
+  .req-box{border:2px solid #111; border-radius:6px; padding:3px 8px; margin-top:2px; text-align:center;}
+  .req-box .rl{font-size:10px; font-weight:700;}
+  .req-box .rsub{font-size:8px; color:#666;}
+  .req-box .rv{font-size:15.5px; font-weight:700; margin-top:2px;}
+
+  /* ── プレビュー拡大オーバーレイ ── */
+  .btn-zoom{margin-bottom:12px; padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:700;
+    background:#3a4658; color:#fff; align-self:center;}
+  #docWrap{cursor:zoom-in;}
+  #docZoom{display:none; position:fixed; top:0; right:0; bottom:0; left:0; z-index:300; background:rgba(20,24,32,.82);}
+  #docZoom.open{display:block;}
+  #docZoom .dz-bar{position:absolute; top:0; right:0; left:0; height:48px; display:flex; align-items:center;
+    justify-content:flex-end; gap:8px; padding:0 14px; z-index:2; background:rgba(28,36,48,.6);}
+  #docZoom .dz-bar button{padding:7px 14px; border:none; border-radius:6px; font-size:15px; font-weight:700;
+    background:#3a4658; color:#fff; min-width:40px;}
+  #docZoom .dz-bar button.dz-close{background:linear-gradient(135deg,#e7c578,#b8942c); color:#1c2430;}
+  #docZoom .dz-level{color:#fff; font-size:13px; min-width:52px; text-align:center;}
+  #docZoom .dz-scroll{position:absolute; top:48px; right:0; bottom:0; left:0; overflow:auto; padding:20px;
+    display:flex; justify-content:center; align-items:flex-start;}
+  #docZoom .dz-stage{position:relative; margin:0 auto; flex-shrink:0;}
+  #docZoom #dzDoc{position:absolute; top:0; left:0; margin:0; transform-origin:top left;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);}
+
+  @media print{
+    body>*{display:none !important;}
+    #docZoom{display:none !important;}
+    #printArea{display:block !important; position:static !important; background:#fff !important;}
+    #printArea > div{
+      transform:scale(1.3333) !important;
+      transform-origin:top left !important;
+      width:595px; height:842px;
+      overflow:hidden;
+      page-break-after:avoid; break-after:avoid;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+    @page{size:A4; margin:0;}
+  }
+  #printArea{display:none;}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <h1>ケンズオート 請求書アプリ</h1>
+  <div class="tabs" id="mainTabs">
+    <button data-view="create" class="active">請求書作成</button>
+    <button data-view="ledger">台帳</button>
+    <button data-view="customers">顧客カルテ</button>
+    <button data-view="reminder">車検リマインド</button>
+    <button data-view="settings">⚙設定</button>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-ghost" id="btnNew">＋ 新規作成</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- ============ 請求書作成 ============ -->
+<div class="view active" id="view-create">
+  <div class="form-pane" id="formPane"></div>
+  <div class="preview-pane">
+    <button class="btn-zoom" id="btnZoomDoc">🔍 拡大表示</button>
+    <div id="docWrap"><div id="doc"></div></div>
+  </div>
+</div>
+
+<!-- ============ 台帳 ============ -->
+<div class="view" id="view-ledger">
+  <div id="ledgerBody"></div>
+</div>
+
+<!-- ============ 顧客カルテ ============ -->
+<div class="view" id="view-customers">
+  <div class="cust-list-pane" id="custListPane"></div>
+  <div class="cust-detail-pane" id="custDetailPane"></div>
+</div>
+
+<!-- ============ 車検リマインド ============ -->
+<div class="view" id="view-reminder">
+  <div id="reminderBody"></div>
+</div>
+
+<!-- ============ 設定 ============ -->
+<div class="view" id="view-settings">
+  <div id="settingsBody"></div>
+</div>
+
+<div id="printArea"></div>
+
+<!-- ============ プレビュー拡大オーバーレイ ============ -->
+<div id="docZoom">
+  <div class="dz-bar">
+    <button onclick="dzZoom(-0.25)" aria-label="縮小">−</button>
+    <span id="dzLevel" class="dz-level">100%</span>
+    <button onclick="dzZoom(0.25)" aria-label="拡大">＋</button>
+    <button class="dz-close" onclick="closeDocZoom()">✕ 閉じる</button>
+  </div>
+  <div class="dz-scroll" id="dzScroll" onclick="if(event.target===this) closeDocZoom()">
+    <div class="dz-stage" id="dzStage"><div class="doc-box" id="dzDoc"></div></div>
+  </div>
+</div>
+
+<!-- PDF共有機能のために追加：html2canvasで帳票をキャンバス化し、jsPDFでA4サイズの実際のPDFファイルを生成して共有する -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+/* ============================================================
+   ユーティリティ
+   ============================================================ */
+function yen(n){
+  n = Math.round(Number(n)||0);
+  const sign = n<0 ? '-' : '';
+  return sign + Math.abs(n).toLocaleString('ja-JP');
+}
+function todayISO(){
+  const d = new Date();
+  const p = x => String(x).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function reiwaParts(iso){
+  if(!iso) return null;
+  const [y,m,dd] = iso.split('-').map(Number);
+  const ry = y - 2018;
+  if(ry < 1) return null;
+  return {ry, m, dd};
+}
+function toWarekiLong(iso){ const p=reiwaParts(iso); return p ? `令和${p.ry}年${p.m}月${p.dd}日` : ''; }
+function toWarekiShort(iso){ const p=reiwaParts(iso); return p ? `R${p.ry}.${p.m}.${p.dd}` : ''; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   ストレージ
+   ============================================================ */
+const STORAGE_OK = (function(){
+  try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; }
+})();
+let memStore = {};
+function storeGet(key){
+  if(STORAGE_OK) return localStorage.getItem(key);
+  return memStore[key] || null;
+}
+function storeSet(key, val){
+  if(STORAGE_OK) localStorage.setItem(key, val);
+  else memStore[key] = val;
+}
+
+function defaultShop(){
+  return {
+    name:'ケンズオート', postal:'', address:'', kikan:'', rep:'', tel:'', fax:'', invoiceNo:'',
+    bankName:'', branch:'', accType:'', accNo:'', holder:'',
+    startNo: 41645,
+  };
+}
+let shop = loadShop();
+function loadShop(){
+  try{
+    const raw = storeGet('ken_shop');
+    return raw ? Object.assign(defaultShop(), JSON.parse(raw)) : defaultShop();
+  }catch(e){ return defaultShop(); }
+}
+function saveShop(){ storeSet('ken_shop', JSON.stringify(shop)); }
+
+let ledger = loadLedger();
+function loadLedger(){
+  try{
+    const raw = storeGet('ken_ledger');
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveLedgerToStorage(){ storeSet('ken_ledger', JSON.stringify(ledger)); }
+
+let customers = loadCustomers();
+function loadCustomers(){
+  try{ const raw = storeGet('ken_customers'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+}
+function saveCustomersToStorage(){ storeSet('ken_customers', JSON.stringify(customers)); }
+
+let vehicles = loadVehicles();
+function loadVehicles(){
+  try{ const raw = storeGet('ken_vehicles'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+}
+function saveVehiclesToStorage(){ storeSet('ken_vehicles', JSON.stringify(vehicles)); }
+
+function defaultTemplates(){
+  return {
+    shakenReminder: '{顧客名} 様｜いつもお世話になっております、ケンズオートです。{車両}（{ナンバー}）の車検が {次回車検日} に迫っております。ご予約のご相談を承っておりますので、お気軽にご連絡ください。',
+  };
+}
+let templates = loadTemplates();
+function loadTemplates(){
+  try{
+    const raw = storeGet('ken_templates');
+    return raw ? Object.assign(defaultTemplates(), JSON.parse(raw)) : defaultTemplates();
+  }catch(e){ return defaultTemplates(); }
+}
+function saveTemplatesToStorage(){ storeSet('ken_templates', JSON.stringify(templates)); }
+
+function genId(prefix, arr){
+  let max = 0;
+  arr.forEach(x=>{
+    const m = /^\D*(\d+)$/.exec(x.id||'');
+    if(m){ const n=parseInt(m[1],10); if(n>max) max=n; }
+  });
+  return prefix + (max+1);
+}
+function toHiragana(s){
+  return String(s||'').replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
+function searchCustomers(query){
+  const q = String(query||'').trim();
+  if(!q) return customers;
+  const qh = toHiragana(q);
+  return customers.filter(c=>{
+    if(toHiragana(c.name).indexOf(qh)===0) return true;
+    if(c.kana && toHiragana(c.kana).indexOf(qh)===0) return true;
+    if(c.code && c.code.indexOf(q)===0) return true;
+    if(c.tel && c.tel.includes(q)) return true;
+    if(c.companyName && toHiragana(c.companyName).indexOf(qh)===0) return true;
+    return vehicles.some(v=>v.customerId===c.id && (
+      (v.regNo && v.regNo.includes(q)) ||
+      (v.chassisNo && v.chassisNo.includes(q)) ||
+      (v.shikiShitei && v.shikiShitei.includes(q)) ||
+      (v.ruibetsu && v.ruibetsu.includes(q))
+    ));
+  });
+}
+
+/* 請求書保存時に顧客・車両カルテへ反映（アップサート）。空欄の項目は既存値を上書きしない。 */
+function upsertCustomerAndVehicle(cust, veh){
+  if(!cust || (!cust.name && !cust.code && !cust.tel)) return null;
+  let c = null;
+  if(cust.code) c = customers.find(x=>x.code && x.code===cust.code);
+  if(!c && cust.name) c = customers.find(x=>x.name===cust.name && (x.tel||'')===(cust.tel||''));
+  if(!c){
+    c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+    customers.push(c);
+  }
+  ['name','companyName','kana','tel','postal','address','code','email'].forEach(k=>{ if(cust[k]) c[k]=cust[k]; });
+
+  if(veh && veh.regNo){
+    let v = vehicles.find(x=>x.customerId===c.id && x.regNo===veh.regNo);
+    if(!v){
+      v = { id: genId('v', vehicles), customerId: c.id, regNo:'', carName:'', modelType:'', engine:'', chassisNo:'',
+        shodo:'', regDate:'', shikiShitei:'', ruibetsu:'', mileage:'', nextShaken:'', nextTenken:'' };
+      vehicles.push(v);
+    }
+    ['regNo','carName','modelType','engine','chassisNo','shodo','regDate','shikiShitei','ruibetsu','mileage','nextShaken','nextTenken'].forEach(k=>{
+      if(veh[k]) v[k]=veh[k];
+    });
+  }
+  saveCustomersToStorage();
+  saveVehiclesToStorage();
+  return c.id;
+}
+function isShakenSoon(iso){
+  if(!iso) return false;
+  const diffDays = (new Date(iso) - new Date(todayISO())) / 86400000;
+  return diffDays >= 0 && diffDays <= 60;
+}
+
+/* ============================================================
+   車検リマインド（対象抽出・定型文差し込み・送信）
+   ============================================================ */
+function fillTemplate(tpl, c, v){
+  c = c || {}; v = v || {};
+  return String(tpl||'')
+    .replace(/\{顧客名\}/g, c.name||'')
+    .replace(/\{車両\}/g, v.carName||'')
+    .replace(/\{ナンバー\}/g, v.regNo||'')
+    .replace(/\{次回車検日\}/g, toWarekiShort(v.nextShaken)||'未設定');
+}
+function buildReminderMessage(c, v){
+  return fillTemplate(templates.shakenReminder, c, v);
+}
+/* nextShaken が「今日〜今日＋days日」の車両を対象に、超過→間近→先の順（残日数昇順）で抽出 */
+function getReminderTargets(days){
+  const todayMs = new Date(todayISO()).getTime();
+  const list = [];
+  vehicles.forEach(v=>{
+    if(!v.nextShaken) return;
+    const diffDays = Math.round((new Date(v.nextShaken).getTime() - todayMs) / 86400000);
+    if(diffDays <= days){
+      list.push({ v, c: customers.find(x=>x.id===v.customerId) || null, diffDays });
+    }
+  });
+  list.sort((a,b)=>a.diffDays-b.diffDays);
+  return list;
+}
+function copyToClipboard(text, msg){
+  const done = ()=>toast(msg||'コピーしました');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.top='0'; ta.style.left='0'; ta.style.right='0'; ta.style.bottom='auto';
+  ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+function findReminderPair(vehId){
+  const v = vehicles.find(x=>x.id===vehId);
+  if(!v) return null;
+  return { v, c: customers.find(x=>x.id===v.customerId) || null };
+}
+function sendReminderSMS(vehId){
+  const pair = findReminderPair(vehId);
+  if(!pair) return;
+  const tel = pair.c && pair.c.tel;
+  if(!tel){ toast('電話番号が未登録です'); return; }
+  const msg = buildReminderMessage(pair.c, pair.v);
+  window.location.href = `sms:${tel}?&body=${encodeURIComponent(msg)}`;
+}
+function sendReminderMail(vehId){
+  const pair = findReminderPair(vehId);
+  if(!pair) return;
+  const email = (pair.c && pair.c.email) || '';
+  if(!email){ toast('メールアドレスが未登録です'); return; }
+  const msg = buildReminderMessage(pair.c, pair.v);
+  window.location.href = `mailto:${email}?subject=${encodeURIComponent('車検のご案内')}&body=${encodeURIComponent(msg)}`;
+}
+function sendReminderLine(vehId){
+  const pair = findReminderPair(vehId);
+  if(!pair) return;
+  const msg = buildReminderMessage(pair.c, pair.v);
+  copyToClipboard(msg, '本文をコピーしました。LINEに貼り付けて送信してください');
+}
+function copyReminderMsg(vehId){
+  const pair = findReminderPair(vehId);
+  if(!pair) return;
+  const msg = buildReminderMessage(pair.c, pair.v);
+  copyToClipboard(msg, '本文をコピーしました');
+}
+
+/* ============================================================
+   請求書データモデル
+   ============================================================ */
+const KUBUN_OPTIONS = [
+  '普通自動車', '軽自動車', '小型貨物（4ナンバー）', '普通貨物（1ナンバー）',
+  '乗用（3・5ナンバー）', 'バス（2ナンバー）', '特殊用途（8ナンバー）',
+  '大型特殊', '二輪車（251cc以上）', '軽二輪（126～250cc）',
+];
+function defaultState(){
+  return {
+    invNo: '',
+    type: '車検整備',
+    issueDate: todayISO(),
+    kubun: '',
+    kyoten: shop.name || 'ケンズオート',
+    uketsukeDate: '', kanryoDate: '', uketsukeTanto: '', seibiTanto: '',
+    customer: { name:'', companyName:'', kana:'', postal:'', address:'', code:'', tel:'', email:'' },
+    vehicle: { regNo:'', carName:'', modelType:'', engine:'', chassisNo:'',
+      shodo:'', regDate:'', shikiShitei:'', ruibetsu:'', mileage:'',
+      nextShaken:'', nextTenken:'' },
+    items: [],
+    costs: { jibaiseki:0, jyuryozei:0, inshi:0, gijutsu:0, tester:0, jimu:0, daikou:0 },
+    nebiki: 0,
+    sangaku: 0,
+  };
+}
+const CHECKUP_ROWS_PLAIN = [
+  '下廻り各部　点検・調整・給油・下回り洗浄',
+  'ブレーキ関係　点検・調整・給油',
+  'ケーブル関係　点検・調整・注油',
+  '灯火、保安装置　点検・調整',
+  '動力伝達装置　点検・調整・給油',
+  'エンジン及び電気機器　点検・調整',
+  'ステアリング装置関係　点検・調整・給油',
+  '排気ガス　測定・調整',
+];
+function seedItemsForType(type){
+  if(type==='車検整備'){
+    state.items = [
+      {name:'車検整備基本工賃', tech:11000, qty:0, price:0},
+      ...CHECKUP_ROWS_PLAIN.map(name=>({name, tech:0, qty:0, price:0})),
+    ];
+  } else {
+    state.items = [];
+  }
+}
+function nextInvNo(){
+  const nums = ledger.map(r=>parseInt(r.invNo,10)).filter(n=>!isNaN(n));
+  const base = Math.max((Number(shop.startNo)||1)-1, nums.length?Math.max(...nums):0);
+  return String(base+1).padStart(9,'0');
+}
+
+let state = defaultState();
+
+/* ============================================================
+   計算（フェーズ0の検算ロジックを共通関数化）
+   ============================================================ */
+function computeTotals(s){
+  const c = s.costs;
+  const gijutsuryou = s.items.reduce((sum,r)=>sum+(Number(r.tech)||0),0);
+  const buhindai = s.items.reduce((sum,r)=>sum+(Number(r.qty)||0)*(Number(r.price)||0),0);
+  const nebiki = Number(s.nebiki)||0;
+  const shohizei = Math.round((gijutsuryou+nebiki+buhindai+(Number(c.tester)||0)+(Number(c.jimu)||0))*0.1);
+  const goukei2 = gijutsuryou+nebiki+buhindai+shohizei;
+  const shohi1 = (Number(c.jibaiseki)||0)+(Number(c.jyuryozei)||0)+(Number(c.inshi)||0)+(Number(c.gijutsu)||0)+(Number(c.tester)||0)+(Number(c.jimu)||0)+(Number(c.daikou)||0);
+  const sangaku = Number(s.sangaku)||0;
+  const uriage = shohi1+goukei2-sangaku;
+  const seikyu = uriage;
+  const kazei10 = gijutsuryou+nebiki+buhindai+(Number(c.tester)||0)+(Number(c.jimu)||0);
+  const kazei10zei = shohizei;
+  const kazeigai = uriage-kazei10-kazei10zei;
+  return { gijutsuryou, buhindai, nebiki, shohizei, goukei2, shohi1, sangaku, uriage, seikyu, kazei10, kazei10zei, kazeigai };
+}
+
+/* ============================================================
+   帳票プレビュー（buildDoc）
+   ============================================================ */
+function buildItemRows(s){
+  let rows = '';
+  s.items.forEach((r,i)=>{
+    rows += `<tr>
+      <td>${esc(r.name)}</td>
+      <td class="num">${r.tech ? yen(r.tech) : ''}</td>
+      <td class="num">${r.qty ? r.qty : ''}</td>
+      <td class="num">${r.price ? yen(r.price) : ''}</td>
+      <td class="num">${(r.qty&&r.price) ? yen(r.qty*r.price) : ''}</td>
+    </tr>`;
+  });
+  const minRows = 14;
+  for(let i=s.items.length; i<minRows; i++){
+    rows += `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>`;
+  }
+  return rows;
+}
+function buildDoc(s){
+  s = s || state;
+  const t = computeTotals(s);
+  const dense = s.items.length > 21 ? ' dense' : '';
+  const shopAddr = (shop.postal||shop.address)
+    ? `〒${esc(shop.postal)||'〔要記入〕'}　${esc(shop.address)||'〔住所：要記入〕'}`
+    : '<span class="ph">〒〔要記入〕　〔住所：要記入〕</span>';
+  return `
+  <div class="hd-row">
+    <div class="hd-left">
+      伝票No　${esc(s.invNo)}　P1/1<br>
+      発行日　${toWarekiLong(s.issueDate) || '未設定'}
+    </div>
+    <div class="hd-title"><div class="t1">御請求書</div></div>
+    <div class="hd-right">
+      <table>
+        <tr><td class="lbl">種別</td><td>${esc(s.type)}</td></tr>
+        <tr><td class="lbl">車検証区分</td><td class="val-kubun">${esc(s.kubun)}</td></tr>
+        <tr><td class="lbl">拠点</td><td>${esc(s.kyoten)}</td></tr>
+        <tr><td class="lbl">受付年月日</td><td>${esc(s.uketsukeDate)}</td></tr>
+        <tr><td class="lbl">完了年月日</td><td>${esc(s.kanryoDate)}</td></tr>
+        <tr><td class="lbl">受付担当者</td><td>${esc(s.uketsukeTanto)}</td></tr>
+        <tr><td class="lbl">整備担当者</td><td>${esc(s.seibiTanto)}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="parties">
+    <div class="p-col">
+      ${s.customer.postal ? '〒'+esc(s.customer.postal)+'<br>' : ''}
+      ${esc(s.customer.address)}<br>
+      ${s.customer.companyName
+        ? `<span class="name">${esc(s.customer.companyName)} 御中</span>${s.customer.name ? `<br><span class="person">${esc(s.customer.name)} 様</span>` : ''}<br>`
+        : `<span class="name">${esc(s.customer.name)||'（宛名未入力）'} 御中</span><br>`
+      }
+      <span class="code">お客様コード　${esc(s.customer.code)}　TEL ${esc(s.customer.tel)}</span>
+    </div>
+    <div class="p-col right">
+      <span class="kikan ph">${esc(shop.kikan)||'〔指定工場表記：要記入〕'}</span><br>
+      ${shopAddr}<br>
+      <span class="shopname">${esc(shop.name)||'ケンズオート'}</span><br>
+      <span class="${shop.rep?'':'ph'}">代表者${esc(shop.rep)||'〔要記入〕'}</span><br>
+      <span class="${(shop.tel||shop.fax)?'':'ph'}">TEL${esc(shop.tel)||'〔要記入〕'}　FAX${esc(shop.fax)||'〔要記入〕'}</span><br>
+      <span class="${shop.invoiceNo?'':'ph'}">登録番号　${esc(shop.invoiceNo)||'〔T＋13桁：要記入〕'}</span>
+    </div>
+  </div>
+
+  <table class="veh-table">
+    <tr><td>登録番号</td><td>車名</td><td>型式</td><td>原動機</td><td>車台番号</td></tr>
+    <tr><td>${esc(s.vehicle.regNo)}</td><td>${esc(s.vehicle.carName)}</td><td>${esc(s.vehicle.modelType)}</td><td>${esc(s.vehicle.engine)}</td><td>${esc(s.vehicle.chassisNo)}</td></tr>
+    <tr><td>初度</td><td>登録年月日</td><td>型式指定</td><td>類別区分番号</td><td>走行距離</td></tr>
+    <tr><td>${esc(s.vehicle.shodo)}</td><td>${esc(s.vehicle.regDate)}</td><td>${esc(s.vehicle.shikiShitei)}</td><td>${esc(s.vehicle.ruibetsu)}</td><td>${esc(s.vehicle.mileage)}</td></tr>
+  </table>
+
+  <table class="items-table${dense}">
+    <colgroup><col class="c-name"><col class="c-num"><col class="c-num"><col class="c-num"><col class="c-num"></colgroup>
+    <tr><th>明細</th><th>技術料</th><th>数量</th><th>部品単価</th><th>部品小計</th></tr>
+    ${buildItemRows(s)}
+  </table>
+  ${s.items.length>30 ? '<div style="color:#c33;font-size:8px;">※明細が多数のため印刷時にレイアウトが崩れる可能性があります（分割発行を検討してください）</div>' : ''}
+
+  <div class="foot-row">
+    <div class="foot-l">
+      <table class="cost-table">
+        <tr><td class="lbl">＊自賠責保険料</td><td class="val">${yen(s.costs.jibaiseki)}</td></tr>
+        <tr><td class="lbl">＊重量税</td><td class="val">${yen(s.costs.jyuryozei)}</td></tr>
+        <tr><td class="lbl">＊印紙［OSS］</td><td class="val">${yen(s.costs.inshi)}</td></tr>
+        <tr><td class="lbl">＊技術情報管理手数料</td><td class="val">${yen(s.costs.gijutsu)}</td></tr>
+        <tr><td class="lbl">テスター計測検査費</td><td class="val">${yen(s.costs.tester)}</td></tr>
+        <tr><td class="lbl">事務手数料</td><td class="val">${yen(s.costs.jimu)}</td></tr>
+        <tr><td class="lbl">代行料</td><td class="val">${yen(s.costs.daikou)}</td></tr>
+      </table>
+      <table class="small-sum">
+        <tr><td class="lbl">①　諸費用合計</td><td class="val">${yen(t.shohi1)}</td></tr>
+        <tr><td class="lbl">売上合計</td><td class="val">¥${yen(t.uriage)}</td></tr>
+        <tr><td class="lbl">10%課税対象額計</td><td class="val">${yen(t.kazei10)}</td></tr>
+        <tr><td class="lbl">10%消費税</td><td class="val">${yen(t.kazei10zei)}</td></tr>
+        <tr><td class="lbl">課税対象外計</td><td class="val">${yen(t.kazeigai)}</td></tr>
+      </table>
+      <div class="next-box">
+        ＊次回車検日　${toWarekiShort(s.vehicle.nextShaken) || '未設定'}<br>
+        ＊次回点検日　${toWarekiShort(s.vehicle.nextTenken) || '未設定'}
+      </div>
+      <div class="thanks">
+        毎度ありがとうございます。お振込の際には下記迄お願い致します。<br>
+        大変恐縮ですが振込手数料はご負担下さい。
+      </div>
+      <div class="bank ${(shop.bankName||shop.accNo)?'':'ph'}">
+        振込先：${esc(shop.bankName)||'〔銀行'}　${esc(shop.branch)||'支店'}　${esc(shop.accType)||'種別'}　${esc(shop.accNo)||'口座番号：要記入〕'}<br>
+        口座名義：${esc(shop.holder)||'〔要記入〕'}
+      </div>
+    </div>
+
+    <div class="foot-r">
+      <table class="r-table">
+        <tr><td class="lbl">技術料</td><td class="val">${yen(t.gijutsuryou)}</td></tr>
+        <tr><td class="lbl">技術料値引</td><td class="val">${yen(t.nebiki)}</td></tr>
+        <tr><td class="lbl">部品代</td><td class="val">${yen(t.buhindai)}</td></tr>
+        <tr><td class="lbl">消費税</td><td class="val">${yen(t.shohizei)}</td></tr>
+        <tr><td class="lbl">②　上記合計</td><td class="val">${yen(t.goukei2)}</td></tr>
+        <tr><td class="lbl">③</td><td class="val">${yen(t.sangaku)}</td></tr>
+      </table>
+      <div class="req-box">
+        <div class="rl">請求額</div>
+        <div class="rsub">（①＋②−③）</div>
+        <div class="rv">¥${yen(t.seikyu)}</div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+function renderPreview(){
+  document.getElementById('doc').innerHTML = buildDoc();
+}
+
+/* ============================================================
+   請求書作成フォーム
+   ============================================================ */
+function buildFormHTML(){
+  const s = state;
+  return `
+  <div class="fsec">
+    <h2>基本情報</h2>
+    <div class="frow"><label>伝票No</label><input type="text" id="f-invNo" value="${esc(s.invNo)}"></div>
+    <div class="frow"><label>種別</label>
+      <div class="seg" id="typeSeg">
+        <button data-type="車検整備" class="${s.type==='車検整備'?'active':''}">車検整備</button>
+        <button data-type="一般整備" class="${s.type==='一般整備'?'active':''}">一般整備</button>
+      </div>
+    </div>
+    <div class="frow"><label>発行日</label><input type="date" id="f-issueDate" value="${esc(s.issueDate)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>車検証区分</label>
+        <select id="f-kubun">
+          <option value="">（未選択）</option>
+          ${KUBUN_OPTIONS.map(o=>`<option value="${esc(o)}"${s.kubun===o?' selected':''}>${esc(o)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="frow"><label>拠点</label><input type="text" id="f-kyoten" value="${esc(s.kyoten)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>受付年月日</label><input type="text" id="f-uketsukeDate" placeholder="R7.7.8" value="${esc(s.uketsukeDate)}"></div>
+      <div class="frow"><label>完了年月日</label><input type="text" id="f-kanryoDate" placeholder="R7.7.9" value="${esc(s.kanryoDate)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>受付担当者</label><input type="text" id="f-uketsukeTanto" value="${esc(s.uketsukeTanto)}"></div>
+      <div class="frow"><label>整備担当者</label><input type="text" id="f-seibiTanto" value="${esc(s.seibiTanto)}"></div>
+    </div>
+  </div>
+
+  <div class="fsec">
+    <h2>お客様（宛先）</h2>
+    <div class="frow"><label>会社名</label><input type="text" id="f-cust-companyName" placeholder="法人の場合のみ入力" value="${esc(s.customer.companyName||'')}"></div>
+    <div class="frow">
+      <label>宛名</label>
+      <div style="flex:1; position:relative;">
+        <input type="text" id="f-cust-name" placeholder="◯◯ 御中" value="${esc(s.customer.name)}" autocomplete="off">
+        <div id="custSuggest" class="suggest-box"></div>
+      </div>
+    </div>
+    <div class="frow"><label>かな</label><input type="text" id="f-cust-kana" placeholder="検索用（任意）" value="${esc(s.customer.kana||'')}"></div>
+    <div class="frow2">
+      <div class="frow"><label>郵便番号</label><input type="text" id="f-cust-postal" value="${esc(s.customer.postal)}"></div>
+      <div class="frow"><label>お客様コード</label><input type="text" id="f-cust-code" value="${esc(s.customer.code)}"></div>
+    </div>
+    <div class="frow"><label>住所</label><input type="text" id="f-cust-address" value="${esc(s.customer.address)}"></div>
+    <div class="frow"><label>TEL</label><input type="text" id="f-cust-tel" value="${esc(s.customer.tel)}"></div>
+    <div class="frow"><label>メール</label><input type="text" id="f-cust-email" placeholder="車検リマインドのメール送信に使用" value="${esc(s.customer.email||'')}"></div>
+  </div>
+
+  <div class="fsec">
+    <h2>車両情報</h2>
+    <div class="frow2">
+      <div class="frow"><label>登録番号</label><input type="text" id="f-veh-regNo" value="${esc(s.vehicle.regNo)}"></div>
+      <div class="frow"><label>車名</label><input type="text" id="f-veh-carName" value="${esc(s.vehicle.carName)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>型式</label><input type="text" id="f-veh-modelType" value="${esc(s.vehicle.modelType)}"></div>
+      <div class="frow"><label>原動機</label><input type="text" id="f-veh-engine" value="${esc(s.vehicle.engine)}"></div>
+    </div>
+    <div class="frow"><label>車台番号</label><input type="text" id="f-veh-chassisNo" value="${esc(s.vehicle.chassisNo)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>初度</label><input type="text" id="f-veh-shodo" placeholder="H24.11" value="${esc(s.vehicle.shodo)}"></div>
+      <div class="frow"><label>登録年月日</label><input type="text" id="f-veh-regDate" placeholder="R6.1.30" value="${esc(s.vehicle.regDate)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>型式指定</label><input type="text" id="f-veh-shikiShitei" value="${esc(s.vehicle.shikiShitei)}"></div>
+      <div class="frow"><label>類別区分番号</label><input type="text" id="f-veh-ruibetsu" value="${esc(s.vehicle.ruibetsu)}"></div>
+    </div>
+    <div class="frow"><label>走行距離</label><input type="text" id="f-veh-mileage" placeholder="171,175Km" value="${esc(s.vehicle.mileage)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>次回車検日</label><input type="date" id="f-veh-nextShaken" value="${esc(s.vehicle.nextShaken)}"></div>
+      <div class="frow"><label>次回点検日</label><input type="date" id="f-veh-nextTenken" value="${esc(s.vehicle.nextTenken)}"></div>
+    </div>
+  </div>
+
+  <div class="fsec">
+    <h2>明細</h2>
+    <table class="item-form-table" id="itemFormTable"></table>
+    <button class="add-row-btn" id="btnAddItem">＋ 明細行を追加</button>
+    ${s.items.length>21 ? '<div class="items-warning">明細が21件を超えたため、印刷サイズを自動縮小しています。</div>' : ''}
+  </div>
+
+  <div class="fsec">
+    <h2>諸費用</h2>
+    <div class="frow"><label>自賠責保険料</label><input type="number" id="f-cost-jibaiseki" value="${s.costs.jibaiseki}"></div>
+    <div class="frow"><label>重量税</label><input type="number" id="f-cost-jyuryozei" value="${s.costs.jyuryozei}"></div>
+    <div class="frow"><label>印紙［OSS］</label><input type="number" id="f-cost-inshi" value="${s.costs.inshi}"></div>
+    <div class="frow"><label>技術情報管理手数料</label><input type="number" id="f-cost-gijutsu" value="${s.costs.gijutsu}"></div>
+    <div class="frow"><label>テスター計測検査費</label><input type="number" id="f-cost-tester" value="${s.costs.tester}"></div>
+    <div class="frow"><label>事務手数料</label><input type="number" id="f-cost-jimu" value="${s.costs.jimu}"></div>
+    <div class="frow"><label>代行料</label><input type="number" id="f-cost-daikou" value="${s.costs.daikou}"></div>
+  </div>
+
+  <div class="fsec">
+    <h2>値引・調整</h2>
+    <div class="frow"><label>技術料値引</label><input type="number" id="f-nebiki" value="${s.nebiki}"></div>
+    <div class="frow"><label>③</label><input type="number" id="f-sangaku" value="${s.sangaku}"></div>
+  </div>
+
+  <div class="action-bar">
+    <button class="save" id="btnSaveLedger">💾 台帳に保存</button>
+    <button class="print" id="btnPrint">🖨 印刷・PDF保存</button>
+    <button class="share" id="btnShare">📤 共有</button>
+  </div>
+  `;
+}
+
+function renderItemFormTable(){
+  const tbl = document.getElementById('itemFormTable');
+  let html = `<tr><th style="width:38%">品目</th><th>技術料</th><th>数量</th><th>部品単価</th><th>部品小計</th><th></th></tr>`;
+  state.items.forEach((r,i)=>{
+    const sub = (Number(r.qty)||0)*(Number(r.price)||0);
+    html += `<tr>
+      <td><input type="text" value="${esc(r.name)}" oninput="onItemInput(${i},'name',this.value)"></td>
+      <td><input type="number" class="num" value="${r.tech||''}" oninput="onItemInput(${i},'tech',this.value)"></td>
+      <td><input type="number" class="num" value="${r.qty||''}" oninput="onItemInput(${i},'qty',this.value)"></td>
+      <td><input type="number" class="num" value="${r.price||''}" oninput="onItemInput(${i},'price',this.value)"></td>
+      <td class="sub" id="itemSub${i}">${sub?yen(sub):''}</td>
+      <td><button class="del" onclick="deleteItemRow(${i})">✕</button></td>
+    </tr>`;
+  });
+  tbl.innerHTML = html;
+}
+/* 明細が「種別選択時の定型そのまま」＝未編集かどうか。未編集ならトグル時に安全に入れ替えられる。 */
+let itemsTouched = false;
+
+function onItemInput(i, key, val){
+  itemsTouched = true;
+  if(key==='name') state.items[i].name = val;
+  else state.items[i][key] = Number(val)||0;
+  if(key!=='name'){
+    const sub = (Number(state.items[i].qty)||0)*(Number(state.items[i].price)||0);
+    const el = document.getElementById('itemSub'+i);
+    if(el) el.textContent = sub?yen(sub):'';
+  }
+  renderPreview();
+}
+function addItemRow(){
+  itemsTouched = true;
+  state.items.push({name:'', tech:0, qty:0, price:0});
+  renderItemFormTable();
+  renderPreview();
+}
+function deleteItemRow(i){
+  itemsTouched = true;
+  state.items.splice(i,1);
+  renderItemFormTable();
+  renderPreview();
+}
+
+/* ============================================================
+   顧客カルテ・サジェスト（請求書作成画面の宛名入力）
+   ============================================================ */
+function wireCustSuggest(){
+  const input = document.getElementById('f-cust-name');
+  const box = document.getElementById('custSuggest');
+  if(!input || !box) return;
+  input.addEventListener('input', function(){ showCustSuggest(this.value, box); });
+  input.addEventListener('focus', function(){ showCustSuggest(this.value, box); });
+}
+function showCustSuggest(query, box){
+  const q = String(query||'').trim();
+  if(!q){ box.classList.remove('open'); box.innerHTML=''; return; }
+  const matches = searchCustomers(q).slice(0,6);
+  let html = matches.map(c=>{
+    const vehs = vehicles.filter(v=>v.customerId===c.id);
+    const vehLabel = vehs.length ? vehs.map(v=>v.regNo).filter(Boolean).join('・') : '車両未登録';
+    const primary = c.companyName || c.name || '（氏名未登録）';
+    const personSub = c.companyName && c.name ? `<div class="si-sub">${esc(c.name)}</div>` : '';
+    return `<div class="suggest-item" onclick="pickCustomer('${esc(c.id)}')">
+      <div>${esc(primary)}</div>
+      ${personSub}
+      <div class="si-sub">${esc(c.kana||'')} ${esc(c.tel||'')} ${esc(vehLabel)}</div>
+    </div>`;
+  }).join('');
+  html += `<div class="suggest-item new" onclick="registerNewCustomerInline('${esc(q).replace(/'/g,"&#39;")}')">＋「${esc(q)}」を新規登録</div>`;
+  box.innerHTML = html;
+  box.classList.add('open');
+}
+function applyVehicleToState(v){
+  state.vehicle = { regNo:v.regNo, carName:v.carName, modelType:v.modelType, engine:v.engine, chassisNo:v.chassisNo,
+    shodo:v.shodo, regDate:v.regDate, shikiShitei:v.shikiShitei, ruibetsu:v.ruibetsu, mileage:v.mileage,
+    nextShaken:v.nextShaken, nextTenken:v.nextTenken };
+}
+function pickCustomer(custId){
+  const c = customers.find(x=>x.id===custId);
+  if(!c) return;
+  state.customer = { name:c.name, companyName:c.companyName||'', kana:c.kana||'', postal:c.postal||'', address:c.address||'', code:c.code||'', tel:c.tel||'', email:c.email||'' };
+  const vehs = vehicles.filter(v=>v.customerId===custId);
+  document.getElementById('custSuggest').classList.remove('open');
+  if(vehs.length===1){
+    applyVehicleToState(vehs[0]);
+    renderCreateView();
+    toast((c.name||'お客様')+'を選択しました');
+  } else if(vehs.length>1){
+    renderCreateView();
+    showVehiclePicker(vehs);
+  } else {
+    renderCreateView();
+    toast((c.name||'お客様')+'を選択しました（車両未登録）');
+  }
+}
+function showVehiclePicker(vehs){
+  const box = document.getElementById('custSuggest');
+  if(!box) return;
+  box.innerHTML = '<div class="suggest-item" style="font-weight:700;color:#666;cursor:default;">車両を選択してください</div>' +
+    vehs.map(v=>`<div class="suggest-veh" onclick="pickVehicle('${esc(v.id)}')">${esc(v.regNo)||'(ナンバー未登録)'}　${esc(v.carName)}</div>`).join('');
+  box.classList.add('open');
+}
+function pickVehicle(vehId){
+  const v = vehicles.find(x=>x.id===vehId);
+  if(!v) return;
+  applyVehicleToState(v);
+  renderCreateView();
+  const box = document.getElementById('custSuggest');
+  if(box) box.classList.remove('open');
+  toast('車両を選択しました（'+(v.regNo||'')+'）');
+}
+function registerNewCustomerInline(name){
+  if(!name) return;
+  const c = { id: genId('c', customers), name, companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+  customers.push(c);
+  saveCustomersToStorage();
+  state.customer = { name:c.name, companyName:'', kana:'', postal:'', address:'', code:'', tel:'', email:'' };
+  renderCreateView();
+  toast('「'+name+'」を新規登録しました');
+}
+
+function wireSimpleInput(id, getSetPath){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const handler = function(){
+    setDeep(state, getSetPath, this.value);
+    renderPreview();
+  };
+  el.addEventListener('input', handler);
+  if(el.tagName==='SELECT') el.addEventListener('change', handler); // 一部環境でselectのinputイベントが発火しないため併用
+}
+function setDeep(obj, path, val){
+  const parts = path.split('.');
+  let o = obj;
+  for(let i=0;i<parts.length-1;i++) o = o[parts[i]];
+  o[parts[parts.length-1]] = val;
+}
+
+function wireForm(){
+  wireSimpleInput('f-invNo','invNo');
+  wireSimpleInput('f-issueDate','issueDate');
+  wireSimpleInput('f-kubun','kubun');
+  wireSimpleInput('f-kyoten','kyoten');
+  wireSimpleInput('f-uketsukeDate','uketsukeDate');
+  wireSimpleInput('f-kanryoDate','kanryoDate');
+  wireSimpleInput('f-uketsukeTanto','uketsukeTanto');
+  wireSimpleInput('f-seibiTanto','seibiTanto');
+
+  wireSimpleInput('f-cust-companyName','customer.companyName');
+  wireSimpleInput('f-cust-name','customer.name');
+  wireSimpleInput('f-cust-kana','customer.kana');
+  wireCustSuggest();
+  wireSimpleInput('f-cust-postal','customer.postal');
+  wireSimpleInput('f-cust-code','customer.code');
+  wireSimpleInput('f-cust-address','customer.address');
+  wireSimpleInput('f-cust-tel','customer.tel');
+  wireSimpleInput('f-cust-email','customer.email');
+
+  wireSimpleInput('f-veh-regNo','vehicle.regNo');
+  wireSimpleInput('f-veh-carName','vehicle.carName');
+  wireSimpleInput('f-veh-modelType','vehicle.modelType');
+  wireSimpleInput('f-veh-engine','vehicle.engine');
+  wireSimpleInput('f-veh-chassisNo','vehicle.chassisNo');
+  wireSimpleInput('f-veh-shodo','vehicle.shodo');
+  wireSimpleInput('f-veh-regDate','vehicle.regDate');
+  wireSimpleInput('f-veh-shikiShitei','vehicle.shikiShitei');
+  wireSimpleInput('f-veh-ruibetsu','vehicle.ruibetsu');
+  wireSimpleInput('f-veh-mileage','vehicle.mileage');
+  wireSimpleInput('f-veh-nextShaken','vehicle.nextShaken');
+  wireSimpleInput('f-veh-nextTenken','vehicle.nextTenken');
+
+  wireSimpleInput('f-cost-jibaiseki','costs.jibaiseki');
+  wireSimpleInput('f-cost-jyuryozei','costs.jyuryozei');
+  wireSimpleInput('f-cost-inshi','costs.inshi');
+  wireSimpleInput('f-cost-gijutsu','costs.gijutsu');
+  wireSimpleInput('f-cost-tester','costs.tester');
+  wireSimpleInput('f-cost-jimu','costs.jimu');
+  wireSimpleInput('f-cost-daikou','costs.daikou');
+
+  wireSimpleInput('f-nebiki','nebiki');
+  wireSimpleInput('f-sangaku','sangaku');
+
+  document.getElementById('typeSeg').addEventListener('click', function(e){
+    const btn = e.target.closest('button[data-type]');
+    if(!btn) return;
+    const newType = btn.dataset.type;
+    if(newType === state.type) return;
+    const canReseedFreely = state.items.length===0 || !itemsTouched;
+    if(!canReseedFreely){
+      if(!confirm('種別を切り替えると、明細を「'+newType+'」の定型内容で入れ替えます。\n現在の明細は失われますが、よろしいですか？')){
+        return; // キャンセル：種別もボタン表示も変更しない
+      }
+    }
+    state.type = newType;
+    [...this.children].forEach(b=>b.classList.toggle('active', b===btn));
+    seedItemsForType(state.type);
+    itemsTouched = false;
+    renderItemFormTable();
+    renderPreview();
+  });
+
+  document.getElementById('btnAddItem').addEventListener('click', addItemRow);
+  document.getElementById('btnSaveLedger').addEventListener('click', saveInvoiceToLedger);
+  document.getElementById('btnPrint').addEventListener('click', doPrint);
+  document.getElementById('btnShare').addEventListener('click', shareCreateForm);
+
+  renderItemFormTable();
+}
+
+function renderCreateView(){
+  document.getElementById('formPane').innerHTML = buildFormHTML();
+  wireForm();
+  renderPreview();
+}
+
+function doPrint(){
+  document.getElementById('printArea').innerHTML = '<div>'+document.getElementById('doc').innerHTML+'</div>';
+  const origTitle = document.title;
+  document.title = `御請求書_${state.invNo||'未採番'}`;
+  window.print();
+  setTimeout(()=>{ document.title = origTitle; }, 500);
+}
+
+/* ============================================================
+   請求書PDFの共有（Web Share API・html2canvas + jsPDF）
+   ============================================================ */
+/* 帳票要素（#doc または .doc-box）をA4のPDF Blobに変換する */
+async function generateInvoicePDFBlob(sourceEl){
+  const canvas = await html2canvas(sourceEl, {scale:2, backgroundColor:'#ffffff'});
+  const imgData = canvas.toDataURL('image/jpeg', 0.92); // JPEGで容量を抑え、モバイル回線での共有に配慮
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({unit:'mm', format:'a4', orientation:'portrait'});
+  const pw = pdf.internal.pageSize.getWidth();
+  const ph = pdf.internal.pageSize.getHeight();
+  pdf.addImage(imgData, 'JPEG', 0, 0, pw, ph);
+  return pdf.output('blob');
+}
+/* rec: 請求書データ（state または台帳レコード）／sourceEl: キャンバス化対象のDOM要素／btnEl: 押されたボタン（ローディング表示用、省略可） */
+async function shareInvoicePDF(rec, sourceEl, btnEl){
+  if(!sourceEl){ toast('共有対象の帳票が見つかりませんでした'); return; }
+  const invNo = (rec && rec.invNo) || '未採番';
+  const origLabel = btnEl ? btnEl.textContent : '';
+  if(btnEl){ btnEl.disabled = true; btnEl.textContent = '作成中…'; }
+  toast('PDFを作成しています…');
+  try{
+    const blob = await generateInvoicePDFBlob(sourceEl);
+    const fileName = `御請求書_${invNo}.pdf`;
+    const file = new File([blob], fileName, {type:'application/pdf'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'御請求書', text:'御請求書 '+invNo});
+    } else {
+      toast('この端末では直接共有できません。🖨印刷・PDF保存でPDFを作成してから、共有機能で送信してください');
+    }
+  }catch(e){
+    if(!(e && e.name==='AbortError')){ // 共有シートのキャンセルは何もしない
+      toast('PDFの作成に失敗しました。もう一度お試しください');
+    }
+  }finally{
+    if(btnEl){ btnEl.disabled = false; btnEl.textContent = origLabel; }
+  }
+}
+function shareCreateForm(){
+  shareInvoicePDF(state, document.getElementById('doc'), document.getElementById('btnShare'));
+}
+function shareLedgerRecord(invNo, btnEl){
+  const rec = ledger.find(r=>r.invNo===invNo);
+  if(!rec) return;
+  const wrap = btnEl.closest('.ledger-preview-wrap');
+  const docEl = wrap ? wrap.querySelector('.doc-box') : null;
+  shareInvoicePDF(rec, docEl, btnEl);
+}
+function shareCustLedgerRecord(invNo, btnEl){
+  const rec = ledger.find(r=>r.invNo===invNo);
+  if(!rec) return;
+  const wrap = btnEl.closest('.ledger-preview-wrap');
+  const docEl = wrap ? wrap.querySelector('.doc-box') : null;
+  shareInvoicePDF(rec, docEl, btnEl);
+}
+
+/* ============================================================
+   プレビュー拡大オーバーレイ（読み取り専用。buildDoc出力を流用）
+   ============================================================ */
+let dzScale = 1;
+function computeFitScale(){
+  const avail = window.innerHeight - 48 - 40; // バー48 + 上下パディング40
+  let k = avail / 842;
+  if(k < 1) k = 1;      // 実寸より小さくはしない
+  if(k > 2.5) k = 2.5;
+  return Math.round(k*100)/100;
+}
+function applyDzScale(){
+  const stage = document.getElementById('dzStage');
+  const doc = document.getElementById('dzDoc');
+  const lbl = document.getElementById('dzLevel');
+  doc.style.transform = 'scale('+dzScale+')';
+  stage.style.width = (595*dzScale)+'px';
+  stage.style.height = (842*dzScale)+'px';
+  if(lbl) lbl.textContent = Math.round(dzScale*100)+'%';
+}
+function openDocZoom(s){
+  const overlay = document.getElementById('docZoom');
+  document.getElementById('dzDoc').innerHTML = buildDoc(s);
+  dzScale = computeFitScale();
+  applyDzScale();
+  document.getElementById('dzScroll').scrollTop = 0;
+  overlay.classList.add('open');
+  document.addEventListener('keydown', dzKeyHandler);
+}
+function dzZoom(delta){
+  dzScale = Math.min(3, Math.max(0.6, Math.round((dzScale+delta)*100)/100));
+  applyDzScale();
+}
+function closeDocZoom(){
+  document.getElementById('docZoom').classList.remove('open');
+  document.getElementById('dzDoc').innerHTML = '';
+  document.removeEventListener('keydown', dzKeyHandler);
+}
+function dzKeyHandler(e){ if(e.key==='Escape') closeDocZoom(); }
+/* 台帳インラインプレビューの拡大（発行時スナップショットを渡す） */
+function openLedgerZoom(invNo){
+  const rec = ledger.find(r=>r.invNo===invNo);
+  if(rec) openDocZoom(rec);
+}
+/* 作成ビューのプレビュー拡大導線（preview-paneは再描画されない静的DOMなので起動時に一度だけ結線） */
+document.getElementById('btnZoomDoc').addEventListener('click', ()=>openDocZoom(state));
+document.getElementById('docWrap').addEventListener('click', ()=>openDocZoom(state));
+
+/* ============================================================
+   台帳
+   ============================================================ */
+function saveInvoiceToLedger(){
+  if(!state.invNo){ toast('伝票Noを入力してください'); return; }
+  upsertCustomerAndVehicle(state.customer, state.vehicle);
+  const record = JSON.parse(JSON.stringify(state));
+  record.savedAt = new Date().toISOString();
+  record.totals = computeTotals(state);
+  const idx = ledger.findIndex(r=>r.invNo===record.invNo);
+  if(idx>=0) ledger[idx] = record; else ledger.unshift(record);
+  saveLedgerToStorage();
+  toast('台帳に保存しました（伝票No '+record.invNo+'）');
+}
+function loadInvoiceToForm(invNo){
+  const rec = ledger.find(r=>r.invNo===invNo);
+  if(!rec) return;
+  state = JSON.parse(JSON.stringify(rec));
+  delete state.savedAt; delete state.totals;
+  itemsTouched = true; // 保存済みの実データなので、種別を切替えても無断で消さない
+  switchView('create');
+  renderCreateView();
+  toast('伝票No '+invNo+' を読み込みました');
+}
+function duplicateInvoice(invNo){
+  const rec = ledger.find(r=>r.invNo===invNo);
+  if(!rec) return;
+  state = JSON.parse(JSON.stringify(rec));
+  delete state.savedAt; delete state.totals;
+  itemsTouched = true; // 保存済みの実データなので、種別を切替えても無断で消さない
+  state.invNo = nextInvNo();
+  switchView('create');
+  renderCreateView();
+  toast('複製しました（新しい伝票No '+state.invNo+'）');
+}
+function deleteLedgerRow(invNo){
+  if(!confirm('伝票No '+invNo+' を削除しますか？この操作は取り消せません。')) return;
+  ledger = ledger.filter(r=>r.invNo!==invNo);
+  saveLedgerToStorage();
+  if(expandedLedgerInvNo===invNo) expandedLedgerInvNo = null;
+  renderLedgerView();
+  toast('削除しました');
+}
+/* 台帳の「開く」＝一覧の下にA4プレビューをその場展開（もう一度押すと閉じる）。編集はプレビュー内のボタンから。 */
+let expandedLedgerInvNo = null;
+function toggleLedgerPreview(invNo){
+  expandedLedgerInvNo = (expandedLedgerInvNo === invNo) ? null : invNo;
+  renderLedgerView();
+}
+function printLedgerRecord(invNo){
+  const rec = ledger.find(r=>r.invNo===invNo);
+  if(!rec) return;
+  document.getElementById('printArea').innerHTML = '<div>'+buildDoc(rec)+'</div>';
+  const origTitle = document.title;
+  document.title = `御請求書_${rec.invNo}`;
+  window.print();
+  setTimeout(()=>{ document.title = origTitle; }, 500);
+}
+function renderLedgerView(){
+  const body = document.getElementById('ledgerBody');
+  if(ledger.length===0){
+    body.innerHTML = '<div class="ledger-empty">まだ保存された請求書はありません。「請求書作成」から新規作成してください。</div>';
+    return;
+  }
+  const sorted = [...ledger].sort((a,b)=> (b.invNo||'').localeCompare(a.invNo||''));
+  let rows = '';
+  sorted.forEach(r=>{
+    const total = r.totals ? r.totals.seikyu : computeTotals(r).seikyu;
+    const isOpen = r.invNo === expandedLedgerInvNo;
+    rows += `<tr>
+      <td>${esc(r.invNo)}</td>
+      <td>${toWarekiShort(r.issueDate)||''}</td>
+      <td>${esc(r.customer && r.customer.name)||''}</td>
+      <td>${esc(r.type)}</td>
+      <td class="amt">¥${yen(total)}</td>
+      <td class="ledger-actions">
+        <button class="${isOpen?'active':''}" onclick="toggleLedgerPreview('${esc(r.invNo)}')">${isOpen?'閉じる':'開く'}</button>
+        <button onclick="duplicateInvoice('${esc(r.invNo)}')">複製</button>
+        <button onclick="deleteLedgerRow('${esc(r.invNo)}')">削除</button>
+      </td>
+    </tr>`;
+    if(isOpen){
+      rows += `<tr class="ledger-preview-row">
+        <td colspan="6">
+          <div class="ledger-preview-wrap">
+            <div class="doc-box">${buildDoc(r)}</div>
+            <div class="ledger-preview-actions">
+              <button class="save" onclick="loadInvoiceToForm('${esc(r.invNo)}')">✏️ この内容を編集</button>
+              <button class="zoom" onclick="openLedgerZoom('${esc(r.invNo)}')">🔍 拡大</button>
+              <button class="print" onclick="printLedgerRecord('${esc(r.invNo)}')">🖨 印刷・PDF保存</button>
+              <button class="share" onclick="shareLedgerRecord('${esc(r.invNo)}', this)">📤 共有</button>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }
+  });
+  body.innerHTML = `
+    <table class="ledger-table">
+      <tr><th>伝票No</th><th>発行日</th><th>宛名</th><th>種別</th><th>請求額</th><th>操作</th></tr>
+      ${rows}
+    </table>
+  `;
+}
+
+/* ============================================================
+   顧客カルテ管理ビュー
+   ============================================================ */
+let selectedCustomerId = null;
+let selectedVehicleId = null;     // 顧客カルテ：選択中の車両タブ
+let expandedCustLedgerInvNo = null; // 顧客カルテ内でその場展開中の過去請求書プレビュー
+
+function renderCustomersView(){
+  document.getElementById('custListPane').innerHTML = `
+    <input type="text" class="cust-search" id="custSearchInput" placeholder="氏名・会社名・かな・コード・電話・ナンバー・車台番号等で検索">
+    <div id="custListArea"></div>
+    <button class="add-row-btn" id="btnAddCustomer">＋ 新規顧客を手動登録</button>
+  `;
+  document.getElementById('custSearchInput').addEventListener('input', function(){
+    renderCustomerList(this.value);
+  });
+  document.getElementById('btnAddCustomer').addEventListener('click', function(){
+    const c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+    customers.push(c);
+    saveCustomersToStorage();
+    renderCustomerList('');
+    selectCustomer(c.id);
+    toast('新規顧客を追加しました。詳細を入力してください');
+  });
+  renderCustomerList('');
+  const pane = document.getElementById('custDetailPane');
+  const c = selectedCustomerId ? customers.find(x=>x.id===selectedCustomerId) : null;
+  if(c){ pane.innerHTML = buildCustomerDetailHTML(c); wireCustomerDetail(c); }
+  else{
+    selectedCustomerId = null;
+    pane.innerHTML = '<div style="color:#999; padding:40px; text-align:center;">左の一覧から顧客を選択してください</div>';
+  }
+}
+function renderCustomerList(query){
+  const area = document.getElementById('custListArea');
+  const list = searchCustomers(query);
+  if(list.length===0){
+    area.innerHTML = '<div style="padding:16px; color:#999; font-size:12px;">該当する顧客がいません</div>';
+    return;
+  }
+  area.innerHTML = list.map(c=>{
+    const vehs = vehicles.filter(v=>v.customerId===c.id);
+    const tags = vehs.map(v=>{
+      const soon = isShakenSoon(v.nextShaken);
+      return `<span class="cust-veh-tag${soon?' soon':''}" onclick="event.stopPropagation(); selectCustomerVehicle('${esc(c.id)}','${esc(v.id)}')">${esc(v.regNo)||'(ナンバー未登録)'}</span>`;
+    }).join('');
+    const cnText = c.companyName || c.name || '（氏名未入力）';
+    const personPrefix = c.companyName && c.name ? (esc(c.name)+'　') : '';
+    return `<div class="cust-item${c.id===selectedCustomerId?' selected':''}" onclick="selectCustomer('${esc(c.id)}')">
+      <div class="cn">${esc(cnText)}</div>
+      <div class="ci">${personPrefix}${esc(c.kana||'')} ${esc(c.tel||'')} ${c.code?('コード'+esc(c.code)):''}</div>
+      <div>${tags}</div>
+    </div>`;
+  }).join('');
+}
+/* 検索クエリと一致する車両（登録番号・車台番号・型式指定・類別区分番号）をその顧客の中から探す。複数一致する場合は先頭を採用。 */
+function findMatchingVehicle(customerId, query){
+  const q = String(query||'').trim();
+  if(!q) return null;
+  return vehicles.find(v => v.customerId===customerId && (
+    (v.regNo && v.regNo.includes(q)) ||
+    (v.chassisNo && v.chassisNo.includes(q)) ||
+    (v.shikiShitei && v.shikiShitei.includes(q)) ||
+    (v.ruibetsu && v.ruibetsu.includes(q))
+  )) || null;
+}
+/* selectedCustomerId・selectedVehicleId・expandedCustLedgerInvNoの現在値をもとに一覧＋詳細ペインを再描画する共通処理 */
+function renderCustomerDetailPane(){
+  const searchInput = document.getElementById('custSearchInput');
+  renderCustomerList(searchInput ? searchInput.value : '');
+  const c = customers.find(x=>x.id===selectedCustomerId);
+  const pane = document.getElementById('custDetailPane');
+  if(!c){ pane.innerHTML=''; return; }
+  pane.innerHTML = buildCustomerDetailHTML(c);
+  wireCustomerDetail(c);
+}
+function selectCustomer(id, query){
+  selectedCustomerId = id;
+  const searchInput = document.getElementById('custSearchInput');
+  const q = query!==undefined ? query : (searchInput ? searchInput.value : '');
+  const match = findMatchingVehicle(id, q);
+  selectedVehicleId = match ? match.id : null; // 一致なしの場合はbuildCustomerDetailHTML側で1台目にフォールバック
+  expandedCustLedgerInvNo = null;
+  renderCustomerDetailPane();
+}
+/* 左の顧客一覧に表示される車両タグから、顧客＋該当車両タブを直接開く */
+function selectCustomerVehicle(custId, vehId){
+  selectedCustomerId = custId;
+  selectedVehicleId = vehId;
+  expandedCustLedgerInvNo = null;
+  renderCustomerDetailPane();
+}
+/* 車両タブの表示ラベル：登録番号→車名→「車両N」の順でフォールバック */
+function vehTabLabel(v, idx){
+  return v.regNo || v.carName || ('車両'+(idx+1));
+}
+function buildCustomerDetailHTML(c){
+  const vehs = vehicles.filter(v=>v.customerId===c.id);
+  if(!vehs.some(v=>v.id===selectedVehicleId)){
+    selectedVehicleId = vehs.length ? vehs[0].id : null; // 顧客切替時は原則1台目を初期選択
+  }
+  let html = `
+  <div class="fsec">
+    <h2>顧客情報</h2>
+    <div class="frow"><label>会社名</label><input type="text" id="cd-companyName" placeholder="法人の場合のみ入力" value="${esc(c.companyName||'')}"></div>
+    <div class="frow"><label>氏名</label><input type="text" id="cd-name" value="${esc(c.name)}"></div>
+    <div class="frow"><label>かな</label><input type="text" id="cd-kana" value="${esc(c.kana||'')}"></div>
+    <div class="frow2">
+      <div class="frow"><label>電話</label><input type="text" id="cd-tel" value="${esc(c.tel||'')}"></div>
+      <div class="frow"><label>お客様コード</label><input type="text" id="cd-code" value="${esc(c.code||'')}"></div>
+    </div>
+    <div class="frow"><label>郵便番号</label><input type="text" id="cd-postal" value="${esc(c.postal||'')}"></div>
+    <div class="frow"><label>住所</label><input type="text" id="cd-address" value="${esc(c.address||'')}"></div>
+    <div class="frow"><label>メール</label><input type="text" id="cd-email" placeholder="車検リマインドのメール送信に使用" value="${esc(c.email||'')}"></div>
+    <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" onclick="deleteCustomer('${esc(c.id)}')">🗑 この顧客を削除</button></div>
+  </div>
+  `;
+
+  if(vehs.length===0){
+    html += `
+    <div class="fsec" style="text-align:center; color:#999; padding:24px 16px;">
+      車両未登録<br>
+      <button class="add-row-btn" style="margin-top:12px;" onclick="addVehicleToCustomer('${esc(c.id)}')">＋ 車両を追加</button>
+    </div>`;
+    return html;
+  }
+
+  html += `<div class="veh-tabs" id="vehTabs">`;
+  vehs.forEach((v,i)=>{
+    html += `<button class="${v.id===selectedVehicleId?'active':''}" onclick="selectVehicleTab('${esc(v.id)}')">${esc(vehTabLabel(v,i))}</button>`;
+  });
+  html += `<button class="add-veh-tab" onclick="addVehicleToCustomer('${esc(c.id)}')">＋ 車両を追加</button></div>`;
+
+  const selVeh = vehs.find(v=>v.id===selectedVehicleId);
+  if(selVeh){
+    html += buildVehicleDetailHTML(selVeh);
+    html += buildVehicleLedgerHTML(selVeh);
+  }
+  return html;
+}
+/* 車両タブ切替。選択中の請求書プレビューはリセットして描画し直す。 */
+function selectVehicleTab(vehId){
+  selectedVehicleId = vehId;
+  expandedCustLedgerInvNo = null;
+  renderCustomerDetailPane();
+}
+/* 車両1台分の過去請求書一覧（登録番号で紐付け）。「開く」でその場にA4プレビューを展開する。 */
+function buildVehicleLedgerHTML(v){
+  if(!v.regNo){
+    return `<div class="fsec"><h2>過去の請求書</h2><div style="color:#999; font-size:12px;">登録番号が未登録のため過去データを紐付けできません</div></div>`;
+  }
+  const recs = ledger.filter(r=>r.vehicle && r.vehicle.regNo===v.regNo)
+    .sort((a,b)=>(b.invNo||'').localeCompare(a.invNo||''));
+  let html = `<div class="fsec"><h2>過去の請求書</h2>`;
+  if(recs.length===0){
+    html += `<div style="color:#999; font-size:12px;">この車両の過去請求書はありません</div>`;
+  } else {
+    html += `<table class="ledger-table"><tr><th>伝票No</th><th>発行日</th><th>請求額</th><th>操作</th></tr>`;
+    recs.forEach(r=>{
+      const total = r.totals ? r.totals.seikyu : computeTotals(r).seikyu;
+      const isOpen = r.invNo === expandedCustLedgerInvNo;
+      html += `<tr>
+        <td>${esc(r.invNo)}</td>
+        <td>${toWarekiShort(r.issueDate)||''}</td>
+        <td class="amt">¥${yen(total)}</td>
+        <td class="ledger-actions"><button class="${isOpen?'active':''}" onclick="toggleCustLedgerPreview('${esc(r.invNo)}')">${isOpen?'閉じる':'開く'}</button></td>
+      </tr>`;
+      if(isOpen){
+        html += `<tr class="ledger-preview-row"><td colspan="4">
+          <div class="ledger-preview-wrap">
+            <div class="doc-box">${buildDoc(r)}</div>
+            <div class="ledger-preview-actions">
+              <button class="save" onclick="loadInvoiceToForm('${esc(r.invNo)}')">✏️ この内容を編集</button>
+              <button class="zoom" onclick="openLedgerZoom('${esc(r.invNo)}')">🔍 拡大</button>
+              <button class="print" onclick="printLedgerRecord('${esc(r.invNo)}')">🖨 印刷・PDF保存</button>
+              <button class="share" onclick="shareCustLedgerRecord('${esc(r.invNo)}', this)">📤 共有</button>
+            </div>
+          </div>
+        </td></tr>`;
+      }
+    });
+    html += `</table>`;
+  }
+  html += `</div>`;
+  return html;
+}
+function toggleCustLedgerPreview(invNo){
+  expandedCustLedgerInvNo = (expandedCustLedgerInvNo === invNo) ? null : invNo;
+  renderCustomerDetailPane();
+}
+function buildVehicleDetailHTML(v){
+  return `
+  <div class="fsec">
+    <h2>車両：${esc(v.regNo)||'(ナンバー未登録)'}</h2>
+    <div class="frow2">
+      <div class="frow"><label>登録番号</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="regNo" value="${esc(v.regNo)}"></div>
+      <div class="frow"><label>車名</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="carName" value="${esc(v.carName)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>型式</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="modelType" value="${esc(v.modelType)}"></div>
+      <div class="frow"><label>原動機</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="engine" value="${esc(v.engine)}"></div>
+    </div>
+    <div class="frow"><label>車台番号</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="chassisNo" value="${esc(v.chassisNo)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>初度</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="shodo" value="${esc(v.shodo)}"></div>
+      <div class="frow"><label>登録年月日</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="regDate" value="${esc(v.regDate)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>型式指定</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="shikiShitei" value="${esc(v.shikiShitei)}"></div>
+      <div class="frow"><label>類別区分番号</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="ruibetsu" value="${esc(v.ruibetsu)}"></div>
+    </div>
+    <div class="frow"><label>走行距離</label><input type="text" class="vfield" data-veh="${esc(v.id)}" data-key="mileage" value="${esc(v.mileage)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>次回車検日</label><input type="date" class="vfield" data-veh="${esc(v.id)}" data-key="nextShaken" value="${esc(v.nextShaken)}"></div>
+      <div class="frow"><label>次回点検日</label><input type="date" class="vfield" data-veh="${esc(v.id)}" data-key="nextTenken" value="${esc(v.nextTenken)}"></div>
+    </div>
+    <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" onclick="deleteVehicle('${esc(v.id)}')">🗑 この車両を削除</button></div>
+  </div>
+  `;
+}
+function wireCustomerDetail(c){
+  ['companyName','name','kana','tel','code','postal','address','email'].forEach(key=>{
+    const el = document.getElementById('cd-'+key);
+    if(!el) return;
+    el.addEventListener('input', function(){
+      c[key] = this.value;
+      saveCustomersToStorage();
+      const searchInput = document.getElementById('custSearchInput');
+      renderCustomerList(searchInput ? searchInput.value : '');
+    });
+  });
+  document.querySelectorAll('.vfield').forEach(el=>{
+    el.addEventListener('input', function(){
+      const v = vehicles.find(x=>x.id===this.dataset.veh);
+      if(!v) return;
+      v[this.dataset.key] = this.value;
+      saveVehiclesToStorage();
+      if(this.dataset.key==='regNo' || this.dataset.key==='nextShaken'){
+        const searchInput = document.getElementById('custSearchInput');
+        renderCustomerList(searchInput ? searchInput.value : '');
+      }
+    });
+    /* タブラベル・過去請求書一覧はregNo/carNameに依存するため、入力中の再描画（フォーカス喪失）を避けてblur時のみ更新する */
+    el.addEventListener('change', function(){
+      if(this.dataset.key==='regNo' || this.dataset.key==='carName'){
+        const pane = document.getElementById('custDetailPane');
+        pane.innerHTML = buildCustomerDetailHTML(c);
+        wireCustomerDetail(c);
+      }
+    });
+  });
+}
+function deleteCustomer(id){
+  const vehs = vehicles.filter(v=>v.customerId===id);
+  const msg = vehs.length
+    ? `この顧客を削除しますか？紐づく車両${vehs.length}件も削除されます。`
+    : 'この顧客を削除しますか？';
+  if(!confirm(msg)) return;
+  customers = customers.filter(c=>c.id!==id);
+  vehicles = vehicles.filter(v=>v.customerId!==id);
+  saveCustomersToStorage();
+  saveVehiclesToStorage();
+  selectedCustomerId = null;
+  selectedVehicleId = null;
+  expandedCustLedgerInvNo = null;
+  renderCustomersView();
+  toast('削除しました');
+}
+function addVehicleToCustomer(customerId){
+  const v = { id: genId('v', vehicles), customerId, regNo:'', carName:'', modelType:'', engine:'', chassisNo:'',
+    shodo:'', regDate:'', shikiShitei:'', ruibetsu:'', mileage:'', nextShaken:'', nextTenken:'' };
+  vehicles.push(v);
+  saveVehiclesToStorage();
+  selectedCustomerId = customerId;
+  selectedVehicleId = v.id; // 追加した車両のタブを自動選択
+  expandedCustLedgerInvNo = null;
+  renderCustomerDetailPane();
+  toast('車両を追加しました');
+}
+function deleteVehicle(id){
+  if(!confirm('この車両を削除しますか？')) return;
+  const v = vehicles.find(x=>x.id===id);
+  vehicles = vehicles.filter(x=>x.id!==id);
+  saveVehiclesToStorage();
+  if(selectedVehicleId===id) selectedVehicleId = null; // buildCustomerDetailHTML側で1台目にフォールバック
+  if(v){
+    selectedCustomerId = v.customerId;
+    expandedCustLedgerInvNo = null;
+    renderCustomerDetailPane();
+  }
+  toast('車両を削除しました');
+}
+
+/* ============================================================
+   車検リマインドビュー
+   ============================================================ */
+let reminderPeriodMode = '3m';
+let reminderPeriodDays = 90;
+function buildReminderRowsHTML(targets){
+  if(targets.length===0){
+    return '<tr><td colspan="5" class="reminder-empty">対象期間に車検予定のお客様はいません</td></tr>';
+  }
+  return targets.map(({v,c,diffDays})=>{
+    const overdue = diffDays<0;
+    const daysLabel = overdue ? `${Math.abs(diffDays)}日超過` : `あと${diffDays}日`;
+    const daysClass = overdue ? 'overdue' : (diffDays<=14 ? 'soon' : '');
+    const tel = c && c.tel;
+    const email = c && c.email;
+    return `<tr class="${overdue?'overdue':''}">
+      <td>${esc(c && c.name)||'（氏名未登録）'}</td>
+      <td>${esc(v.carName)||''}　${esc(v.regNo)||''}</td>
+      <td>${toWarekiShort(v.nextShaken)||''}</td>
+      <td class="rem-days ${daysClass}">${daysLabel}</td>
+      <td class="reminder-actions">
+        <button ${tel?'':'disabled'} onclick="sendReminderSMS('${esc(v.id)}')">SMS</button>
+        <button ${email?'':'disabled'} onclick="sendReminderMail('${esc(v.id)}')">メール</button>
+        <button onclick="sendReminderLine('${esc(v.id)}')">LINE</button>
+        <button onclick="copyReminderMsg('${esc(v.id)}')">コピー</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function renderReminderRowsOnly(){
+  const rowsEl = document.getElementById('reminderRows');
+  if(!rowsEl) return;
+  rowsEl.innerHTML = buildReminderRowsHTML(getReminderTargets(reminderPeriodDays));
+}
+function renderReminderView(){
+  const body = document.getElementById('reminderBody');
+  const rowsHTML = buildReminderRowsHTML(getReminderTargets(reminderPeriodDays));
+  body.innerHTML = `
+    <div class="reminder-controls">
+      <div class="seg" id="reminderSeg">
+        <button data-mode="2m" class="${reminderPeriodMode==='2m'?'active':''}">2ヶ月</button>
+        <button data-mode="3m" class="${reminderPeriodMode==='3m'?'active':''}">3ヶ月</button>
+        <button data-mode="6m" class="${reminderPeriodMode==='6m'?'active':''}">半年</button>
+        <button data-mode="custom" class="${reminderPeriodMode==='custom'?'active':''}">任意</button>
+      </div>
+      <div class="reminder-custom" id="reminderCustomWrap" style="${reminderPeriodMode==='custom'?'':'display:none;'}">
+        <input type="number" id="reminderCustomDays" min="1" value="${reminderPeriodDays}"> 日以内
+      </div>
+    </div>
+    <table class="reminder-table">
+      <tr><th>顧客名</th><th>車両</th><th>次回車検日</th><th>残日数</th><th>送信</th></tr>
+      <tbody id="reminderRows">${rowsHTML}</tbody>
+    </table>
+  `;
+  document.getElementById('reminderSeg').addEventListener('click', function(e){
+    const btn = e.target.closest('button[data-mode]');
+    if(!btn) return;
+    reminderPeriodMode = btn.dataset.mode;
+    if(reminderPeriodMode==='2m') reminderPeriodDays = 60;
+    else if(reminderPeriodMode==='3m') reminderPeriodDays = 90;
+    else if(reminderPeriodMode==='6m') reminderPeriodDays = 180;
+    renderReminderView();
+  });
+  const customInput = document.getElementById('reminderCustomDays');
+  if(customInput){
+    customInput.addEventListener('input', function(){
+      reminderPeriodDays = Number(this.value)||1;
+      renderReminderRowsOnly();
+    });
+  }
+}
+
+/* ============================================================
+   設定
+   ============================================================ */
+function buildSettingsHTML(){
+  return `
+  <div class="fsec">
+    <h2>発行元情報（ケンズオート）</h2>
+    <div class="frow"><label>事業者名</label><input type="text" id="s-name" value="${esc(shop.name)}"></div>
+    <div class="frow"><label>指定工場表記</label><input type="text" id="s-kikan" placeholder="例：九州運輸局指定整備工場" value="${esc(shop.kikan)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>郵便番号</label><input type="text" id="s-postal" value="${esc(shop.postal)}"></div>
+      <div class="frow"><label>代表者</label><input type="text" id="s-rep" value="${esc(shop.rep)}"></div>
+    </div>
+    <div class="frow"><label>住所</label><input type="text" id="s-address" value="${esc(shop.address)}"></div>
+    <div class="frow2">
+      <div class="frow"><label>TEL</label><input type="text" id="s-tel" value="${esc(shop.tel)}"></div>
+      <div class="frow"><label>FAX</label><input type="text" id="s-fax" value="${esc(shop.fax)}"></div>
+    </div>
+    <div class="frow"><label>登録番号</label><input type="text" id="s-invoiceNo" placeholder="T＋13桁" value="${esc(shop.invoiceNo)}"></div>
+  </div>
+
+  <div class="fsec">
+    <h2>振込先</h2>
+    <div class="frow2">
+      <div class="frow"><label>銀行</label><input type="text" id="s-bankName" value="${esc(shop.bankName)}"></div>
+      <div class="frow"><label>支店</label><input type="text" id="s-branch" value="${esc(shop.branch)}"></div>
+    </div>
+    <div class="frow2">
+      <div class="frow"><label>種別</label><input type="text" id="s-accType" placeholder="普通／当座" value="${esc(shop.accType)}"></div>
+      <div class="frow"><label>口座番号</label><input type="text" id="s-accNo" value="${esc(shop.accNo)}"></div>
+    </div>
+    <div class="frow"><label>口座名義</label><input type="text" id="s-holder" value="${esc(shop.holder)}"></div>
+  </div>
+
+  <div class="fsec">
+    <h2>伝票番号</h2>
+    <div class="frow"><label>開始番号</label><input type="number" id="s-startNo" value="${shop.startNo}"></div>
+  </div>
+
+  <div class="fsec">
+    <h2>車検リマインド定型文</h2>
+    <div style="font-size:11px; color:#888; margin-bottom:6px;">差し込みタグ：{顧客名}　{車両}　{ナンバー}　{次回車検日}</div>
+    <textarea id="s-template" rows="5" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px; font-family:inherit; resize:vertical;">${esc(templates.shakenReminder)}</textarea>
+  </div>
+
+  <div class="fsec">
+    <h2>バックアップ</h2>
+    <div class="action-bar">
+      <button class="save" id="btnBackup">⬇ バックアップ書き出し</button>
+      <button class="print" id="btnRestore">⬆ 復元（読み込み）</button>
+    </div>
+    <input type="file" id="restoreFile" accept="application/json" style="display:none;">
+  </div>
+  `;
+}
+function wireSettings(){
+  const bind = (id, key) => {
+    document.getElementById(id).addEventListener('input', function(){
+      shop[key] = this.value;
+      saveShop();
+    });
+  };
+  bind('s-name','name'); bind('s-kikan','kikan'); bind('s-postal','postal'); bind('s-rep','rep');
+  bind('s-address','address'); bind('s-tel','tel'); bind('s-fax','fax'); bind('s-invoiceNo','invoiceNo');
+  bind('s-bankName','bankName'); bind('s-branch','branch'); bind('s-accType','accType');
+  bind('s-accNo','accNo'); bind('s-holder','holder');
+  document.getElementById('s-startNo').addEventListener('input', function(){
+    shop.startNo = Number(this.value)||1;
+    saveShop();
+  });
+  document.getElementById('s-template').addEventListener('input', function(){
+    templates.shakenReminder = this.value;
+    saveTemplatesToStorage();
+  });
+  document.getElementById('btnBackup').addEventListener('click', backupJSON);
+  document.getElementById('btnRestore').addEventListener('click', ()=>document.getElementById('restoreFile').click());
+  document.getElementById('restoreFile').addEventListener('change', restoreJSON);
+}
+function renderSettingsView(){
+  document.getElementById('settingsBody').innerHTML = buildSettingsHTML();
+  wireSettings();
+}
+function backupJSON(){
+  const data = { shop, ledger, customers, vehicles, templates, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ケンズオート_バックアップ_${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  storeSet('ken_lastbackup', new Date().toISOString());
+  toast('バックアップを書き出しました');
+}
+function restoreJSON(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const data = JSON.parse(reader.result);
+      if(data.shop) shop = Object.assign(defaultShop(), data.shop);
+      if(data.ledger) ledger = data.ledger;
+      if(data.customers) customers = data.customers;
+      if(data.vehicles) vehicles = data.vehicles;
+      if(data.templates) templates = Object.assign(defaultTemplates(), data.templates);
+      saveShop();
+      saveLedgerToStorage();
+      saveCustomersToStorage();
+      saveVehiclesToStorage();
+      saveTemplatesToStorage();
+      renderSettingsView();
+      renderLedgerView();
+      toast('復元しました');
+    }catch(err){
+      toast('復元に失敗しました：ファイル形式を確認してください');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   ビュー切替
+   ============================================================ */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('#mainTabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  if(name==='ledger') renderLedgerView();
+  if(name==='customers') renderCustomersView();
+  if(name==='reminder') renderReminderView();
+  if(name==='settings') renderSettingsView();
+}
+document.getElementById('mainTabs').addEventListener('click', function(e){
+  const btn = e.target.closest('button[data-view]');
+  if(!btn) return;
+  switchView(btn.dataset.view);
+});
+document.getElementById('btnNew').addEventListener('click', function(){
+  state = defaultState();
+  state.invNo = nextInvNo();
+  seedItemsForType(state.type);
+  itemsTouched = false;
+  switchView('create');
+  renderCreateView();
+  toast('新規作成しました（伝票No '+state.invNo+'）');
+});
+
+/* ============================================================
+   起動
+   ============================================================ */
+state.invNo = nextInvNo();
+seedItemsForType(state.type);
+itemsTouched = false;
+renderCreateView();
+</script>
+</body>
+</html>
