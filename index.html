@@ -46,9 +46,9 @@
   .frow{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
   .frow label{width:104px; flex-shrink:0; font-size:12px; color:#555;}
   .frow input[type=text], .frow input[type=date], .frow input[type=number], .frow select{
-    flex:1; padding:7px 9px; border:1px solid #ccc; border-radius:4px; font-size:14px; width:100%; min-height:36px;}
+    flex:1; padding:7px 9px; border:1px solid #ccc; border-radius:4px; font-size:14px; width:100%; min-height:36px; min-width:0;}
   .frow2{display:flex; gap:8px;}
-  .frow2 .frow{flex:1;}
+  .frow2 .frow{flex:1; min-width:0;}
   /* 375〜430px幅のモバイル縦画面では2カラムが窮屈になるため1カラムに積む（CLAUDE.md 4章） */
   @media (max-width:480px){
     .frow2{flex-direction:column; gap:0;}
@@ -244,6 +244,14 @@
     @page{size:A4; margin:0;}
   }
   #printArea{display:none;}
+
+  /* 数値入力欄のスピナー（上下ボタン）はデフォルトで非表示にする。数量欄（.qty-num）のみ下で復活させる */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  input[type=number]{ -moz-appearance:textfield; }
+  input[type=number].qty-num{ -moz-appearance:number-input; }
+  input[type=number].qty-num::-webkit-outer-spin-button,
+  input[type=number].qty-num::-webkit-inner-spin-button{ -webkit-appearance:auto; }
 </style>
 </head>
 <body>
@@ -400,7 +408,14 @@ let ledger = loadLedger();
 function loadLedger(){
   try{
     const raw = storeGet('ken_ledger');
-    return raw ? JSON.parse(raw) : [];
+    const list = raw ? JSON.parse(raw) : [];
+    /* 旧仕様（sangakuが数値のみ）のレコードを{label:'', amount:元の数値}形式に移行する。金額は必ず引き継ぐ */
+    list.forEach(r=>{
+      if(!r.sangaku || typeof r.sangaku!=='object'){
+        r.sangaku = { label:'', amount: Number(r.sangaku)||0 };
+      }
+    });
+    return list;
   }catch(e){ return []; }
 }
 function saveLedgerToStorage(){ storeSet('ken_ledger', JSON.stringify(ledger)); }
@@ -502,11 +517,11 @@ function upsertCustomerAndVehicle(cust, veh){
   if(cust.code) c = customers.find(x=>x.code && x.code===cust.code);
   if(!c && cust.name) c = customers.find(x=>x.name===cust.name && (x.tel||'')===(cust.tel||''));
   if(!c){
-    c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+    c = { id: genId('c', customers), name:'', companyName:'', companyKana:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
     customers.push(c);
     isNewCustomer = true;
   }
-  ['name','companyName','kana','tel','postal','address','code','email'].forEach(k=>{ if(cust[k]) c[k]=cust[k]; });
+  ['name','companyName','companyKana','kana','tel','postal','address','code','email'].forEach(k=>{ if(cust[k]) c[k]=cust[k]; });
   if(isNewCustomer && !c.code) c.code = nextCustomerCode();
 
   if(veh && veh.regNo){
@@ -627,7 +642,7 @@ function defaultState(){
     kubun: '',
     kyoten: shop.name || 'ケンズオート',
     uketsukeDate: '', kanryoDate: '', uketsukeTanto: '', seibiTanto: '',
-    customer: { name:'', companyName:'', kana:'', postal:'', address:'', code:'', tel:'', email:'' },
+    customer: { name:'', companyName:'', companyKana:'', kana:'', postal:'', address:'', code:'', tel:'', email:'' },
     vehicle: { regNo:'', carName:'', modelType:'', engine:'', chassisNo:'',
       shodo:'', regDate:'', shikiShitei:'', ruibetsu:'', mileage:'',
       nextShaken:'', nextTenken:'' },
@@ -639,7 +654,7 @@ function defaultState(){
       extra3: { label:'', amount:0, taxable:false },
     },
     nebiki: 0,
-    sangaku: 0,
+    sangaku: { label:'', amount:0 },
   };
 }
 const CHECKUP_ROWS_PLAIN = [
@@ -686,7 +701,9 @@ function computeTotals(s){
   const shohizei = Math.round(taxBase*0.1);
   const goukei2 = gijutsuryou+nebiki+buhindai+shohizei;
   const shohi1 = (Number(c.jibaiseki)||0)+(Number(c.jyuryozei)||0)+(Number(c.inshi)||0)+(Number(c.gijutsu)||0)+(Number(c.tester)||0)+(Number(c.jimu)||0)+(Number(c.daikou)||0)+extraAll;
-  const sangaku = Number(s.sangaku)||0;
+  /* sangakuは旧仕様（数値のみ）と新仕様（{label,amount}）の両方があり得るため両対応する */
+  const sangakuRaw = s.sangaku;
+  const sangaku = Number(sangakuRaw && typeof sangakuRaw==='object' ? sangakuRaw.amount : sangakuRaw) || 0;
   const uriage = shohi1+goukei2-sangaku;
   const seikyu = uriage;
   const kazei10 = taxBase;
@@ -826,7 +843,7 @@ function buildDoc(s){
         <tr><td class="lbl">部品代</td><td class="val">${yen(t.buhindai)}</td></tr>
         <tr><td class="lbl">消費税</td><td class="val">${yen(t.shohizei)}</td></tr>
         <tr><td class="lbl">②　上記合計</td><td class="val">${yen(t.goukei2)}</td></tr>
-        <tr><td class="lbl">③</td><td class="val">${yen(t.sangaku)}</td></tr>
+        <tr><td class="lbl">③${s.sangaku && s.sangaku.label ? '　'+esc(s.sangaku.label) : ''}</td><td class="val">${t.sangaku?yen(t.sangaku):''}</td></tr>
       </table>
       <div class="req-box">
         <div class="rl">請求額</div>
@@ -912,6 +929,7 @@ function buildFormHTML(){
         <div id="custCompanySuggest" class="suggest-box"></div>
       </div>
     </div>
+    <div class="frow"><label>会社名かな</label><input type="text" id="f-cust-companyKana" placeholder="検索・並び替え用（任意）" value="${esc(s.customer.companyKana||'')}"></div>
     <div class="frow">
       <label>宛名（担当者名）</label>
       <div style="flex:1; position:relative;">
@@ -979,7 +997,13 @@ function buildFormHTML(){
   <div class="fsec">
     <h2>値引・調整</h2>
     <div class="frow"><label>技術料値引</label><input type="number" id="f-nebiki" placeholder="マイナスは付けずに数字のみ" value="${s.nebiki?Math.abs(s.nebiki):''}"></div>
-    <div class="frow"><label>③</label><input type="number" id="f-sangaku" value="${s.sangaku}"></div>
+    <div class="frow" style="align-items:center;">
+      <label>③（自由項目）</label>
+      <div style="flex:1; display:flex; gap:6px; align-items:center;">
+        <input type="text" id="f-sangaku-label" placeholder="項目名（例：預り金、下取り車代金など）" value="${esc(s.sangaku.label||'')}" style="flex:1;">
+        <input type="number" id="f-sangaku-amount" placeholder="金額" value="${s.sangaku.amount||''}" style="width:90px;">
+      </div>
+    </div>
   </div>
 
   <div class="action-bar">
@@ -999,7 +1023,7 @@ function renderItemFormTable(){
     html += `<tr>
       <td><input type="text" value="${esc(r.name)}" oninput="onItemInput(${i},'name',this.value)"></td>
       <td><input type="number" class="num" value="${r.tech||''}" oninput="onItemInput(${i},'tech',this.value)"></td>
-      <td><input type="number" class="num" value="${r.qty||''}" oninput="onItemInput(${i},'qty',this.value)"></td>
+      <td><input type="number" class="num qty-num" value="${r.qty||''}" oninput="onItemInput(${i},'qty',this.value)"></td>
       <td><input type="number" class="num" value="${r.price||''}" oninput="onItemInput(${i},'price',this.value)"></td>
       <td class="sub" id="itemSub${i}">${sub?yen(sub):''}</td>
       <td><button class="del" onclick="deleteItemRow(${i})">✕</button></td>
@@ -1077,7 +1101,7 @@ function applyVehicleToState(v){
 function pickCustomer(custId){
   const c = customers.find(x=>x.id===custId);
   if(!c) return;
-  state.customer = { name:c.name, companyName:c.companyName||'', kana:c.kana||'', postal:c.postal||'', address:c.address||'', code:c.code||'', tel:c.tel||'', email:c.email||'' };
+  state.customer = { name:c.name, companyName:c.companyName||'', companyKana:c.companyKana||'', kana:c.kana||'', postal:c.postal||'', address:c.address||'', code:c.code||'', tel:c.tel||'', email:c.email||'' };
   const vehs = vehicles.filter(v=>v.customerId===custId);
   document.getElementById('custSuggest').classList.remove('open');
   if(vehs.length===1){
@@ -1111,10 +1135,10 @@ function pickVehicle(vehId){
 function registerNewCustomerInline(name){
   if(!name) return;
   const code = nextCustomerCode();
-  const c = { id: genId('c', customers), name, companyName:'', kana:'', tel:'', postal:'', address:'', code, email:'' };
+  const c = { id: genId('c', customers), name, companyName:'', companyKana:'', kana:'', tel:'', postal:'', address:'', code, email:'' };
   customers.push(c);
   saveCustomersToStorage();
-  state.customer = { name:c.name, companyName:'', kana:'', postal:'', address:'', code, tel:'', email:'' };
+  state.customer = { name:c.name, companyName:'', companyKana:'', kana:'', postal:'', address:'', code, tel:'', email:'' };
   renderCreateView();
   toast('「'+name+'」を新規登録しました');
 }
@@ -1181,6 +1205,14 @@ function wireStaffSuggest(inputId, boxId, listGetter, statePath){
     renderPreview();
   });
 }
+/* 値引・調整③欄（自由項目：項目名・金額）の結線 */
+function wireSangakuRow(){
+  const labelEl = document.getElementById('f-sangaku-label');
+  const amountEl = document.getElementById('f-sangaku-amount');
+  if(!labelEl || !amountEl) return;
+  labelEl.addEventListener('input', function(){ state.sangaku.label = this.value; renderPreview(); });
+  amountEl.addEventListener('input', function(){ state.sangaku.amount = Number(this.value)||0; renderPreview(); });
+}
 /* 諸費用の無地行（項目名・金額・課税区分）の結線 */
 function wireExtraCostRow(key){
   const labelEl = document.getElementById(`f-cost-${key}-label`);
@@ -1205,6 +1237,7 @@ function wireForm(){
   wireStaffSuggest('f-seibiTanto','seibiTantoSuggest', ()=>shop.seibiStaffList||[], 'seibiTanto');
 
   wireSimpleInput('f-cust-companyName','customer.companyName');
+  wireKanaInput('f-cust-companyKana','customer.companyKana');
   wireSimpleInput('f-cust-name','customer.name');
   wireKanaInput('f-cust-kana','customer.kana');
   wireCustSuggest();
@@ -1245,7 +1278,7 @@ function wireForm(){
     state.nebiki = this.value ? -Math.abs(Number(this.value)||0) : 0;
     renderPreview();
   });
-  wireSimpleInput('f-sangaku','sangaku');
+  wireSangakuRow();
 
   document.getElementById('typeSeg').addEventListener('click', function(e){
     const btn = e.target.closest('button[data-type]');
@@ -1526,7 +1559,7 @@ function renderCustomersView(){
     input.focus();
   });
   document.getElementById('btnAddCustomer').addEventListener('click', function(){
-    const c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:nextCustomerCode(), email:'' };
+    const c = { id: genId('c', customers), name:'', companyName:'', companyKana:'', kana:'', tel:'', postal:'', address:'', code:nextCustomerCode(), email:'' };
     customers.push(c);
     saveCustomersToStorage();
     renderCustomerList('');
@@ -1542,9 +1575,22 @@ function renderCustomersView(){
     pane.innerHTML = '<div style="color:#999; padding:40px; text-align:center;">左の一覧から顧客を選択してください</div>';
   }
 }
+/* 顧客一覧の表示順：「会社」グループ→「個人」グループの順、各グループ内は50音順（かな未入力時は名称をフォールバック） */
+function sortCustomersForDisplay(list){
+  const companies = list.filter(c=>c.companyName);
+  const individuals = list.filter(c=>!c.companyName);
+  const byKana = getKanaFns => (a,b)=>{
+    const ka = toHiragana(getKanaFns(a));
+    const kb = toHiragana(getKanaFns(b));
+    return ka.localeCompare(kb, 'ja');
+  };
+  companies.sort(byKana(c=>c.companyKana || c.companyName || ''));
+  individuals.sort(byKana(c=>c.kana || c.name || ''));
+  return [...companies, ...individuals];
+}
 function renderCustomerList(query){
   const area = document.getElementById('custListArea');
-  const list = searchCustomers(query);
+  const list = sortCustomersForDisplay(searchCustomers(query));
   if(list.length===0){
     area.innerHTML = '<div style="padding:16px; color:#999; font-size:12px;">該当する顧客がいません</div>';
     return;
@@ -1613,6 +1659,7 @@ function buildCustomerDetailHTML(c){
   <div class="fsec">
     <h2>顧客情報</h2>
     <div class="frow"><label>会社名（個人名）</label><input type="text" id="cd-companyName" placeholder="法人の場合の会社名、個人の場合は個人名" value="${esc(c.companyName||'')}"></div>
+    <div class="frow"><label>会社名かな</label><input type="text" id="cd-companyKana" placeholder="検索・並び替え用（任意）" value="${esc(c.companyKana||'')}"></div>
     <div class="frow"><label>宛名（担当者名）</label><input type="text" id="cd-name" value="${esc(c.name)}"></div>
     <div class="frow"><label>かな</label><input type="text" id="cd-kana" value="${esc(c.kana||'')}"></div>
     <div class="frow2">
@@ -1739,6 +1786,15 @@ function wireCustomerDetail(c){
       const searchInput = document.getElementById('custSearchInput');
       renderCustomerList(searchInput ? searchInput.value : '');
     });
+  });
+  const companyKanaEl = document.getElementById('cd-companyKana');
+  if(companyKanaEl) companyKanaEl.addEventListener('input', function(){
+    const kana = toKatakana(this.value);
+    this.value = kana;
+    c.companyKana = kana;
+    saveCustomersToStorage();
+    const searchInput = document.getElementById('custSearchInput');
+    renderCustomerList(searchInput ? searchInput.value : '');
   });
   const kanaEl = document.getElementById('cd-kana');
   if(kanaEl) kanaEl.addEventListener('input', function(){
