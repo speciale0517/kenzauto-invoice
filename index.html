@@ -44,11 +44,15 @@
   .fsec{background:#fff; border-radius:8px; padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.08);}
   .fsec h2{font-size:13px; font-weight:700; margin:0 0 10px; color:#1c2430; border-left:4px solid #b8942c; padding-left:8px;}
   .frow{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
-  .frow label{width:96px; flex-shrink:0; font-size:12px; color:#555;}
+  .frow label{width:104px; flex-shrink:0; font-size:12px; color:#555;}
   .frow input[type=text], .frow input[type=date], .frow input[type=number], .frow select{
     flex:1; padding:7px 9px; border:1px solid #ccc; border-radius:4px; font-size:14px; width:100%; min-height:36px;}
   .frow2{display:flex; gap:8px;}
   .frow2 .frow{flex:1;}
+  /* 375〜430px幅のモバイル縦画面では2カラムが窮屈になるため1カラムに積む（CLAUDE.md 4章） */
+  @media (max-width:480px){
+    .frow2{flex-direction:column; gap:0;}
+  }
   .seg{display:flex; border:1px solid #999; border-radius:5px; overflow:hidden;}
   .seg button{flex:1; padding:8px; border:none; background:#f4f4f0; font-size:13px; font-weight:600; color:#555;}
   .seg button.active{background:#1c2430; color:#fff;}
@@ -64,15 +68,17 @@
   .add-row-btn{margin-top:8px; padding:7px 14px; border:1px dashed #999; border-radius:5px; background:#fafaf7; font-size:12px; color:#555; width:100%;}
   .items-warning{font-size:11px; color:#a33; margin-top:6px;}
 
-  .action-bar{display:flex; gap:8px; margin-top:4px;}
-  .action-bar button{flex:1; padding:12px; border:none; border-radius:6px; font-size:14px; font-weight:700;}
+  .action-bar{display:flex; gap:8px; margin-top:4px; flex-wrap:wrap;}
+  .action-bar button{flex:1 1 45%; min-width:120px; padding:12px; border:none; border-radius:6px; font-size:13px; font-weight:700;}
   .action-bar .save{background:#2A5D8F; color:#fff;}
+  .action-bar .clear{background:#f0e0e0; color:#a33;}
   .action-bar .print{background:linear-gradient(135deg,#e7c578,#b8942c); color:#1c2430;}
   .action-bar .share{background:#3a4658; color:#fff;}
   .action-bar button:disabled{opacity:.6; cursor:not-allowed;}
 
   /* ── 台帳ビュー ── */
   #view-ledger{padding:20px;}
+  .ledger-scroll{overflow-x:auto;}
   .ledger-table{width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.08);}
   .ledger-table th{background:#1c2430; color:#fff; padding:9px 10px; font-size:12px; text-align:left;}
   .ledger-table td{padding:9px 10px; font-size:13px; border-bottom:1px solid #eee;}
@@ -160,8 +166,9 @@
   .hd-title .t1{font-size:17.5px; font-weight:700; letter-spacing:.5em; padding-left:.5em;}
   .hd-right table{width:170px; font-size:8.7px;}
   .hd-right td{border:1px solid #111; padding:1px 4px;}
-  .hd-right td.lbl{background:#f2f2ee; width:52px; color:#333;}
+  .hd-right td.lbl{background:#f2f2ee; width:58px; color:#333; white-space:nowrap;}
   .hd-right td.val-kubun{font-size:7.4px;}
+  .veh-table td.faded{color:#999;}
   .parties{display:flex; justify-content:space-between; margin:3px 0 5px; gap:14px;}
   .p-col{width:48%; font-size:8.7px; line-height:1.4;}
   .p-col .name{font-size:11.5px; font-weight:700; border-bottom:1.4px solid #111; padding-bottom:2px; margin:1px 0 2px; display:inline-block;}
@@ -187,7 +194,7 @@
   .foot-r{width:42%; font-size:8.7px;}
   .cost-table td{border:1px solid #111; padding:1px 5px;}
   .cost-table td.lbl{background:#f8f8f6; color:#444;}
-  .cost-table td.val{text-align:right; width:70px;}
+  .cost-table td.val{text-align:right; width:72px;}
   .small-sum td{border:1px solid #111; padding:1px 5px; font-size:8.3px;}
   .small-sum td.lbl{background:#f8f8f6; color:#555;}
   .small-sum td.val{text-align:right; width:72px;}
@@ -197,7 +204,7 @@
   .r-table{margin-bottom:4px;}
   .r-table td{border:1px solid #111; padding:1.5px 5px;}
   .r-table td.lbl{background:#f8f8f6; color:#444; width:60px;}
-  .r-table td.val{text-align:right;}
+  .r-table td.val{text-align:right; width:72px;}
   .req-box{border:2px solid #111; border-radius:6px; padding:3px 8px; margin-top:2px; text-align:center;}
   .req-box .rl{font-size:10px; font-weight:700;}
   .req-box .rsub{font-size:8px; color:#666;}
@@ -320,12 +327,28 @@ function todayISO(){
 function reiwaParts(iso){
   if(!iso) return null;
   const [y,m,dd] = iso.split('-').map(Number);
+  /* "R7.7.8" 等の旧仕様自由入力文字列はハイフン区切りでないためNaNになる。
+     NaN<1 は false 判定になり素通りしてしまうため、有限数チェックを明示する */
+  if(!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(dd)) return null;
   const ry = y - 2018;
   if(ry < 1) return null;
   return {ry, m, dd};
 }
 function toWarekiLong(iso){ const p=reiwaParts(iso); return p ? `令和${p.ry}年${p.m}月${p.dd}日` : ''; }
 function toWarekiShort(iso){ const p=reiwaParts(iso); return p ? `R${p.ry}.${p.m}.${p.dd}` : ''; }
+/* 初度・登録年月日は西暦のまま表示する（複数元号対応が不要なため） */
+function formatMonthJP(ym){
+  if(!ym) return '';
+  const [y,m] = String(ym).split('-').map(Number);
+  if(!Number.isFinite(y) || !Number.isFinite(m)) return '';
+  return `${y}年${m}月`;
+}
+function formatDateJP(iso){
+  if(!iso) return '';
+  const [y,m,d] = String(iso).split('-').map(Number);
+  if(!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return '';
+  return `${y}年${m}月${d}日`;
+}
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toast(msg){
   const el = document.getElementById('toast');
@@ -352,16 +375,23 @@ function storeSet(key, val){
 
 function defaultShop(){
   return {
-    name:'ケンズオート', postal:'', address:'', kikan:'', rep:'', tel:'', fax:'', invoiceNo:'',
-    bankName:'', branch:'', accType:'', accNo:'', holder:'',
-    startNo: 41645,
+    name:'ケンズオート', postal:'', address:'', kikan:'', rep:'', repTitle:'', tel:'', fax:'', invoiceNo:'',
+    bankAccounts: [{ label:'', bankName:'', branch:'', accType:'', accNo:'', holder:'' }],
+    uketsukeStaffList: [], seibiStaffList: [],
+    startNo: 1,
   };
 }
 let shop = loadShop();
 function loadShop(){
   try{
     const raw = storeGet('ken_shop');
-    return raw ? Object.assign(defaultShop(), JSON.parse(raw)) : defaultShop();
+    const data = raw ? JSON.parse(raw) : {};
+    const s = Object.assign(defaultShop(), data);
+    /* 旧仕様（振込先1件をフラットな項目で保持）からの移行。bankAccountsが無く旧項目が残っている場合のみ1件目として引き継ぐ */
+    if(!data.bankAccounts && (data.bankName || data.branch || data.accType || data.accNo || data.holder)){
+      s.bankAccounts = [{ label:'', bankName:data.bankName||'', branch:data.branch||'', accType:data.accType||'', accNo:data.accNo||'', holder:data.holder||'' }];
+    }
+    return s;
   }catch(e){ return defaultShop(); }
 }
 function saveShop(){ storeSet('ken_shop', JSON.stringify(shop)); }
@@ -412,6 +442,39 @@ function genId(prefix, arr){
 function toHiragana(s){
   return String(s||'').replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
 }
+/* かな欄はカタカナで統一表示する（ひらがな入力を自動変換） */
+function toKatakana(s){
+  return String(s||'').replace(/[ぁ-ん]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+}
+/* 郵便番号：数字以外を除去し3-4桁で自動整形 */
+function formatPostal(raw){
+  const d = String(raw||'').replace(/[^0-9]/g,'').slice(0,7);
+  if(d.length<=3) return d;
+  return d.slice(0,3)+'-'+d.slice(3);
+}
+/* 電話番号：携帯（090/080/070/050始まり）は3-4-4、それ以外は簡易的に2-4-4で自動整形 */
+function formatPhone(raw){
+  const d = String(raw||'').replace(/[^0-9]/g,'').slice(0,11);
+  const mobile = /^(090|080|070|050)/.test(d);
+  const a = mobile ? 3 : 2;
+  if(d.length<=a) return d;
+  if(d.length<=a+4) return d.slice(0,a)+'-'+d.slice(a);
+  return d.slice(0,a)+'-'+d.slice(a,a+4)+'-'+d.slice(a+4);
+}
+/* お客様コード：既存の5桁数値コードの最大値+1を5桁ゼロ埋めで返す */
+function nextCustomerCode(){
+  let max = 0;
+  customers.forEach(c=>{
+    if(c.code && /^\d{5}$/.test(c.code)){ const n=parseInt(c.code,10); if(n>max) max=n; }
+  });
+  return String(max+1).padStart(5,'0');
+}
+/* 台帳・顧客一覧・サジェストで共通して使う宛名表示ルール：会社名があれば会社名（個人名）主表示、無ければ個人名のみ */
+function customerDisplayName(cust){
+  if(!cust) return '';
+  if(cust.companyName) return cust.companyName + (cust.name ? `（${cust.name}）` : '');
+  return cust.name || '';
+}
 function searchCustomers(query){
   const q = String(query||'').trim();
   if(!q) return customers;
@@ -435,13 +498,16 @@ function searchCustomers(query){
 function upsertCustomerAndVehicle(cust, veh){
   if(!cust || (!cust.name && !cust.code && !cust.tel)) return null;
   let c = null;
+  let isNewCustomer = false;
   if(cust.code) c = customers.find(x=>x.code && x.code===cust.code);
   if(!c && cust.name) c = customers.find(x=>x.name===cust.name && (x.tel||'')===(cust.tel||''));
   if(!c){
     c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
     customers.push(c);
+    isNewCustomer = true;
   }
   ['name','companyName','kana','tel','postal','address','code','email'].forEach(k=>{ if(cust[k]) c[k]=cust[k]; });
+  if(isNewCustomer && !c.code) c.code = nextCustomerCode();
 
   if(veh && veh.regNo){
     let v = vehicles.find(x=>x.customerId===c.id && x.regNo===veh.regNo);
@@ -566,7 +632,12 @@ function defaultState(){
       shodo:'', regDate:'', shikiShitei:'', ruibetsu:'', mileage:'',
       nextShaken:'', nextTenken:'' },
     items: [],
-    costs: { jibaiseki:0, jyuryozei:0, inshi:0, gijutsu:0, tester:0, jimu:0, daikou:0 },
+    costs: { jibaiseki:0, jyuryozei:0, inshi:0,
+      extra1: { label:'', amount:0, taxable:false },
+      gijutsu:0, tester:0, jimu:0, daikou:0,
+      extra2: { label:'', amount:0, taxable:false },
+      extra3: { label:'', amount:0, taxable:false },
+    },
     nebiki: 0,
     sangaku: 0,
   };
@@ -594,7 +665,7 @@ function seedItemsForType(type){
 function nextInvNo(){
   const nums = ledger.map(r=>parseInt(r.invNo,10)).filter(n=>!isNaN(n));
   const base = Math.max((Number(shop.startNo)||1)-1, nums.length?Math.max(...nums):0);
-  return String(base+1).padStart(9,'0');
+  return String(base+1).padStart(6,'0');
 }
 
 let state = defaultState();
@@ -604,16 +675,21 @@ let state = defaultState();
    ============================================================ */
 function computeTotals(s){
   const c = s.costs;
+  /* 諸費用の無地行（extra1〜3）：課税指定があれば10%課税対象額に、いずれにせよ①諸費用合計には含める */
+  const extras = [c.extra1, c.extra2, c.extra3].map(e=>e||{amount:0,taxable:false});
+  const extraTaxable = extras.reduce((sum,e)=>sum+(e.taxable?(Number(e.amount)||0):0),0);
+  const extraAll = extras.reduce((sum,e)=>sum+(Number(e.amount)||0),0);
   const gijutsuryou = s.items.reduce((sum,r)=>sum+(Number(r.tech)||0),0);
   const buhindai = s.items.reduce((sum,r)=>sum+(Number(r.qty)||0)*(Number(r.price)||0),0);
   const nebiki = Number(s.nebiki)||0;
-  const shohizei = Math.round((gijutsuryou+nebiki+buhindai+(Number(c.tester)||0)+(Number(c.jimu)||0))*0.1);
+  const taxBase = gijutsuryou+nebiki+buhindai+(Number(c.tester)||0)+(Number(c.jimu)||0)+extraTaxable;
+  const shohizei = Math.round(taxBase*0.1);
   const goukei2 = gijutsuryou+nebiki+buhindai+shohizei;
-  const shohi1 = (Number(c.jibaiseki)||0)+(Number(c.jyuryozei)||0)+(Number(c.inshi)||0)+(Number(c.gijutsu)||0)+(Number(c.tester)||0)+(Number(c.jimu)||0)+(Number(c.daikou)||0);
+  const shohi1 = (Number(c.jibaiseki)||0)+(Number(c.jyuryozei)||0)+(Number(c.inshi)||0)+(Number(c.gijutsu)||0)+(Number(c.tester)||0)+(Number(c.jimu)||0)+(Number(c.daikou)||0)+extraAll;
   const sangaku = Number(s.sangaku)||0;
   const uriage = shohi1+goukei2-sangaku;
   const seikyu = uriage;
-  const kazei10 = gijutsuryou+nebiki+buhindai+(Number(c.tester)||0)+(Number(c.jimu)||0);
+  const kazei10 = taxBase;
   const kazei10zei = shohizei;
   const kazeigai = uriage-kazei10-kazei10zei;
   return { gijutsuryou, buhindai, nebiki, shohizei, goukei2, shohi1, sangaku, uriage, seikyu, kazei10, kazei10zei, kazeigai };
@@ -643,9 +719,18 @@ function buildDoc(s){
   s = s || state;
   const t = computeTotals(s);
   const dense = s.items.length > 21 ? ' dense' : '';
+  /* 諸費用の無地行（印紙の下・代行料の下）。未入力でも罫線付きの行として印字する */
+  const extraCostRow = (e)=> `<tr><td class="lbl">${esc((e&&e.label)||'')}</td><td class="val">${(e&&e.amount)?yen(e.amount):''}</td></tr>`;
   const shopAddr = (shop.postal||shop.address)
     ? `〒${esc(shop.postal)||'〔要記入〕'}　${esc(shop.address)||'〔住所：要記入〕'}`
     : '<span class="ph">〒〔要記入〕　〔住所：要記入〕</span>';
+  /* 振込先は複数登録可。登録されている口座をすべて印字する */
+  const bankAccounts = (shop.bankAccounts && shop.bankAccounts.length) ? shop.bankAccounts : [{}];
+  const bankHasAny = bankAccounts.some(b=>b.bankName||b.accNo);
+  const bankHTML = bankAccounts.map(b=>{
+    const label = b.label ? `【${esc(b.label)}】` : '';
+    return `${label}振込先：${esc(b.bankName)||'〔銀行'}　${esc(b.branch)||'支店'}　${esc(b.accType)||'種別'}　${esc(b.accNo)||'口座番号：要記入〕'}　口座名義：${esc(b.holder)||'〔要記入〕'}`;
+  }).join('<br>');
   return `
   <div class="hd-row">
     <div class="hd-left">
@@ -658,8 +743,8 @@ function buildDoc(s){
         <tr><td class="lbl">種別</td><td>${esc(s.type)}</td></tr>
         <tr><td class="lbl">車検証区分</td><td class="val-kubun">${esc(s.kubun)}</td></tr>
         <tr><td class="lbl">拠点</td><td>${esc(s.kyoten)}</td></tr>
-        <tr><td class="lbl">受付年月日</td><td>${esc(s.uketsukeDate)}</td></tr>
-        <tr><td class="lbl">完了年月日</td><td>${esc(s.kanryoDate)}</td></tr>
+        <tr><td class="lbl">受付年月日</td><td>${toWarekiShort(s.uketsukeDate)}</td></tr>
+        <tr><td class="lbl">完了年月日</td><td>${toWarekiShort(s.kanryoDate)}</td></tr>
         <tr><td class="lbl">受付担当者</td><td>${esc(s.uketsukeTanto)}</td></tr>
         <tr><td class="lbl">整備担当者</td><td>${esc(s.seibiTanto)}</td></tr>
       </table>
@@ -680,7 +765,7 @@ function buildDoc(s){
       <span class="kikan ph">${esc(shop.kikan)||'〔指定工場表記：要記入〕'}</span><br>
       ${shopAddr}<br>
       <span class="shopname">${esc(shop.name)||'ケンズオート'}</span><br>
-      <span class="${shop.rep?'':'ph'}">代表者${esc(shop.rep)||'〔要記入〕'}</span><br>
+      <span class="${shop.rep?'':'ph'}">${esc(shop.repTitle)||'代表者'}${esc(shop.rep)||'〔要記入〕'}</span><br>
       <span class="${(shop.tel||shop.fax)?'':'ph'}">TEL${esc(shop.tel)||'〔要記入〕'}　FAX${esc(shop.fax)||'〔要記入〕'}</span><br>
       <span class="${shop.invoiceNo?'':'ph'}">登録番号　${esc(shop.invoiceNo)||'〔T＋13桁：要記入〕'}</span>
     </div>
@@ -690,7 +775,7 @@ function buildDoc(s){
     <tr><td>登録番号</td><td>車名</td><td>型式</td><td>原動機</td><td>車台番号</td></tr>
     <tr><td>${esc(s.vehicle.regNo)}</td><td>${esc(s.vehicle.carName)}</td><td>${esc(s.vehicle.modelType)}</td><td>${esc(s.vehicle.engine)}</td><td>${esc(s.vehicle.chassisNo)}</td></tr>
     <tr><td>初度</td><td>登録年月日</td><td>型式指定</td><td>類別区分番号</td><td>走行距離</td></tr>
-    <tr><td>${esc(s.vehicle.shodo)}</td><td>${esc(s.vehicle.regDate)}</td><td>${esc(s.vehicle.shikiShitei)}</td><td>${esc(s.vehicle.ruibetsu)}</td><td>${esc(s.vehicle.mileage)}</td></tr>
+    <tr><td class="faded">${formatMonthJP(s.vehicle.shodo)||esc(s.vehicle.shodo)}</td><td class="faded">${formatDateJP(s.vehicle.regDate)||esc(s.vehicle.regDate)}</td><td>${esc(s.vehicle.shikiShitei)}</td><td>${esc(s.vehicle.ruibetsu)}</td><td>${esc(s.vehicle.mileage)}</td></tr>
   </table>
 
   <table class="items-table${dense}">
@@ -703,17 +788,20 @@ function buildDoc(s){
   <div class="foot-row">
     <div class="foot-l">
       <table class="cost-table">
-        <tr><td class="lbl">＊自賠責保険料</td><td class="val">${yen(s.costs.jibaiseki)}</td></tr>
-        <tr><td class="lbl">＊重量税</td><td class="val">${yen(s.costs.jyuryozei)}</td></tr>
-        <tr><td class="lbl">＊印紙［OSS］</td><td class="val">${yen(s.costs.inshi)}</td></tr>
-        <tr><td class="lbl">＊技術情報管理手数料</td><td class="val">${yen(s.costs.gijutsu)}</td></tr>
-        <tr><td class="lbl">テスター計測検査費</td><td class="val">${yen(s.costs.tester)}</td></tr>
-        <tr><td class="lbl">事務手数料</td><td class="val">${yen(s.costs.jimu)}</td></tr>
-        <tr><td class="lbl">代行料</td><td class="val">${yen(s.costs.daikou)}</td></tr>
+        <tr><td class="lbl">＊自賠責保険料</td><td class="val">${s.costs.jibaiseki?yen(s.costs.jibaiseki):''}</td></tr>
+        <tr><td class="lbl">＊重量税</td><td class="val">${s.costs.jyuryozei?yen(s.costs.jyuryozei):''}</td></tr>
+        <tr><td class="lbl">＊印紙［OSS］</td><td class="val">${s.costs.inshi?yen(s.costs.inshi):''}</td></tr>
+        ${extraCostRow(s.costs.extra1)}
+        <tr><td class="lbl">＊技術情報管理手数料</td><td class="val">${s.costs.gijutsu?yen(s.costs.gijutsu):''}</td></tr>
+        <tr><td class="lbl">テスター計測検査費</td><td class="val">${s.costs.tester?yen(s.costs.tester):''}</td></tr>
+        <tr><td class="lbl">事務手数料</td><td class="val">${s.costs.jimu?yen(s.costs.jimu):''}</td></tr>
+        <tr><td class="lbl">代行料</td><td class="val">${s.costs.daikou?yen(s.costs.daikou):''}</td></tr>
+        ${extraCostRow(s.costs.extra2)}
+        ${extraCostRow(s.costs.extra3)}
       </table>
       <table class="small-sum">
         <tr><td class="lbl">①　諸費用合計</td><td class="val">${yen(t.shohi1)}</td></tr>
-        <tr><td class="lbl">売上合計</td><td class="val">¥${yen(t.uriage)}</td></tr>
+        <tr><td class="lbl">売上合計</td><td class="val">${yen(t.uriage)}</td></tr>
         <tr><td class="lbl">10%課税対象額計</td><td class="val">${yen(t.kazei10)}</td></tr>
         <tr><td class="lbl">10%消費税</td><td class="val">${yen(t.kazei10zei)}</td></tr>
         <tr><td class="lbl">課税対象外計</td><td class="val">${yen(t.kazeigai)}</td></tr>
@@ -726,9 +814,8 @@ function buildDoc(s){
         毎度ありがとうございます。お振込の際には下記迄お願い致します。<br>
         大変恐縮ですが振込手数料はご負担下さい。
       </div>
-      <div class="bank ${(shop.bankName||shop.accNo)?'':'ph'}">
-        振込先：${esc(shop.bankName)||'〔銀行'}　${esc(shop.branch)||'支店'}　${esc(shop.accType)||'種別'}　${esc(shop.accNo)||'口座番号：要記入〕'}<br>
-        口座名義：${esc(shop.holder)||'〔要記入〕'}
+      <div class="bank ${bankHasAny?'':'ph'}">
+        ${bankHTML}
       </div>
     </div>
 
@@ -757,6 +844,21 @@ function renderPreview(){
 /* ============================================================
    請求書作成フォーム
    ============================================================ */
+/* 諸費用の無地行（印紙［OSS］の下・代行料の下）。項目名・金額・課税/非課税を行ごとに入力できる */
+function buildExtraCostRowHTML(key, e){
+  e = e || {label:'', amount:0, taxable:false};
+  return `
+  <div class="frow" style="align-items:center;">
+    <label>（自由項目）</label>
+    <div style="flex:1; display:flex; gap:6px; align-items:center;">
+      <input type="text" id="f-cost-${key}-label" placeholder="項目名" value="${esc(e.label)}" style="flex:1;">
+      <input type="number" id="f-cost-${key}-amount" placeholder="金額" value="${e.amount||''}" style="width:90px;">
+      <label style="width:auto; display:flex; align-items:center; gap:2px; font-size:11px; color:#555; white-space:nowrap;">
+        <input type="checkbox" id="f-cost-${key}-taxable" ${e.taxable?'checked':''}>課税
+      </label>
+    </div>
+  </div>`;
+}
 function buildFormHTML(){
   const s = state;
   return `
@@ -780,20 +882,38 @@ function buildFormHTML(){
       <div class="frow"><label>拠点</label><input type="text" id="f-kyoten" value="${esc(s.kyoten)}"></div>
     </div>
     <div class="frow2">
-      <div class="frow"><label>受付年月日</label><input type="text" id="f-uketsukeDate" placeholder="R7.7.8" value="${esc(s.uketsukeDate)}"></div>
-      <div class="frow"><label>完了年月日</label><input type="text" id="f-kanryoDate" placeholder="R7.7.9" value="${esc(s.kanryoDate)}"></div>
+      <div class="frow"><label>受付年月日</label><input type="date" id="f-uketsukeDate" value="${esc(s.uketsukeDate)}"></div>
+      <div class="frow"><label>完了年月日</label><input type="date" id="f-kanryoDate" value="${esc(s.kanryoDate)}"></div>
     </div>
     <div class="frow2">
-      <div class="frow"><label>受付担当者</label><input type="text" id="f-uketsukeTanto" value="${esc(s.uketsukeTanto)}"></div>
-      <div class="frow"><label>整備担当者</label><input type="text" id="f-seibiTanto" value="${esc(s.seibiTanto)}"></div>
+      <div class="frow">
+        <label>受付担当者</label>
+        <div style="flex:1; position:relative;">
+          <input type="text" id="f-uketsukeTanto" value="${esc(s.uketsukeTanto)}" autocomplete="off">
+          <div id="uketsukeTantoSuggest" class="suggest-box"></div>
+        </div>
+      </div>
+      <div class="frow">
+        <label>整備担当者</label>
+        <div style="flex:1; position:relative;">
+          <input type="text" id="f-seibiTanto" value="${esc(s.seibiTanto)}" autocomplete="off">
+          <div id="seibiTantoSuggest" class="suggest-box"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="fsec">
-    <h2>お客様（宛先）</h2>
-    <div class="frow"><label>会社名</label><input type="text" id="f-cust-companyName" placeholder="法人の場合のみ入力" value="${esc(s.customer.companyName||'')}"></div>
+    <h2>お客様情報（宛先）</h2>
     <div class="frow">
-      <label>宛名</label>
+      <label>会社名（個人名）</label>
+      <div style="flex:1; position:relative;">
+        <input type="text" id="f-cust-companyName" placeholder="法人の場合の会社名、個人の場合は個人名" value="${esc(s.customer.companyName||'')}" autocomplete="off">
+        <div id="custCompanySuggest" class="suggest-box"></div>
+      </div>
+    </div>
+    <div class="frow">
+      <label>宛名（担当者名）</label>
       <div style="flex:1; position:relative;">
         <input type="text" id="f-cust-name" placeholder="◯◯ 御中" value="${esc(s.customer.name)}" autocomplete="off">
         <div id="custSuggest" class="suggest-box"></div>
@@ -821,8 +941,8 @@ function buildFormHTML(){
     </div>
     <div class="frow"><label>車台番号</label><input type="text" id="f-veh-chassisNo" value="${esc(s.vehicle.chassisNo)}"></div>
     <div class="frow2">
-      <div class="frow"><label>初度</label><input type="text" id="f-veh-shodo" placeholder="H24.11" value="${esc(s.vehicle.shodo)}"></div>
-      <div class="frow"><label>登録年月日</label><input type="text" id="f-veh-regDate" placeholder="R6.1.30" value="${esc(s.vehicle.regDate)}"></div>
+      <div class="frow"><label>初度</label><input type="month" id="f-veh-shodo" value="${esc(s.vehicle.shodo)}"></div>
+      <div class="frow"><label>登録年月日</label><input type="date" id="f-veh-regDate" value="${esc(s.vehicle.regDate)}"></div>
     </div>
     <div class="frow2">
       <div class="frow"><label>型式指定</label><input type="text" id="f-veh-shikiShitei" value="${esc(s.vehicle.shikiShitei)}"></div>
@@ -847,20 +967,24 @@ function buildFormHTML(){
     <div class="frow"><label>自賠責保険料</label><input type="number" id="f-cost-jibaiseki" value="${s.costs.jibaiseki}"></div>
     <div class="frow"><label>重量税</label><input type="number" id="f-cost-jyuryozei" value="${s.costs.jyuryozei}"></div>
     <div class="frow"><label>印紙［OSS］</label><input type="number" id="f-cost-inshi" value="${s.costs.inshi}"></div>
+    ${buildExtraCostRowHTML('extra1', s.costs.extra1)}
     <div class="frow"><label>技術情報管理手数料</label><input type="number" id="f-cost-gijutsu" value="${s.costs.gijutsu}"></div>
     <div class="frow"><label>テスター計測検査費</label><input type="number" id="f-cost-tester" value="${s.costs.tester}"></div>
     <div class="frow"><label>事務手数料</label><input type="number" id="f-cost-jimu" value="${s.costs.jimu}"></div>
     <div class="frow"><label>代行料</label><input type="number" id="f-cost-daikou" value="${s.costs.daikou}"></div>
+    ${buildExtraCostRowHTML('extra2', s.costs.extra2)}
+    ${buildExtraCostRowHTML('extra3', s.costs.extra3)}
   </div>
 
   <div class="fsec">
     <h2>値引・調整</h2>
-    <div class="frow"><label>技術料値引</label><input type="number" id="f-nebiki" value="${s.nebiki}"></div>
+    <div class="frow"><label>技術料値引</label><input type="number" id="f-nebiki" placeholder="マイナスは付けずに数字のみ" value="${s.nebiki?Math.abs(s.nebiki):''}"></div>
     <div class="frow"><label>③</label><input type="number" id="f-sangaku" value="${s.sangaku}"></div>
   </div>
 
   <div class="action-bar">
     <button class="save" id="btnSaveLedger">💾 台帳に保存</button>
+    <button class="clear" id="btnClearForm">🧹 クリア</button>
     <button class="print" id="btnPrint">🖨 印刷・PDF保存</button>
     <button class="share" id="btnShare">📤 共有</button>
   </div>
@@ -920,6 +1044,14 @@ function wireCustSuggest(){
   input.addEventListener('input', function(){ showCustSuggest(this.value, box); });
   input.addEventListener('focus', function(){ showCustSuggest(this.value, box); });
 }
+/* 会社名欄からも同じカルテ検索候補を出せるようにする */
+function wireCompanySuggest(){
+  const input = document.getElementById('f-cust-companyName');
+  const box = document.getElementById('custCompanySuggest');
+  if(!input || !box) return;
+  input.addEventListener('input', function(){ showCustSuggest(this.value, box); });
+  input.addEventListener('focus', function(){ showCustSuggest(this.value, box); });
+}
 function showCustSuggest(query, box){
   const q = String(query||'').trim();
   if(!q){ box.classList.remove('open'); box.innerHTML=''; return; }
@@ -927,11 +1059,9 @@ function showCustSuggest(query, box){
   let html = matches.map(c=>{
     const vehs = vehicles.filter(v=>v.customerId===c.id);
     const vehLabel = vehs.length ? vehs.map(v=>v.regNo).filter(Boolean).join('・') : '車両未登録';
-    const primary = c.companyName || c.name || '（氏名未登録）';
-    const personSub = c.companyName && c.name ? `<div class="si-sub">${esc(c.name)}</div>` : '';
+    const primary = customerDisplayName(c) || '（氏名未登録）';
     return `<div class="suggest-item" onclick="pickCustomer('${esc(c.id)}')">
       <div>${esc(primary)}</div>
-      ${personSub}
       <div class="si-sub">${esc(c.kana||'')} ${esc(c.tel||'')} ${esc(vehLabel)}</div>
     </div>`;
   }).join('');
@@ -980,10 +1110,11 @@ function pickVehicle(vehId){
 }
 function registerNewCustomerInline(name){
   if(!name) return;
-  const c = { id: genId('c', customers), name, companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+  const code = nextCustomerCode();
+  const c = { id: genId('c', customers), name, companyName:'', kana:'', tel:'', postal:'', address:'', code, email:'' };
   customers.push(c);
   saveCustomersToStorage();
-  state.customer = { name:c.name, companyName:'', kana:'', postal:'', address:'', code:'', tel:'', email:'' };
+  state.customer = { name:c.name, companyName:'', kana:'', postal:'', address:'', code, tel:'', email:'' };
   renderCreateView();
   toast('「'+name+'」を新規登録しました');
 }
@@ -1004,6 +1135,62 @@ function setDeep(obj, path, val){
   for(let i=0;i<parts.length-1;i++) o = o[parts[i]];
   o[parts[parts.length-1]] = val;
 }
+/* 郵便番号・電話番号：入力の都度ハイフンを自動整形して反映する */
+function wireFormatInput(id, path, formatter){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input', function(){
+    const formatted = formatter(this.value);
+    this.value = formatted;
+    setDeep(state, path, formatted);
+    renderPreview();
+  });
+}
+/* かな欄：入力の都度カタカナに自動変換して反映する */
+function wireKanaInput(id, path){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input', function(){
+    const kana = toKatakana(this.value);
+    this.value = kana;
+    setDeep(state, path, kana);
+    renderPreview();
+  });
+}
+/* 受付担当者・整備担当者：設定シート登録済みリストからの入力候補（サジェスト） */
+function wireStaffSuggest(inputId, boxId, listGetter, statePath){
+  const input = document.getElementById(inputId);
+  const box = document.getElementById(boxId);
+  if(!input || !box) return;
+  const show = ()=>{
+    const list = listGetter();
+    const q = input.value.trim();
+    const matches = (q ? list.filter(n=>n.indexOf(q)===0) : list).slice(0,8);
+    if(matches.length===0){ box.classList.remove('open'); box.innerHTML=''; return; }
+    box.innerHTML = matches.map(n=>`<div class="suggest-item" data-name="${esc(n)}">${esc(n)}</div>`).join('');
+    box.classList.add('open');
+  };
+  input.addEventListener('input', show);
+  input.addEventListener('focus', show);
+  box.addEventListener('click', function(e){
+    const item = e.target.closest('.suggest-item');
+    if(!item) return;
+    input.value = item.dataset.name;
+    setDeep(state, statePath, item.dataset.name);
+    box.classList.remove('open');
+    renderPreview();
+  });
+}
+/* 諸費用の無地行（項目名・金額・課税区分）の結線 */
+function wireExtraCostRow(key){
+  const labelEl = document.getElementById(`f-cost-${key}-label`);
+  const amountEl = document.getElementById(`f-cost-${key}-amount`);
+  const taxableEl = document.getElementById(`f-cost-${key}-taxable`);
+  if(!labelEl || !amountEl || !taxableEl) return;
+  labelEl.addEventListener('input', function(){ state.costs[key].label = this.value; renderPreview(); });
+  amountEl.addEventListener('input', function(){ state.costs[key].amount = Number(this.value)||0; renderPreview(); });
+  taxableEl.addEventListener('change', function(){ state.costs[key].taxable = this.checked; renderPreview(); });
+}
 
 function wireForm(){
   wireSimpleInput('f-invNo','invNo');
@@ -1014,15 +1201,18 @@ function wireForm(){
   wireSimpleInput('f-kanryoDate','kanryoDate');
   wireSimpleInput('f-uketsukeTanto','uketsukeTanto');
   wireSimpleInput('f-seibiTanto','seibiTanto');
+  wireStaffSuggest('f-uketsukeTanto','uketsukeTantoSuggest', ()=>shop.uketsukeStaffList||[], 'uketsukeTanto');
+  wireStaffSuggest('f-seibiTanto','seibiTantoSuggest', ()=>shop.seibiStaffList||[], 'seibiTanto');
 
   wireSimpleInput('f-cust-companyName','customer.companyName');
   wireSimpleInput('f-cust-name','customer.name');
-  wireSimpleInput('f-cust-kana','customer.kana');
+  wireKanaInput('f-cust-kana','customer.kana');
   wireCustSuggest();
-  wireSimpleInput('f-cust-postal','customer.postal');
+  wireCompanySuggest();
+  wireFormatInput('f-cust-postal','customer.postal', formatPostal);
   wireSimpleInput('f-cust-code','customer.code');
   wireSimpleInput('f-cust-address','customer.address');
-  wireSimpleInput('f-cust-tel','customer.tel');
+  wireFormatInput('f-cust-tel','customer.tel', formatPhone);
   wireSimpleInput('f-cust-email','customer.email');
 
   wireSimpleInput('f-veh-regNo','vehicle.regNo');
@@ -1045,8 +1235,16 @@ function wireForm(){
   wireSimpleInput('f-cost-tester','costs.tester');
   wireSimpleInput('f-cost-jimu','costs.jimu');
   wireSimpleInput('f-cost-daikou','costs.daikou');
+  wireExtraCostRow('extra1');
+  wireExtraCostRow('extra2');
+  wireExtraCostRow('extra3');
 
-  wireSimpleInput('f-nebiki','nebiki');
+  const nebikiEl = document.getElementById('f-nebiki');
+  nebikiEl.addEventListener('input', function(){
+    /* マイナス記号を入れずに数字だけ入力してもらい、内部では常にマイナス値として計算する */
+    state.nebiki = this.value ? -Math.abs(Number(this.value)||0) : 0;
+    renderPreview();
+  });
   wireSimpleInput('f-sangaku','sangaku');
 
   document.getElementById('typeSeg').addEventListener('click', function(e){
@@ -1070,10 +1268,22 @@ function wireForm(){
 
   document.getElementById('btnAddItem').addEventListener('click', addItemRow);
   document.getElementById('btnSaveLedger').addEventListener('click', saveInvoiceToLedger);
+  document.getElementById('btnClearForm').addEventListener('click', clearFormForRetry);
   document.getElementById('btnPrint').addEventListener('click', doPrint);
   document.getElementById('btnShare').addEventListener('click', shareCreateForm);
 
   renderItemFormTable();
+}
+/* 入力中の内容を全てクリアする（次の入力・入力ミス時用）。伝票Noはそのまま維持し、新規の伝票Noは採番し直さない */
+function clearFormForRetry(){
+  if(!confirm('入力中の内容をすべてクリアします。伝票Noはそのまま維持されます。よろしいですか？')) return;
+  const keepInvNo = state.invNo;
+  state = defaultState();
+  state.invNo = keepInvNo;
+  seedItemsForType(state.type);
+  itemsTouched = false;
+  renderCreateView();
+  toast('入力内容をクリアしました');
 }
 
 function renderCreateView(){
@@ -1218,17 +1428,6 @@ function loadInvoiceToForm(invNo){
   renderCreateView();
   toast('伝票No '+invNo+' を読み込みました');
 }
-function duplicateInvoice(invNo){
-  const rec = ledger.find(r=>r.invNo===invNo);
-  if(!rec) return;
-  state = JSON.parse(JSON.stringify(rec));
-  delete state.savedAt; delete state.totals;
-  itemsTouched = true; // 保存済みの実データなので、種別を切替えても無断で消さない
-  state.invNo = nextInvNo();
-  switchView('create');
-  renderCreateView();
-  toast('複製しました（新しい伝票No '+state.invNo+'）');
-}
 function deleteLedgerRow(invNo){
   if(!confirm('伝票No '+invNo+' を削除しますか？この操作は取り消せません。')) return;
   ledger = ledger.filter(r=>r.invNo!==invNo);
@@ -1266,12 +1465,12 @@ function renderLedgerView(){
     rows += `<tr>
       <td>${esc(r.invNo)}</td>
       <td>${toWarekiShort(r.issueDate)||''}</td>
-      <td>${esc(r.customer && r.customer.name)||''}</td>
+      <td>${esc(customerDisplayName(r.customer))}</td>
       <td>${esc(r.type)}</td>
       <td class="amt">¥${yen(total)}</td>
       <td class="ledger-actions">
         <button class="${isOpen?'active':''}" onclick="toggleLedgerPreview('${esc(r.invNo)}')">${isOpen?'閉じる':'開く'}</button>
-        <button onclick="duplicateInvoice('${esc(r.invNo)}')">複製</button>
+        <button onclick="loadInvoiceToForm('${esc(r.invNo)}')">修正</button>
         <button onclick="deleteLedgerRow('${esc(r.invNo)}')">削除</button>
       </td>
     </tr>`;
@@ -1292,10 +1491,12 @@ function renderLedgerView(){
     }
   });
   body.innerHTML = `
-    <table class="ledger-table">
-      <tr><th>伝票No</th><th>発行日</th><th>宛名</th><th>種別</th><th>請求額</th><th>操作</th></tr>
-      ${rows}
-    </table>
+    <div class="ledger-scroll">
+      <table class="ledger-table">
+        <tr><th>伝票No</th><th>発行日</th><th>宛名</th><th>種別</th><th>請求額</th><th>操作</th></tr>
+        ${rows}
+      </table>
+    </div>
   `;
 }
 
@@ -1308,15 +1509,24 @@ let expandedCustLedgerInvNo = null; // 顧客カルテ内でその場展開中�
 
 function renderCustomersView(){
   document.getElementById('custListPane').innerHTML = `
-    <input type="text" class="cust-search" id="custSearchInput" placeholder="氏名・会社名・かな・コード・電話・ナンバー・車台番号等で検索">
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <input type="text" class="cust-search" id="custSearchInput" placeholder="氏名・会社名・かな・コード・電話・ナンバー・車台番号等で検索" style="margin-bottom:0; flex:1;">
+      <button id="btnClearCustSearch" style="flex-shrink:0; width:44px; height:44px; border:1px solid #ccc; border-radius:6px; background:#fff; font-size:14px; color:#888;">✕</button>
+    </div>
     <div id="custListArea"></div>
     <button class="add-row-btn" id="btnAddCustomer">＋ 新規顧客を手動登録</button>
   `;
   document.getElementById('custSearchInput').addEventListener('input', function(){
     renderCustomerList(this.value);
   });
+  document.getElementById('btnClearCustSearch').addEventListener('click', function(){
+    const input = document.getElementById('custSearchInput');
+    input.value = '';
+    renderCustomerList('');
+    input.focus();
+  });
   document.getElementById('btnAddCustomer').addEventListener('click', function(){
-    const c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+    const c = { id: genId('c', customers), name:'', companyName:'', kana:'', tel:'', postal:'', address:'', code:nextCustomerCode(), email:'' };
     customers.push(c);
     saveCustomersToStorage();
     renderCustomerList('');
@@ -1345,11 +1555,10 @@ function renderCustomerList(query){
       const soon = isShakenSoon(v.nextShaken);
       return `<span class="cust-veh-tag${soon?' soon':''}" onclick="event.stopPropagation(); selectCustomerVehicle('${esc(c.id)}','${esc(v.id)}')">${esc(v.regNo)||'(ナンバー未登録)'}</span>`;
     }).join('');
-    const cnText = c.companyName || c.name || '（氏名未入力）';
-    const personPrefix = c.companyName && c.name ? (esc(c.name)+'　') : '';
+    const cnText = customerDisplayName(c) || '（氏名未入力）';
     return `<div class="cust-item${c.id===selectedCustomerId?' selected':''}" onclick="selectCustomer('${esc(c.id)}')">
       <div class="cn">${esc(cnText)}</div>
-      <div class="ci">${personPrefix}${esc(c.kana||'')} ${esc(c.tel||'')} ${c.code?('コード'+esc(c.code)):''}</div>
+      <div class="ci">${esc(c.kana||'')} ${esc(c.tel||'')} ${c.code?('コード'+esc(c.code)):''}</div>
       <div>${tags}</div>
     </div>`;
   }).join('');
@@ -1403,8 +1612,8 @@ function buildCustomerDetailHTML(c){
   let html = `
   <div class="fsec">
     <h2>顧客情報</h2>
-    <div class="frow"><label>会社名</label><input type="text" id="cd-companyName" placeholder="法人の場合のみ入力" value="${esc(c.companyName||'')}"></div>
-    <div class="frow"><label>氏名</label><input type="text" id="cd-name" value="${esc(c.name)}"></div>
+    <div class="frow"><label>会社名（個人名）</label><input type="text" id="cd-companyName" placeholder="法人の場合の会社名、個人の場合は個人名" value="${esc(c.companyName||'')}"></div>
+    <div class="frow"><label>宛名（担当者名）</label><input type="text" id="cd-name" value="${esc(c.name)}"></div>
     <div class="frow"><label>かな</label><input type="text" id="cd-kana" value="${esc(c.kana||'')}"></div>
     <div class="frow2">
       <div class="frow"><label>電話</label><input type="text" id="cd-tel" value="${esc(c.tel||'')}"></div>
@@ -1456,18 +1665,19 @@ function buildVehicleLedgerHTML(v){
   if(recs.length===0){
     html += `<div style="color:#999; font-size:12px;">この車両の過去請求書はありません</div>`;
   } else {
-    html += `<table class="ledger-table"><tr><th>伝票No</th><th>発行日</th><th>請求額</th><th>操作</th></tr>`;
+    html += `<div class="ledger-scroll"><table class="ledger-table"><tr><th>伝票No</th><th>発行日</th><th>種別</th><th>請求額</th><th>操作</th></tr>`;
     recs.forEach(r=>{
       const total = r.totals ? r.totals.seikyu : computeTotals(r).seikyu;
       const isOpen = r.invNo === expandedCustLedgerInvNo;
       html += `<tr>
         <td>${esc(r.invNo)}</td>
         <td>${toWarekiShort(r.issueDate)||''}</td>
+        <td>${esc(r.type)}</td>
         <td class="amt">¥${yen(total)}</td>
         <td class="ledger-actions"><button class="${isOpen?'active':''}" onclick="toggleCustLedgerPreview('${esc(r.invNo)}')">${isOpen?'閉じる':'開く'}</button></td>
       </tr>`;
       if(isOpen){
-        html += `<tr class="ledger-preview-row"><td colspan="4">
+        html += `<tr class="ledger-preview-row"><td colspan="5">
           <div class="ledger-preview-wrap">
             <div class="doc-box">${buildDoc(r)}</div>
             <div class="ledger-preview-actions">
@@ -1480,7 +1690,7 @@ function buildVehicleLedgerHTML(v){
         </td></tr>`;
       }
     });
-    html += `</table>`;
+    html += `</table></div>`;
   }
   html += `</div>`;
   return html;
@@ -1520,7 +1730,7 @@ function buildVehicleDetailHTML(v){
   `;
 }
 function wireCustomerDetail(c){
-  ['companyName','name','kana','tel','code','postal','address','email'].forEach(key=>{
+  ['companyName','name','code','address','email'].forEach(key=>{
     const el = document.getElementById('cd-'+key);
     if(!el) return;
     el.addEventListener('input', function(){
@@ -1529,6 +1739,31 @@ function wireCustomerDetail(c){
       const searchInput = document.getElementById('custSearchInput');
       renderCustomerList(searchInput ? searchInput.value : '');
     });
+  });
+  const kanaEl = document.getElementById('cd-kana');
+  if(kanaEl) kanaEl.addEventListener('input', function(){
+    const kana = toKatakana(this.value);
+    this.value = kana;
+    c.kana = kana;
+    saveCustomersToStorage();
+    const searchInput = document.getElementById('custSearchInput');
+    renderCustomerList(searchInput ? searchInput.value : '');
+  });
+  const postalEl = document.getElementById('cd-postal');
+  if(postalEl) postalEl.addEventListener('input', function(){
+    const v = formatPostal(this.value);
+    this.value = v;
+    c.postal = v;
+    saveCustomersToStorage();
+  });
+  const telEl = document.getElementById('cd-tel');
+  if(telEl) telEl.addEventListener('input', function(){
+    const v = formatPhone(this.value);
+    this.value = v;
+    c.tel = v;
+    saveCustomersToStorage();
+    const searchInput = document.getElementById('custSearchInput');
+    renderCustomerList(searchInput ? searchInput.value : '');
   });
   document.querySelectorAll('.vfield').forEach(el=>{
     el.addEventListener('input', function(){
@@ -1667,14 +1902,51 @@ function renderReminderView(){
 /* ============================================================
    設定
    ============================================================ */
+/* 受付担当者・整備担当者の事前登録リスト編集UI（設定シート） */
+function buildStaffListHTML(label, listKey){
+  const list = shop[listKey] || [];
+  let html = `<div class="frow" style="align-items:flex-start;"><label>${esc(label)}</label><div style="flex:1;">`;
+  list.forEach((name,i)=>{
+    html += `<div style="display:flex; gap:6px; margin-bottom:6px;">
+      <input type="text" class="staff-field" data-list="${listKey}" data-idx="${i}" value="${esc(name)}" style="flex:1; padding:7px 9px; border:1px solid #ccc; border-radius:4px; font-size:14px;">
+      <button data-list="${listKey}" data-idx="${i}" data-action="del-staff" style="flex-shrink:0; width:36px; height:36px; border:none; border-radius:4px; background:#f8d8d8; color:#a33; font-size:13px;">✕</button>
+    </div>`;
+  });
+  html += `<button class="add-row-btn" data-list="${listKey}" data-action="add-staff" type="button">＋ ${esc(label)}を追加</button></div></div>`;
+  return html;
+}
+/* 振込先（複数登録可）の編集UI */
+function buildBankAccountsHTML(){
+  const list = (shop.bankAccounts && shop.bankAccounts.length) ? shop.bankAccounts : [{}];
+  let html = '';
+  list.forEach((b,i)=>{
+    html += `
+    <div style="border:1px solid #eee; border-radius:6px; padding:10px; margin-bottom:10px;">
+      <div class="frow"><label>表示名</label><input type="text" class="bank-field" data-idx="${i}" data-key="label" placeholder="例：メイン" value="${esc(b.label||'')}"></div>
+      <div class="frow2">
+        <div class="frow"><label>銀行</label><input type="text" class="bank-field" data-idx="${i}" data-key="bankName" value="${esc(b.bankName||'')}"></div>
+        <div class="frow"><label>支店</label><input type="text" class="bank-field" data-idx="${i}" data-key="branch" value="${esc(b.branch||'')}"></div>
+      </div>
+      <div class="frow2">
+        <div class="frow"><label>種別</label><input type="text" class="bank-field" data-idx="${i}" data-key="accType" placeholder="普通／当座" value="${esc(b.accType||'')}"></div>
+        <div class="frow"><label>口座番号</label><input type="text" class="bank-field" data-idx="${i}" data-key="accNo" value="${esc(b.accNo||'')}"></div>
+      </div>
+      <div class="frow"><label>口座名義</label><input type="text" class="bank-field" data-idx="${i}" data-key="holder" value="${esc(b.holder||'')}"></div>
+      <button data-action="del-bank" data-idx="${i}" style="padding:8px 14px; border:none; border-radius:5px; background:#f8d8d8; color:#a33; font-size:12px;">🗑 この振込先を削除</button>
+    </div>`;
+  });
+  html += `<button class="add-row-btn" id="btnAddBank" type="button">＋ 振込先を追加</button>`;
+  return html;
+}
 function buildSettingsHTML(){
   return `
   <div class="fsec">
     <h2>発行元情報（ケンズオート）</h2>
     <div class="frow"><label>事業者名</label><input type="text" id="s-name" value="${esc(shop.name)}"></div>
     <div class="frow"><label>指定工場表記</label><input type="text" id="s-kikan" placeholder="例：九州運輸局指定整備工場" value="${esc(shop.kikan)}"></div>
+    <div class="frow"><label>郵便番号</label><input type="text" id="s-postal" value="${esc(shop.postal)}"></div>
     <div class="frow2">
-      <div class="frow"><label>郵便番号</label><input type="text" id="s-postal" value="${esc(shop.postal)}"></div>
+      <div class="frow"><label>代表者肩書き</label><input type="text" id="s-repTitle" placeholder="例：代表取締役" value="${esc(shop.repTitle)}"></div>
       <div class="frow"><label>代表者</label><input type="text" id="s-rep" value="${esc(shop.rep)}"></div>
     </div>
     <div class="frow"><label>住所</label><input type="text" id="s-address" value="${esc(shop.address)}"></div>
@@ -1686,16 +1958,15 @@ function buildSettingsHTML(){
   </div>
 
   <div class="fsec">
+    <h2>担当者リスト</h2>
+    <div style="font-size:11px; color:#888; margin-bottom:8px;">請求書作成画面の受付担当者・整備担当者欄で入力候補として表示されます</div>
+    ${buildStaffListHTML('受付担当者','uketsukeStaffList')}
+    ${buildStaffListHTML('整備担当者','seibiStaffList')}
+  </div>
+
+  <div class="fsec">
     <h2>振込先</h2>
-    <div class="frow2">
-      <div class="frow"><label>銀行</label><input type="text" id="s-bankName" value="${esc(shop.bankName)}"></div>
-      <div class="frow"><label>支店</label><input type="text" id="s-branch" value="${esc(shop.branch)}"></div>
-    </div>
-    <div class="frow2">
-      <div class="frow"><label>種別</label><input type="text" id="s-accType" placeholder="普通／当座" value="${esc(shop.accType)}"></div>
-      <div class="frow"><label>口座番号</label><input type="text" id="s-accNo" value="${esc(shop.accNo)}"></div>
-    </div>
-    <div class="frow"><label>口座名義</label><input type="text" id="s-holder" value="${esc(shop.holder)}"></div>
+    <div id="bankAccountsArea">${buildBankAccountsHTML()}</div>
   </div>
 
   <div class="fsec">
@@ -1711,6 +1982,7 @@ function buildSettingsHTML(){
 
   <div class="fsec">
     <h2>バックアップ</h2>
+    <div style="font-size:11px; color:#888; margin-bottom:8px;">書き出し時に共有シートが開ける端末では、共有先として「Googleドライブ」等を選んで保存できます。読み込みはファイル選択画面からGoogleドライブ内のファイルも選べます。</div>
     <div class="action-bar">
       <button class="save" id="btnBackup">⬇ バックアップ書き出し</button>
       <button class="print" id="btnRestore">⬆ 復元（読み込み）</button>
@@ -1726,10 +1998,20 @@ function wireSettings(){
       saveShop();
     });
   };
-  bind('s-name','name'); bind('s-kikan','kikan'); bind('s-postal','postal'); bind('s-rep','rep');
-  bind('s-address','address'); bind('s-tel','tel'); bind('s-fax','fax'); bind('s-invoiceNo','invoiceNo');
-  bind('s-bankName','bankName'); bind('s-branch','branch'); bind('s-accType','accType');
-  bind('s-accNo','accNo'); bind('s-holder','holder');
+  bind('s-name','name'); bind('s-kikan','kikan'); bind('s-rep','rep'); bind('s-repTitle','repTitle');
+  bind('s-address','address'); bind('s-invoiceNo','invoiceNo');
+  const bindFormatted = (id, key, formatter) => {
+    document.getElementById(id).addEventListener('input', function(){
+      const v = formatter(this.value);
+      this.value = v;
+      shop[key] = v;
+      saveShop();
+    });
+  };
+  bindFormatted('s-postal','postal', formatPostal);
+  bindFormatted('s-tel','tel', formatPhone);
+  bindFormatted('s-fax','fax', formatPhone);
+
   document.getElementById('s-startNo').addEventListener('input', function(){
     shop.startNo = Number(this.value)||1;
     saveShop();
@@ -1738,6 +2020,53 @@ function wireSettings(){
     templates.shakenReminder = this.value;
     saveTemplatesToStorage();
   });
+
+  /* 担当者リスト（受付・整備）の編集・追加・削除 */
+  document.querySelectorAll('.staff-field').forEach(el=>{
+    el.addEventListener('input', function(){
+      shop[this.dataset.list][Number(this.dataset.idx)] = this.value;
+      saveShop();
+    });
+  });
+  document.querySelectorAll('[data-action="add-staff"]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      shop[this.dataset.list].push('');
+      saveShop();
+      renderSettingsView();
+    });
+  });
+  document.querySelectorAll('[data-action="del-staff"]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      shop[this.dataset.list].splice(Number(this.dataset.idx),1);
+      saveShop();
+      renderSettingsView();
+    });
+  });
+
+  /* 振込先（複数登録可）の編集・追加・削除 */
+  document.querySelectorAll('.bank-field').forEach(el=>{
+    el.addEventListener('input', function(){
+      shop.bankAccounts[Number(this.dataset.idx)][this.dataset.key] = this.value;
+      saveShop();
+    });
+  });
+  const addBankBtn = document.getElementById('btnAddBank');
+  if(addBankBtn) addBankBtn.addEventListener('click', function(){
+    shop.bankAccounts.push({ label:'', bankName:'', branch:'', accType:'', accNo:'', holder:'' });
+    saveShop();
+    renderSettingsView();
+  });
+  document.querySelectorAll('[data-action="del-bank"]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      /* 振込先は最低1件残す。削除前に必ず確認を取る（破壊的操作のため） */
+      if(shop.bankAccounts.length<=1){ toast('振込先は最低1件必要です'); return; }
+      if(!confirm('この振込先を削除しますか？')) return;
+      shop.bankAccounts.splice(Number(this.dataset.idx),1);
+      saveShop();
+      renderSettingsView();
+    });
+  });
+
   document.getElementById('btnBackup').addEventListener('click', backupJSON);
   document.getElementById('btnRestore').addEventListener('click', ()=>document.getElementById('restoreFile').click());
   document.getElementById('restoreFile').addEventListener('change', restoreJSON);
@@ -1746,13 +2075,28 @@ function renderSettingsView(){
   document.getElementById('settingsBody').innerHTML = buildSettingsHTML();
   wireSettings();
 }
-function backupJSON(){
+async function backupJSON(){
   const data = { shop, ledger, customers, vehicles, templates, exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const json = JSON.stringify(data,null,2);
+  const fileName = `ケンズオート_バックアップ_${todayISO()}.json`;
+  /* 共有シートに対応した端末では、共有先としてGoogleドライブ等を選んで保存できるようにする */
+  const file = new File([json], fileName, {type:'application/json'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file], title:'ケンズオート バックアップ', text:'ケンズオートのバックアップデータです'});
+      storeSet('ken_lastbackup', new Date().toISOString());
+      toast('共有シートからバックアップを保存してください');
+      return;
+    }catch(e){
+      if(e && e.name==='AbortError') return; // 共有シートのキャンセルは何もしない
+      // 共有に失敗した場合は下のダウンロード方式にフォールバックする
+    }
+  }
+  const blob = new Blob([json], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `ケンズオート_バックアップ_${todayISO()}.json`;
+  a.download = fileName;
   a.click();
   URL.revokeObjectURL(url);
   storeSet('ken_lastbackup', new Date().toISOString());
