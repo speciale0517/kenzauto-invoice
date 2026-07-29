@@ -65,7 +65,7 @@
     .frow2{flex-direction:column; gap:0;}
   }
   .seg{display:flex; border:1px solid #999; border-radius:5px; overflow:hidden;}
-  .seg button{flex:1; padding:8px; border:none; background:#f4f4f0; font-size:13px; font-weight:600; color:#555;}
+  .seg button{flex:1; padding:8px; border:none; background:#f4f4f0; font-size:13px; font-weight:600; color:#555; white-space:nowrap;}
   .seg button.active{background:#1c2430; color:#fff;}
 
   /* 明細テーブル（フォーム側） */
@@ -436,7 +436,6 @@ function loadShop(){
 }
 function saveShop(){ setStoreItem('ken_shop', JSON.stringify(shop)); }
 
-let ledger = loadLedger();
 /* 台帳データの旧仕様からの移行処理。起動時のloadLedger()だけでなく、バックアップ復元（restoreJSON）
    でも同じ移行を通す必要があるため、共通関数として切り出している（第3回修正） */
 /* computeTotals()の戻り値キー名を用語集準拠に整理した際の旧キー名→新キー名対応表（第5回修正）。
@@ -465,6 +464,10 @@ function normalizeLedgerData(list){
     if(r.totals && r.totals.seikyu!==undefined && r.totals.billingAmount===undefined){
       r.totals = migrateTotalsKeys(r.totals);
     }
+    /* 振込先の単一選択（bankAccountId、第2回修正）を複数選択（bankAccountIds、第9回修正）へ移行する */
+    if(!r.bankAccountIds && r.bankAccountId){
+      r.bankAccountIds = [r.bankAccountId];
+    }
   });
   return list;
 }
@@ -476,12 +479,40 @@ function loadLedger(){
   }catch(e){ return []; }
 }
 function saveLedgerToStorage(){ setStoreItem('ken_ledger', JSON.stringify(ledger)); }
+/* letledgerの初期化はTOTALS_KEY_MIGRATION（constのため参照前は初期化前アクセスエラーになるTDZ制約がある）
+   の宣言より後に置く必要がある。以前はこの行が上の定義群より前にあり、旧キー名（seikyu等）の
+   totalsスナップショットを含む台帳データを起動時に読み込むと必ずReferenceErrorで失敗し、
+   台帳がメモリ上だけ空になっていた（保存自体はlocalStorageに正しく反映されるため、次回読み込み時に
+   「保存したのに台帳に反映されていない」ように見える不具合の原因だった。第7回修正） */
+let ledger = loadLedger();
 
-let customers = loadCustomers();
+/* 顧客データの旧仕様からの移行処理。起動時のloadCustomers()だけでなく、バックアップ復元（restoreJSON）
+   でも同じ移行を通す必要があるため、共通関数として切り出している（第8回修正）。
+   宛名（担当者名）欄・かな欄の廃止に伴い、会社名（個人名）欄が未入力で個人名（旧name／kana）欄のみを
+   持っていた顧客データを、会社名（個人名）欄へ一度だけ移行する。旧nameがあった＝元は個人客なので
+   敬称の初期値は「様」、既にcompanyNameを持っていた＝会社客は「御中」とし、現状の見た目を変えない */
+function normalizeCustomersData(list){
+  list = list || [];
+  list.forEach(c=>{
+    if(!c.companyName && c.name){
+      c.companyName = c.name;
+      if(!c.companyKana && c.kana) c.companyKana = c.kana;
+      if(!c.honorific) c.honorific = '様';
+      /* 移行元のname／kanaを残したままにすると、後日companyNameだけを編集した際に
+         getCustomerDisplayName()が「新会社名（旧個人名）」のように古いnameを括弧書きで
+         復活表示してしまうため、移行済みのnameとkanaはここで消しておく */
+      delete c.name;
+      delete c.kana;
+    }
+    if(!c.honorific) c.honorific = '御中';
+  });
+  return list;
+}
 function loadCustomers(){
-  try{ const raw = getStoreItem('ken_customers'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+  try{ const raw = getStoreItem('ken_customers'); const list = raw ? JSON.parse(raw) : []; return normalizeCustomersData(list); }catch(e){ return []; }
 }
 function saveCustomersToStorage(){ setStoreItem('ken_customers', JSON.stringify(customers)); }
+let customers = loadCustomers();
 
 let vehicles = loadVehicles();
 function loadVehicles(){
@@ -578,7 +609,11 @@ function issueCustomerCode(){
 /* 台帳・顧客一覧・サジェストで共通して使う宛名表示ルール：会社名があれば会社名（個人名）主表示、無ければ個人名のみ */
 function getCustomerDisplayName(cust){
   if(!cust) return '';
-  if(cust.companyName) return cust.companyName + (cust.name ? `（${cust.name}）` : '');
+  /* nameは第8回修正で廃止した旧・宛名（担当者名）欄の名残。移行処理でcompanyNameへコピーした
+     個人客はname===companyNameになるため、二重表示（例：「山田太郎（山田太郎）」）を防ぐため
+     一致する場合は括弧書きを付けない。companyNameと異なる場合（旧仕様の会社customer+担当者名）のみ
+     従来通り括弧書きで併記する */
+  if(cust.companyName) return cust.companyName + (cust.name && cust.name!==cust.companyName ? `（${cust.name}）` : '');
   return cust.name || '';
 }
 function searchCustomers(query){
@@ -586,11 +621,11 @@ function searchCustomers(query){
   if(!q) return customers;
   const qh = toHiragana(q);
   return customers.filter(c=>{
-    if(toHiragana(c.name).indexOf(qh)===0) return true;
-    if(c.kana && toHiragana(c.kana).indexOf(qh)===0) return true;
+    if(c.companyName && toHiragana(c.companyName).indexOf(qh)===0) return true;
+    /* 会社名かな（companyKana）も検索対象に含める。以前は会社名かなだけ検索から漏れていた（第8回修正） */
+    if(c.companyKana && toHiragana(c.companyKana).indexOf(qh)===0) return true;
     if(c.code && c.code.indexOf(q)===0) return true;
     if(c.tel && c.tel.includes(q)) return true;
-    if(c.companyName && toHiragana(c.companyName).indexOf(qh)===0) return true;
     return vehicles.some(v=>v.customerId===c.id && (
       (v.regNo && v.regNo.includes(q)) ||
       (v.chassisNo && v.chassisNo.includes(q)) ||
@@ -602,31 +637,34 @@ function searchCustomers(query){
 
 /* 請求書保存時に顧客・車両カルテへ反映（アップサート）。空欄の項目は既存値を上書きしない。 */
 function upsertCustomerAndVehicle(cust, veh){
-  if(!cust || (!cust.name && !cust.code && !cust.tel)) return null;
+  if(!cust || (!cust.companyName && !cust.code && !cust.tel)) return null;
   let c = null;
   let isNewCustomer = false;
   if(cust.code){
     const byCode = customers.find(x=>x.code && x.code===cust.code);
     if(byCode){
-      /* お客様コードが一致しても、双方に氏名が入力されていて食い違う場合は別人の可能性があるため、
+      /* お客様コードが一致しても、双方に名称が入力されていて食い違う場合は別人の可能性があるため、
          無条件で上書きせず確認を取ってから統合する（第3回修正） */
-      const nameConflict = cust.name && byCode.name && cust.name!==byCode.name;
-      if(!nameConflict || confirm('お客様コード '+cust.code+' は「'+byCode.name+'」様として既に登録されています。\n入力された氏名「'+cust.name+'」と一致しませんが、同一人物として上書きしますか？\n（いいえの場合は別の新しいお客様として登録します）')){
+      const nameConflict = cust.companyName && byCode.companyName && cust.companyName!==byCode.companyName;
+      if(!nameConflict || confirm('お客様コード '+cust.code+' は「'+byCode.companyName+'」として既に登録されています。\n入力された名称「'+cust.companyName+'」と一致しませんが、同一人物として上書きしますか？\n（いいえの場合は別の新しいお客様として登録します）')){
         c = byCode;
       }
     }
   }
-  /* 氏名＋電話番号が一致する既存顧客を同一人物とみなす。ただし双方とも電話番号未入力（空文字同士）だと
-     同姓同名の別人を誤って統合してしまうため、電話番号が入力されている場合のみマッチさせる（第3回修正） */
-  if(!c && cust.name){
-    c = customers.find(x=>x.name===cust.name && cust.tel && x.tel===cust.tel);
+  /* 会社名（個人名）＋電話番号が一致する既存顧客を同一人物とみなす。ただし双方とも電話番号未入力（空文字同士）だと
+     同姓同名の別人を誤って統合してしまうため、電話番号が入力されている場合のみマッチさせる（第3回修正）。
+     第8回修正：宛名（担当者名）欄の廃止により個人客も会社名（個人名）欄のみを持つため、コード一致に加えて
+     こちらもcompanyName基準に統一（従来は個人名＋電話番号のみでマッチしており、会社名のみの顧客は
+     マッチ手段がなく毎回重複登録されていた） */
+  if(!c && cust.companyName){
+    c = customers.find(x=>x.companyName===cust.companyName && cust.tel && x.tel===cust.tel);
   }
   if(!c){
-    c = { id: generateId('c', customers), name:'', companyName:'', companyKana:'', kana:'', tel:'', postal:'', address:'', code:'', email:'' };
+    c = { id: generateId('c', customers), companyName:'', companyKana:'', honorific:'御中', tel:'', postal:'', address:'', code:'', email:'' };
     customers.push(c);
     isNewCustomer = true;
   }
-  ['name','companyName','companyKana','kana','tel','postal','address','code','email'].forEach(k=>{ if(cust[k]) c[k]=cust[k]; });
+  ['companyName','companyKana','honorific','tel','postal','address','code','email'].forEach(k=>{ if(cust[k]) c[k]=cust[k]; });
   if(isNewCustomer && !c.code) c.code = issueCustomerCode();
   /* お客様コードが他の顧客と重複してしまう場合（コード衝突を確認のうえ別人として新規登録した場合等）は
      自動採番し直し、コードの一意性を保つ（第3回修正） */
@@ -658,8 +696,11 @@ function isShakenSoon(iso){
    ============================================================ */
 function fillTemplate(tpl, c, v){
   c = c || {}; v = v || {};
+  /* c.nameだけを参照すると、宛名（担当者名）が未入力の会社名のみの顧客で{顧客名}タグが空欄になって
+     しまう不具合があった。台帳等の宛名表示と同じgetCustomerDisplayName()（会社名優先・個人名は
+     括弧書きで併記）に統一して解消（第8回修正） */
   return String(tpl||'')
-    .replace(/\{顧客名\}/g, c.name||'')
+    .replace(/\{顧客名\}/g, getCustomerDisplayName(c)||'')
     .replace(/\{車両\}/g, v.carName||'')
     .replace(/\{ナンバー\}/g, v.regNo||'')
     .replace(/\{次回車検日\}/g, toWarekiShort(v.nextShaken)||'未設定');
@@ -756,7 +797,7 @@ function createDefaultState(){
     kubun: '',
     kyoten: shop.name || 'ケンズオート',
     uketsukeDate: '', kanryoDate: '', uketsukeTanto: '', seibiTanto: '',
-    customer: { name:'', companyName:'', companyKana:'', kana:'', postal:'', address:'', code:'', tel:'', email:'' },
+    customer: { companyName:'', companyKana:'', honorific:'', postal:'', address:'', code:'', tel:'', email:'' },
     vehicle: createEmptyVehicle(),
     items: [],
     costs: { jibaiseki:0, jyuryozei:0, inshi:0,
@@ -767,8 +808,9 @@ function createDefaultState(){
     },
     nebiki: 0,
     sangaku: { label:'', amount:0 },
-    /* 振込先（複数登録時）の選択。新規作成時は1件目をデフォルト選択する（第2回修正） */
-    bankAccountId: (shop.bankAccounts && shop.bankAccounts[0] && shop.bankAccounts[0].id) || '',
+    /* 振込先（複数登録時）の選択。チェックした分だけ請求書に印字する（第2回修正で単一選択式に変更、
+       第9回修正でチェックボックスによる複数選択式に変更）。新規作成時は1件目をデフォルトで選択する */
+    bankAccountIds: (shop.bankAccounts && shop.bankAccounts[0] && shop.bankAccounts[0].id) ? [shop.bankAccounts[0].id] : [],
   };
 }
 const CHECKUP_ROWS_PLAIN = [
@@ -888,16 +930,17 @@ function buildDoc(s){
   const shopAddr = (shop.postal||shop.address)
     ? `〒${escapeHtml(shop.postal)||'〔要記入〕'}　${escapeHtml(shop.address)||'〔住所：要記入〕'}`
     : '<span class="ph">〒〔要記入〕　〔住所：要記入〕</span>';
-  /* 振込先は複数登録可。請求書ごとに選択された1件のみ印字する（第2回修正）。
-     s.bankAccountIdが未設定、または該当口座が見つからない場合（＝bankAccountId未対応の旧台帳データ等）は、
+  /* 振込先は複数登録可。請求書ごとにチェックした口座だけを印字する（第2回修正で単一選択式に変更した
+     ものを、第9回修正でチェックボックスによる複数選択式に変更）。
+     s.bankAccountIdsが未設定（空配列含む）の場合は、bankAccountIds未対応の旧台帳データとみなし
      従来通り登録されている口座をすべて印字する（後方互換） */
   const allBankAccounts = (shop.bankAccounts && shop.bankAccounts.length) ? shop.bankAccounts : [{}];
-  const selectedBank = s.bankAccountId ? allBankAccounts.find(b=>b.id===s.bankAccountId) : null;
-  /* bankAccountId未設定＝振込先選択機能に対応する前の旧データ→従来通り全件表示にフォールバックする。
-     bankAccountIdは設定されているが該当口座が見つからない＝発行後にその振込先が削除された、というケースは
-     発行時と異なる内容を印字してしまうため全件表示にフォールバックせず、削除済みである旨を案内する（第5回修正） */
-  const bankAccountDeleted = !!(s.bankAccountId && !selectedBank);
-  const bankAccounts = selectedBank ? [selectedBank] : (s.bankAccountId ? [] : allBankAccounts);
+  const hasBankSelection = Array.isArray(s.bankAccountIds) && s.bankAccountIds.length>0;
+  const selectedBanks = hasBankSelection ? s.bankAccountIds.map(id=>allBankAccounts.find(b=>b.id===id)).filter(Boolean) : [];
+  /* 選択されていた振込先が発行後にすべて削除された場合は、発行時と異なる内容を印字してしまうため
+     全件表示にフォールバックせず、削除済みである旨を案内する（第5回修正） */
+  const bankAccountDeleted = hasBankSelection && selectedBanks.length===0;
+  const bankAccounts = hasBankSelection ? selectedBanks : allBankAccounts;
   const bankHasAny = bankAccounts.some(b=>b.bankName||b.accNo);
   const bankHTML = bankAccountDeleted
     ? '〔選択されていた振込先が削除されています。設定から振込先を選び直してください〕'
@@ -929,10 +972,7 @@ function buildDoc(s){
     <div class="p-col">
       ${s.customer.postal ? '〒'+escapeHtml(s.customer.postal)+'<br>' : ''}
       ${escapeHtml(s.customer.address)}<br>
-      ${s.customer.companyName
-        ? `<span class="name">${escapeHtml(s.customer.companyName)} 御中</span>${s.customer.name ? `<br><span class="person">${escapeHtml(s.customer.name)} 様</span>` : ''}<br>`
-        : `<span class="name">${escapeHtml(s.customer.name)||'（宛名未入力）'} 御中</span><br>`
-      }
+      <span class="name">${escapeHtml(s.customer.companyName)||'（宛名未入力）'} ${escapeHtml(s.customer.honorific||'御中')}</span><br>
       <span class="code">お客様コード　${escapeHtml(s.customer.code)}　TEL ${escapeHtml(s.customer.tel)}</span>
     </div>
     <div class="p-col right">
@@ -1080,10 +1120,15 @@ function buildFormHTML(){
       </div>
     </div>
     ${shop.bankAccounts && shop.bankAccounts.length>1 ? `
-    <div class="frow"><label>振込先</label>
-      <select id="f-bank-account-id">
-        ${shop.bankAccounts.map(b=>`<option value="${escapeHtml(b.id)}"${s.bankAccountId===b.id?' selected':''}>${escapeHtml(b.label || [b.bankName,b.branch].filter(Boolean).join(' ') || '（未設定の振込先）')}</option>`).join('')}
-      </select>
+    <div class="frow" style="align-items:flex-start;">
+      <label style="margin-top:8px;">振込先</label>
+      <div id="f-bank-account-checks" style="flex:1; display:flex; flex-direction:column; gap:6px; padding-top:6px;">
+        ${shop.bankAccounts.map(b=>`
+        <label style="display:flex; align-items:center; gap:6px; width:auto; font-size:13px; color:#333;">
+          <input type="checkbox" data-bank-id="${escapeHtml(b.id)}" ${(s.bankAccountIds||[]).includes(b.id)?'checked':''}>
+          ${escapeHtml(b.label || [b.bankName,b.branch].filter(Boolean).join(' ') || '（未設定の振込先）')}
+        </label>`).join('')}
+      </div>
     </div>` : ''}
   </div>
 
@@ -1101,19 +1146,18 @@ function buildFormHTML(){
     </div>
     <div class="frow"><label>会社名かな</label><input type="text" id="f-cust-company-kana" placeholder="検索・並び替え用（任意）" value="${escapeHtml(s.customer.companyKana||'')}"></div>
     <div class="frow">
-      <label>宛名（担当者名）</label>
-      <div style="flex:1; position:relative;">
-        <input type="text" id="f-cust-name" placeholder="${escapeHtml(s.customer.companyName) || '◯◯ 御中'}" value="${escapeHtml(s.customer.name)}" autocomplete="off">
-        <div id="cust-suggest" class="suggest-box"></div>
+      <label>敬称</label>
+      <div class="seg" id="cust-honorific-seg">
+        <button type="button" data-honorific="様" class="${(s.customer.honorific||'御中')==='様'?'active':''}">様</button>
+        <button type="button" data-honorific="御中" class="${(s.customer.honorific||'御中')==='御中'?'active':''}">御中</button>
       </div>
     </div>
-    <div class="frow"><label>かな</label><input type="text" id="f-cust-kana" placeholder="検索用（任意）" value="${escapeHtml(s.customer.kana||'')}"></div>
     <div class="frow2">
-      <div class="frow"><label>郵便番号</label><input type="text" id="f-cust-postal" value="${escapeHtml(s.customer.postal)}"></div>
+      <div class="frow"><label>郵便番号</label><input type="text" inputmode="numeric" autocomplete="off" id="f-cust-postal" value="${escapeHtml(s.customer.postal)}"></div>
       <div class="frow"><label>お客様コード</label><input type="text" id="f-cust-code" value="${escapeHtml(s.customer.code)}"></div>
     </div>
     <div class="frow"><label>住所</label><input type="text" id="f-cust-address" value="${escapeHtml(s.customer.address)}"></div>
-    <div class="frow"><label>TEL</label><input type="text" id="f-cust-tel" value="${escapeHtml(s.customer.tel)}"></div>
+    <div class="frow"><label>TEL</label><input type="text" inputmode="numeric" autocomplete="off" id="f-cust-tel" value="${escapeHtml(s.customer.tel)}"></div>
     <div class="frow"><label>メール</label><input type="text" id="f-cust-email" placeholder="車検リマインドのメール送信に使用" value="${escapeHtml(s.customer.email||'')}"></div>
   </div>
 
@@ -1227,26 +1271,19 @@ function deleteItemRow(i){
 }
 
 /* ============================================================
-   顧客カルテ・サジェスト（請求書作成画面の宛名入力）
+   顧客カルテ・サジェスト（請求書作成画面の会社名（個人名）入力）
    ============================================================ */
-function wireCustSuggest(){
-  const input = document.getElementById('f-cust-name');
-  const box = document.getElementById('cust-suggest');
-  if(!input || !box) return;
-  input.addEventListener('input', function(){ showCustSuggest(this.value, box, 'name'); });
-  input.addEventListener('focus', function(){ showCustSuggest(this.value, box, 'name'); });
-  wireSuggestBoxActions(box);
-}
-/* 会社名欄からも同じカルテ検索候補を出せるようにする */
+/* 会社名（個人名）欄からカルテ検索候補を出す（第8回修正：宛名（担当者名）欄の廃止に伴い、
+   サジェストは会社名（個人名）欄のみに一本化） */
 function wireCompanySuggest(){
   const input = document.getElementById('f-cust-company-name');
   const box = document.getElementById('cust-company-suggest');
   if(!input || !box) return;
-  input.addEventListener('input', function(){ showCustSuggest(this.value, box, 'company'); });
-  input.addEventListener('focus', function(){ showCustSuggest(this.value, box, 'company'); });
+  input.addEventListener('input', function(){ showCustSuggest(this.value, box); });
+  input.addEventListener('focus', function(){ showCustSuggest(this.value, box); });
   wireSuggestBoxActions(box);
 }
-/* 宛名・会社名サジェストボックス内の候補クリックをイベント委譲で処理する。
+/* サジェストボックス内の候補クリックをイベント委譲で処理する。
    検索文字列（自由入力）をonclick文字列に組み立てるとJS文字列リテラルを脱出されXSSの原因になるため、
    data-*属性に値を格納しdatasetから読み取る（wireStaffSuggest()と同じ安全なパターン。第3回修正） */
 function wireSuggestBoxActions(box){
@@ -1256,24 +1293,23 @@ function wireSuggestBoxActions(box){
     const action = item.dataset.action;
     if(action==='pick-customer') pickCustomer(item.dataset.id);
     else if(action==='pick-vehicle') pickVehicle(item.dataset.id);
-    else if(action==='register-new') registerNewCustomerInline(item.dataset.query, item.dataset.source);
+    else if(action==='register-new') registerNewCustomerInline(item.dataset.query);
   });
 }
-/* sourceField: どの欄から呼ばれたか（'name'=宛名（担当者名）欄／'company'=会社名欄）。新規登録時の登録先を区別するために使う */
-function showCustSuggest(query, box, sourceField){
+function showCustSuggest(query, box){
   const q = String(query||'').trim();
   if(!q){ box.classList.remove('open'); box.innerHTML=''; return; }
   const matches = searchCustomers(q).slice(0,6);
   let html = matches.map(c=>{
     const vehs = vehicles.filter(v=>v.customerId===c.id);
     const vehLabel = vehs.length ? vehs.map(v=>v.regNo).filter(Boolean).join('・') : '車両未登録';
-    const primary = getCustomerDisplayName(c) || '（氏名未登録）';
+    const primary = getCustomerDisplayName(c) || '（会社名未登録）';
     return `<div class="suggest-item" data-action="pick-customer" data-id="${escapeHtml(c.id)}">
       <div>${escapeHtml(primary)}</div>
-      <div class="si-sub">${escapeHtml(c.kana||'')} ${escapeHtml(c.tel||'')} ${escapeHtml(vehLabel)}</div>
+      <div class="si-sub">${escapeHtml(c.companyKana||'')} ${escapeHtml(c.tel||'')} ${escapeHtml(vehLabel)}</div>
     </div>`;
   }).join('');
-  html += `<div class="suggest-item new" data-action="register-new" data-query="${escapeHtml(q)}" data-source="${sourceField==='company'?'company':'name'}">＋「${escapeHtml(q)}」を新規登録</div>`;
+  html += `<div class="suggest-item new" data-action="register-new" data-query="${escapeHtml(q)}">＋「${escapeHtml(q)}」を新規登録</div>`;
   box.innerHTML = html;
   box.classList.add('open');
 }
@@ -1285,13 +1321,13 @@ function applyVehicleToState(v){
 function pickCustomer(custId){
   const c = customers.find(x=>x.id===custId);
   if(!c) return;
-  state.customer = { name:c.name, companyName:c.companyName||'', companyKana:c.companyKana||'', kana:c.kana||'', postal:c.postal||'', address:c.address||'', code:c.code||'', tel:c.tel||'', email:c.email||'' };
+  state.customer = { companyName:c.companyName||'', companyKana:c.companyKana||'', honorific:c.honorific||'御中', postal:c.postal||'', address:c.address||'', code:c.code||'', tel:c.tel||'', email:c.email||'' };
   const vehs = vehicles.filter(v=>v.customerId===custId);
-  document.getElementById('cust-suggest').classList.remove('open');
+  document.getElementById('cust-company-suggest').classList.remove('open');
   if(vehs.length===1){
     applyVehicleToState(vehs[0]);
     renderCreateView();
-    showToast((c.name||'お客様')+'を選択しました');
+    showToast(getCustomerDisplayName(c)+'を選択しました');
   } else if(vehs.length>1){
     /* 車両が複数あり選択待ちになる間、前の顧客の車両情報が残ったまま保存されないよう一旦空にする（第3回修正） */
     state.vehicle = createEmptyVehicle();
@@ -1301,11 +1337,11 @@ function pickCustomer(custId){
     /* 車両未登録の顧客に切り替えた場合も、前の顧客の車両情報が残らないよう空にする（第3回修正） */
     state.vehicle = createEmptyVehicle();
     renderCreateView();
-    showToast((c.name||'お客様')+'を選択しました（車両未登録）');
+    showToast(getCustomerDisplayName(c)+'を選択しました（車両未登録）');
   }
 }
 function showVehiclePicker(vehs){
-  const box = document.getElementById('cust-suggest');
+  const box = document.getElementById('cust-company-suggest');
   if(!box) return;
   box.innerHTML = '<div class="suggest-item" style="font-weight:700;color:#666;cursor:default;">車両を選択してください</div>' +
     vehs.map(v=>`<div class="suggest-veh" data-action="pick-vehicle" data-id="${escapeHtml(v.id)}">${escapeHtml(v.regNo)||'(ナンバー未登録)'}　${escapeHtml(v.carName)}</div>`).join('');
@@ -1316,33 +1352,32 @@ function pickVehicle(vehId){
   if(!v) return;
   applyVehicleToState(v);
   renderCreateView();
-  const box = document.getElementById('cust-suggest');
+  const box = document.getElementById('cust-company-suggest');
   if(box) box.classList.remove('open');
   showToast('車両を選択しました（'+(v.regNo||'')+'）');
 }
-/* sourceField==='company'の場合は会社名欄からの新規登録なので、companyNameに登録する（宛名/個人名欄はそのまま維持）。
-   会社名欄→宛名欄の順で続けて新規登録した場合、既に採番済みの同一顧客（state.customer.code）に追記する形にし、
-   別人として二重登録して片方の項目（会社名や宛名）が消えてしまわないようにする（第3回修正・第6回修正） */
-function registerNewCustomerInline(name, sourceField){
+/* 会社名（個人名）欄からの新規登録。同じ請求書内で続けて新規登録した場合、既に採番済みの同一顧客
+   （state.customer.code）に追記する形にし、別人として二重登録してしまわないようにする
+   （第3回修正・第6回修正）。第8回修正：宛名（担当者名）欄の廃止に伴い、会社名（個人名）欄のみを
+   対象にするよう簡略化 */
+function registerNewCustomerInline(name){
   if(!name) return;
-  const isCompany = sourceField==='company';
   const already = state.customer.code && customers.find(x=>x.code===state.customer.code);
   let c;
   if(already){
     c = already;
-    if(isCompany) c.companyName = name; else c.name = name;
+    c.companyName = name;
   } else {
     const code = issueCustomerCode();
     c = { id: generateId('c', customers),
-      name: isCompany ? (state.customer.name||'') : name,
-      companyName: isCompany ? name : (state.customer.companyName||''),
-      companyKana: state.customer.companyKana||'', kana: state.customer.kana||'',
+      companyName: name, companyKana: state.customer.companyKana||'',
+      honorific: state.customer.honorific||'御中',
       tel: state.customer.tel||'', postal: state.customer.postal||'', address: state.customer.address||'',
       code, email: state.customer.email||'' };
     customers.push(c);
   }
   saveCustomersToStorage();
-  state.customer = { name:c.name, companyName:c.companyName, companyKana:c.companyKana||'', kana:c.kana||'', postal:c.postal||'', address:c.address||'', code:c.code, tel:c.tel||'', email:c.email||'' };
+  state.customer = { companyName:c.companyName, companyKana:c.companyKana||'', honorific:c.honorific||'御中', postal:c.postal||'', address:c.address||'', code:c.code, tel:c.tel||'', email:c.email||'' };
   /* 新規登録した顧客はまだ車両を持たないため、前の顧客の車両情報が残らないよう空にする（第3回修正） */
   state.vehicle = createEmptyVehicle();
   renderCreateView();
@@ -1364,6 +1399,34 @@ function setDeep(obj, path, val){
   let o = obj;
   for(let i=0;i<parts.length-1;i++) o = o[parts[i]];
   o[parts[parts.length-1]] = val;
+}
+/* 敬称（様／御中）の2択セグメントボタンの結線。請求書作成画面・顧客カルテ画面で共用する（第8回修正） */
+function wireHonorificSeg(segId, onPick){
+  const seg = document.getElementById(segId);
+  if(!seg) return;
+  seg.addEventListener('click', function(e){
+    const btn = e.target.closest('button[data-honorific]');
+    if(!btn) return;
+    [...seg.children].forEach(b=>b.classList.toggle('active', b===btn));
+    onPick(btn.dataset.honorific);
+  });
+}
+/* 振込先チェックボックス群の結線。チェックした口座のidだけをstate.bankAccountIdsに保持する（第9回修正） */
+function wireBankAccountChecks(){
+  const wrap = document.getElementById('f-bank-account-checks');
+  if(!wrap) return;
+  wrap.addEventListener('change', function(e){
+    const cb = e.target.closest('input[type=checkbox][data-bank-id]');
+    if(!cb) return;
+    const id = cb.dataset.bankId;
+    state.bankAccountIds = state.bankAccountIds || [];
+    if(cb.checked){
+      if(!state.bankAccountIds.includes(id)) state.bankAccountIds.push(id);
+    } else {
+      state.bankAccountIds = state.bankAccountIds.filter(x=>x!==id);
+    }
+    renderPreview();
+  });
 }
 /* 郵便番号・電話番号：入力の都度ハイフンを自動整形して反映する */
 function wireFormatInput(id, path, formatter){
@@ -1449,14 +1512,12 @@ function wireForm(){
   wireSimpleInput('f-seibi-tanto','seibiTanto');
   wireStaffSuggest('f-uketsuke-tanto','uketsuke-tanto-suggest', ()=>shop.uketsukeStaffList||[], 'uketsukeTanto');
   wireStaffSuggest('f-seibi-tanto','seibi-tanto-suggest', ()=>shop.seibiStaffList||[], 'seibiTanto');
-  wireSimpleInput('f-bank-account-id','bankAccountId');
+  wireBankAccountChecks();
 
   wireSimpleInput('f-cust-company-name','customer.companyName');
   wireKanaInput('f-cust-company-kana','customer.companyKana');
-  wireSimpleInput('f-cust-name','customer.name');
-  wireKanaInput('f-cust-kana','customer.kana');
-  wireCustSuggest();
   wireCompanySuggest();
+  wireHonorificSeg('cust-honorific-seg', function(honorific){ state.customer.honorific = honorific; renderPreview(); });
   wireFormatInput('f-cust-postal','customer.postal', formatPostal);
   wireSimpleInput('f-cust-code','customer.code');
   wireSimpleInput('f-cust-address','customer.address');
@@ -1542,9 +1603,13 @@ function renderCreateView(){
 }
 
 /* #print-area（ネイティブ印刷用コピー）への描画を一箇所にまとめた共通関数。
-   アプリの印刷ボタン（doPrint/printLedgerRecord）とbeforeprintフォールバックの両方から呼び出す（第4回修正） */
+   アプリの印刷ボタン（doPrint/printLedgerRecord）とbeforeprintフォールバックの両方から呼び出す（第4回修正）。
+   ラップ用divに"doc-box"クラスを付与するのが必須。これが無いと`#doc, .doc-box`のCSS（基準フォントサイズ
+   9.2px・余白・position:relative等）が一切適用されず、印刷専用の`#print-area > div`側では幅・高さと
+   overflow:hiddenしか補っていないため、既定フォントサイズ（16px）のまま固定ピクセルレイアウトが
+   大幅にはみ出してほぼ全てクリップされ、印刷プレビューがほぼ無地に見える不具合があった（第8回修正） */
 function syncPrintArea(invoiceData){
-  document.getElementById('print-area').innerHTML = '<div>'+buildDoc(invoiceData)+'</div>';
+  document.getElementById('print-area').innerHTML = '<div class="doc-box">'+buildDoc(invoiceData)+'</div>';
 }
 /* アプリの印刷ボタン経由で#print-areaを同期済みかどうかのフラグ。
    trueのままbeforeprintが発火した場合は、直前に正しい内容へ同期済みなので何もしない（第4回修正） */
@@ -1830,18 +1895,15 @@ function renderCustomersView(){
     pane.innerHTML = '<div style="color:#999; padding:40px; text-align:center;">左の一覧から顧客を選択してください</div>';
   }
 }
-/* 顧客一覧の表示順：「会社」グループ→「個人」グループの順、各グループ内は50音順（かな未入力時は名称をフォールバック） */
+/* 顧客一覧の表示順：50音順（かな未入力時は会社名（個人名）をフォールバック）。
+   第8回修正：宛名（担当者名）欄の廃止で全顧客が会社名（個人名）欄に一本化されたため、
+   「会社」→「個人」のグループ分けは意味を持たなくなり単純な50音順一覧に変更 */
 function sortCustomersForDisplay(list){
-  const companies = list.filter(c=>c.companyName);
-  const individuals = list.filter(c=>!c.companyName);
-  const byKana = getKanaFns => (a,b)=>{
-    const ka = toHiragana(getKanaFns(a));
-    const kb = toHiragana(getKanaFns(b));
+  return [...list].sort((a,b)=>{
+    const ka = toHiragana(a.companyKana || a.companyName || '');
+    const kb = toHiragana(b.companyKana || b.companyName || '');
     return ka.localeCompare(kb, 'ja');
-  };
-  companies.sort(byKana(c=>c.companyKana || c.companyName || ''));
-  individuals.sort(byKana(c=>c.kana || c.name || ''));
-  return [...companies, ...individuals];
+  });
 }
 function renderCustomerList(query){
   const area = document.getElementById('cust-list-area');
@@ -1859,7 +1921,7 @@ function renderCustomerList(query){
     const cnText = getCustomerDisplayName(c) || '（氏名未入力）';
     return `<div class="cust-item${c.id===selectedCustomerId?' selected':''}" onclick="selectCustomer('${escapeHtml(c.id)}')">
       <div class="cn">${escapeHtml(cnText)}</div>
-      <div class="ci">${escapeHtml(c.kana||'')} ${escapeHtml(c.tel||'')} ${c.code?('コード'+escapeHtml(c.code)):''}</div>
+      <div class="ci">${escapeHtml(c.companyKana||'')} ${escapeHtml(c.tel||'')} ${c.code?('コード'+escapeHtml(c.code)):''}</div>
       <div>${tags}</div>
     </div>`;
   }).join('');
@@ -1915,13 +1977,18 @@ function buildCustomerDetailHTML(c){
     <h2>顧客情報</h2>
     <div class="frow"><label>会社名（個人名）</label><input type="text" id="cd-company-name" placeholder="法人の場合の会社名、個人の場合は個人名" value="${escapeHtml(c.companyName||'')}"></div>
     <div class="frow"><label>会社名かな</label><input type="text" id="cd-company-kana" placeholder="検索・並び替え用（任意）" value="${escapeHtml(c.companyKana||'')}"></div>
-    <div class="frow"><label>宛名（担当者名）</label><input type="text" id="cd-name" value="${escapeHtml(c.name)}"></div>
-    <div class="frow"><label>かな</label><input type="text" id="cd-kana" value="${escapeHtml(c.kana||'')}"></div>
+    <div class="frow">
+      <label>敬称</label>
+      <div class="seg" id="cd-honorific-seg">
+        <button type="button" data-honorific="様" class="${(c.honorific||'御中')==='様'?'active':''}">様</button>
+        <button type="button" data-honorific="御中" class="${(c.honorific||'御中')==='御中'?'active':''}">御中</button>
+      </div>
+    </div>
     <div class="frow2">
-      <div class="frow"><label>電話</label><input type="text" id="cd-tel" value="${escapeHtml(c.tel||'')}"></div>
+      <div class="frow"><label>電話</label><input type="text" inputmode="numeric" autocomplete="off" id="cd-tel" value="${escapeHtml(c.tel||'')}"></div>
       <div class="frow"><label>お客様コード</label><input type="text" id="cd-code" value="${escapeHtml(c.code||'')}"></div>
     </div>
-    <div class="frow"><label>郵便番号</label><input type="text" id="cd-postal" value="${escapeHtml(c.postal||'')}"></div>
+    <div class="frow"><label>郵便番号</label><input type="text" inputmode="numeric" autocomplete="off" id="cd-postal" value="${escapeHtml(c.postal||'')}"></div>
     <div class="frow"><label>住所</label><input type="text" id="cd-address" value="${escapeHtml(c.address||'')}"></div>
     <div class="frow"><label>メール</label><input type="text" id="cd-email" placeholder="車検リマインドのメール送信に使用" value="${escapeHtml(c.email||'')}"></div>
     <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" onclick="deleteCustomer('${escapeHtml(c.id)}')">🗑 この顧客を削除</button></div>
@@ -2048,7 +2115,7 @@ function buildVehicleDetailHTML(v){
 function wireCustomerDetail(c){
   /* DOM idはkebab-case（cd-company-name等）、顧客オブジェクトのプロパティ名はcamelCase（companyName等）
      と表記が異なるため、idサフィックスとプロパティ名の対応表として持つ（第5回修正） */
-  [['company-name','companyName'],['name','name'],['code','code'],['address','address'],['email','email']].forEach(([idSuffix,propKey])=>{
+  [['company-name','companyName'],['code','code'],['address','address'],['email','email']].forEach(([idSuffix,propKey])=>{
     const el = document.getElementById('cd-'+idSuffix);
     if(!el) return;
     el.addEventListener('input', function(){
@@ -2066,11 +2133,9 @@ function wireCustomerDetail(c){
     const searchInput = document.getElementById('cust-search-input');
     renderCustomerList(searchInput ? searchInput.value : '');
   });
-  wireKanaField(document.getElementById('cd-kana'), kana=>{
-    c.kana = kana;
+  wireHonorificSeg('cd-honorific-seg', function(honorific){
+    c.honorific = honorific;
     saveCustomersToStorage();
-    const searchInput = document.getElementById('cust-search-input');
-    renderCustomerList(searchInput ? searchInput.value : '');
   });
   const postalEl = document.getElementById('cd-postal');
   if(postalEl) postalEl.addEventListener('input', function(){
@@ -2164,7 +2229,7 @@ function buildReminderRowsHTML(targets){
     const tel = c && c.tel;
     const email = c && c.email;
     return `<tr class="${overdue?'overdue':''}">
-      <td>${escapeHtml(c && c.name)||'（氏名未登録）'}</td>
+      <td>${escapeHtml(c && getCustomerDisplayName(c))||'（氏名未登録）'}</td>
       <td>${escapeHtml(v.carName)||''}　${escapeHtml(v.regNo)||''}</td>
       <td>${toWarekiShort(v.nextShaken)||''}</td>
       <td class="rem-days ${daysClass}">${daysLabel}</td>
@@ -2267,16 +2332,14 @@ function buildSettingsHTML(){
     <h2>発行元情報（ケンズオート）</h2>
     <div class="frow"><label>事業者名</label><input type="text" id="s-name" value="${escapeHtml(shop.name)}"></div>
     <div class="frow"><label>指定工場表記</label><input type="text" id="s-kikan" placeholder="例：九州運輸局指定整備工場" value="${escapeHtml(shop.kikan)}"></div>
-    <div class="frow"><label>郵便番号</label><input type="text" id="s-postal" value="${escapeHtml(shop.postal)}"></div>
+    <div class="frow"><label>郵便番号</label><input type="text" inputmode="numeric" autocomplete="off" id="s-postal" value="${escapeHtml(shop.postal)}"></div>
     <div class="frow2">
       <div class="frow"><label>代表者肩書き</label><input type="text" id="s-rep-title" placeholder="例：代表取締役" value="${escapeHtml(shop.repTitle)}"></div>
       <div class="frow"><label>代表者</label><input type="text" id="s-rep" value="${escapeHtml(shop.rep)}"></div>
     </div>
     <div class="frow"><label>住所</label><input type="text" id="s-address" value="${escapeHtml(shop.address)}"></div>
-    <div class="frow2">
-      <div class="frow"><label>TEL</label><input type="text" id="s-tel" value="${escapeHtml(shop.tel)}"></div>
-      <div class="frow"><label>FAX</label><input type="text" id="s-fax" value="${escapeHtml(shop.fax)}"></div>
-    </div>
+    <div class="frow"><label>TEL</label><input type="text" inputmode="numeric" autocomplete="off" id="s-tel" value="${escapeHtml(shop.tel)}"></div>
+    <div class="frow"><label>FAX</label><input type="text" inputmode="numeric" autocomplete="off" id="s-fax" value="${escapeHtml(shop.fax)}"></div>
     <div class="frow"><label>登録番号</label><input type="text" id="s-invoice-no" placeholder="T＋13桁" value="${escapeHtml(shop.invoiceNo)}"></div>
   </div>
 
@@ -2446,7 +2509,7 @@ function restoreJSON(e){
          起動時と同じ移行処理を通すことで振込先情報等が消えないようにする（第3回修正） */
       if(data.shop) shop = normalizeShopData(data.shop);
       if(data.ledger) ledger = normalizeLedgerData(data.ledger);
-      if(data.customers) customers = data.customers;
+      if(data.customers) customers = normalizeCustomersData(data.customers);
       if(data.vehicles) vehicles = data.vehicles;
       if(data.templates) templates = Object.assign(createDefaultTemplates(), data.templates);
       /* 復元後のledger/customersを踏まえ、伝票No・お客様コードの高水位マークも追いつかせる（第5回修正） */
