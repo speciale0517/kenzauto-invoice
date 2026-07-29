@@ -16,13 +16,13 @@
   .topnav h1{font-size:14px; font-weight:700; margin:0;}
   .tabs{display:flex; gap:4px; margin-left:8px;}
   .tabs button{padding:8px 16px; border:none; border-radius:5px; font-size:13px; font-weight:600;
-    background:#2b3444; color:#bbb;}
+    background:#2b3444; color:#bbb; min-height:44px;}
   .tabs button.active{background:#3a4658; color:#fff;}
   .topnav .spacer{flex:1;}
   .btn-primary{padding:8px 16px; border:none; border-radius:5px; font-size:13px; font-weight:700;
     background:linear-gradient(135deg,#e7c578,#b8942c); color:#1c2430;}
   .btn-ghost{padding:8px 14px; border:1px solid #555; border-radius:5px; font-size:13px; font-weight:600;
-    background:transparent; color:#ddd;}
+    background:transparent; color:#ddd; min-height:44px;}
   .toast{position:fixed; top:56px; left:50%; transform:translateX(-50%); background:#1c2430; color:#fff;
     padding:8px 18px; border-radius:20px; font-size:13px; z-index:200; box-shadow:0 4px 16px rgba(0,0,0,.3);
     opacity:0; pointer-events:none; transition:opacity .25s;}
@@ -384,6 +384,12 @@ function showToast(msg){
   el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'), 1800);
 }
+/* 保存データが存在するのにJSON.parseやnormalize*Data()が失敗した場合（＝データ破損）にのみ呼ぶ。
+   以前はload*()のcatchが無警告でデフォルト値へフォールバックしており、ユーザーには
+   「なぜか前回のデータが消えている」としか見えず原因にも対処法にも気づけなかった（軽微修正） */
+function notifyDataCorruption(label){
+  showToast(`${label}の読み込みに失敗しました。保存されているデータが壊れている可能性があります。「設定」画面からバックアップを復元してください`);
+}
 
 /* ============================================================
    ストレージ
@@ -396,9 +402,42 @@ function getStoreItem(key){
   if(STORAGE_OK) return localStorage.getItem(key);
   return memStore[key] || null;
 }
+/* 容量超過（QuotaExceededError等）でlocalStorage.setItemが失敗した場合、以前は無反応で
+   ユーザーに保存失敗が伝わらなかった。try-catchで保護し成否をbooleanで返すよう変更し、
+   呼び出し元のsave*ToStorage()経由で保存失敗を検知できるようにする（中優先度修正） */
 function setStoreItem(key, val){
-  if(STORAGE_OK) localStorage.setItem(key, val);
-  else memStore[key] = val;
+  try{
+    if(STORAGE_OK) localStorage.setItem(key, val);
+    else memStore[key] = val;
+  }catch(e){
+    showToast('保存に失敗しました。デバイスの空き容量が不足している可能性があります。バックアップを書き出してから、古いデータの整理をご検討ください');
+    return false;
+  }
+  checkStorageCapacityWarning();
+  return true;
+}
+/* CLAUDE.md 7章：iOS Safari等のlocalStorage容量制限（目安5MB）を見越し、上限に近づいたら警告する。
+   保存のたびに毎回警告するとユーザーの妨げになるため、1セッション（ページ読み込みから次のリロードまで）
+   につき1回のみ表示する */
+let capacityWarningShown = false;
+const STORAGE_CAPACITY_WARNING_BYTES = 5 * 1024 * 1024 * 0.8; // 5MBの80%（4MB）
+function estimateStorageUsageBytes(){
+  let total = 0;
+  if(!STORAGE_OK) return total;
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.indexOf('ken_')===0){
+      total += new Blob([localStorage.getItem(key)||'']).size;
+    }
+  }
+  return total;
+}
+function checkStorageCapacityWarning(){
+  if(capacityWarningShown) return;
+  if(estimateStorageUsageBytes() > STORAGE_CAPACITY_WARNING_BYTES){
+    capacityWarningShown = true;
+    showToast('保存データの容量が上限に近づいています。バックアップを書き出してから、古い請求書データの整理をご検討ください');
+  }
 }
 
 function createDefaultShop(){
@@ -428,13 +467,16 @@ function normalizeShopData(data){
   return s;
 }
 function loadShop(){
+  const raw = getStoreItem('ken_shop');
   try{
-    const raw = getStoreItem('ken_shop');
     const data = raw ? JSON.parse(raw) : {};
     return normalizeShopData(data);
-  }catch(e){ return createDefaultShop(); }
+  }catch(e){
+    if(raw) notifyDataCorruption('事業者設定');
+    return createDefaultShop();
+  }
 }
-function saveShop(){ setStoreItem('ken_shop', JSON.stringify(shop)); }
+function saveShop(){ return setStoreItem('ken_shop', JSON.stringify(shop)); }
 
 /* 台帳データの旧仕様からの移行処理。起動時のloadLedger()だけでなく、バックアップ復元（restoreJSON）
    でも同じ移行を通す必要があるため、共通関数として切り出している（第3回修正） */
@@ -454,7 +496,8 @@ function migrateTotalsKeys(totals){
   return migrated;
 }
 function normalizeLedgerData(list){
-  list = list || [];
+  if(list===undefined || list===null) list = [];
+  if(!Array.isArray(list)) throw new Error('台帳データの形式が不正です');
   list.forEach(r=>{
     /* 旧仕様（sangakuが数値のみ）のレコードを{label:'', amount:元の数値}形式に移行する。金額は必ず引き継ぐ */
     if(!r.sangaku || typeof r.sangaku!=='object'){
@@ -472,13 +515,16 @@ function normalizeLedgerData(list){
   return list;
 }
 function loadLedger(){
+  const raw = getStoreItem('ken_ledger');
   try{
-    const raw = getStoreItem('ken_ledger');
     const list = raw ? JSON.parse(raw) : [];
     return normalizeLedgerData(list);
-  }catch(e){ return []; }
+  }catch(e){
+    if(raw) notifyDataCorruption('台帳');
+    return [];
+  }
 }
-function saveLedgerToStorage(){ setStoreItem('ken_ledger', JSON.stringify(ledger)); }
+function saveLedgerToStorage(){ return setStoreItem('ken_ledger', JSON.stringify(ledger)); }
 /* letledgerの初期化はTOTALS_KEY_MIGRATION（constのため参照前は初期化前アクセスエラーになるTDZ制約がある）
    の宣言より後に置く必要がある。以前はこの行が上の定義群より前にあり、旧キー名（seikyu等）の
    totalsスナップショットを含む台帳データを起動時に読み込むと必ずReferenceErrorで失敗し、
@@ -492,7 +538,8 @@ let ledger = loadLedger();
    持っていた顧客データを、会社名（個人名）欄へ一度だけ移行する。旧nameがあった＝元は個人客なので
    敬称の初期値は「様」、既にcompanyNameを持っていた＝会社客は「御中」とし、現状の見た目を変えない */
 function normalizeCustomersData(list){
-  list = list || [];
+  if(list===undefined || list===null) list = [];
+  if(!Array.isArray(list)) throw new Error('顧客データの形式が不正です');
   list.forEach(c=>{
     if(!c.companyName && c.name){
       c.companyName = c.name;
@@ -509,16 +556,37 @@ function normalizeCustomersData(list){
   return list;
 }
 function loadCustomers(){
-  try{ const raw = getStoreItem('ken_customers'); const list = raw ? JSON.parse(raw) : []; return normalizeCustomersData(list); }catch(e){ return []; }
+  const raw = getStoreItem('ken_customers');
+  try{
+    const list = raw ? JSON.parse(raw) : [];
+    return normalizeCustomersData(list);
+  }catch(e){
+    if(raw) notifyDataCorruption('顧客');
+    return [];
+  }
 }
-function saveCustomersToStorage(){ setStoreItem('ken_customers', JSON.stringify(customers)); }
+function saveCustomersToStorage(){ return setStoreItem('ken_customers', JSON.stringify(customers)); }
 let customers = loadCustomers();
 
+/* 車両データにはこれまで専用のnormalize関数がなく、バックアップ復元時に非配列データが無検証で
+   直接代入され得たため、台帳・顧客と同様の配列チェックを行う関数を新設する（中優先度修正） */
+function normalizeVehiclesData(list){
+  if(list===undefined || list===null) list = [];
+  if(!Array.isArray(list)) throw new Error('車両データの形式が不正です');
+  return list;
+}
 let vehicles = loadVehicles();
 function loadVehicles(){
-  try{ const raw = getStoreItem('ken_vehicles'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+  const raw = getStoreItem('ken_vehicles');
+  try{
+    const list = raw ? JSON.parse(raw) : [];
+    return normalizeVehiclesData(list);
+  }catch(e){
+    if(raw) notifyDataCorruption('車両');
+    return [];
+  }
 }
-function saveVehiclesToStorage(){ setStoreItem('ken_vehicles', JSON.stringify(vehicles)); }
+function saveVehiclesToStorage(){ return setStoreItem('ken_vehicles', JSON.stringify(vehicles)); }
 
 function createDefaultTemplates(){
   return {
@@ -527,12 +595,15 @@ function createDefaultTemplates(){
 }
 let templates = loadTemplates();
 function loadTemplates(){
+  const raw = getStoreItem('ken_templates');
   try{
-    const raw = getStoreItem('ken_templates');
     return raw ? Object.assign(createDefaultTemplates(), JSON.parse(raw)) : createDefaultTemplates();
-  }catch(e){ return createDefaultTemplates(); }
+  }catch(e){
+    if(raw) notifyDataCorruption('テンプレート');
+    return createDefaultTemplates();
+  }
 }
-function saveTemplatesToStorage(){ setStoreItem('ken_templates', JSON.stringify(templates)); }
+function saveTemplatesToStorage(){ return setStoreItem('ken_templates', JSON.stringify(templates)); }
 
 function generateId(prefix, arr){
   let max = 0;
@@ -555,11 +626,10 @@ function formatPostal(raw){
   if(d.length<=3) return d;
   return d.slice(0,3)+'-'+d.slice(3);
 }
-/* 電話番号：携帯（090/080/070/050始まり）は3-4-4、それ以外は簡易的に2-4-4で自動整形 */
+/* 電話番号・FAX：市外局番の桁数に関わらず3-4-4で統一して自動整形 */
 function formatPhone(raw){
   const d = String(raw||'').replace(/[^0-9]/g,'').slice(0,11);
-  const mobile = /^(090|080|070|050)/.test(d);
-  const a = mobile ? 3 : 2;
+  const a = 3;
   if(d.length<=a) return d;
   if(d.length<=a+4) return d.slice(0,a)+'-'+d.slice(a);
   return d.slice(0,a)+'-'+d.slice(a,a+4)+'-'+d.slice(a+4);
@@ -1746,11 +1816,13 @@ function saveInvoiceToLedger(){
   record.savedAt = new Date().toISOString();
   record.totals = computeTotals(state);
   if(idx>=0) ledger[idx] = record; else ledger.unshift(record);
-  saveLedgerToStorage();
+  const saveOk = saveLedgerToStorage();
   commitInvNo(state.invNo); // 実際に台帳へ保存された伝票Noで高水位マークを確定する（第3回修正）
   loadedInvNo = state.invNo; // 保存後はこの伝票Noが「現在フォームに読み込まれている伝票」になる
   syncDirtyBaseline();
-  showToast('台帳に保存しました（伝票No '+record.invNo+'）');
+  /* setStoreItem側で保存失敗時のエラートーストは既に表示されているため、直後に矛盾する
+     成功トーストを出さないようガードする（中優先度修正） */
+  if(saveOk) showToast('台帳に保存しました（伝票No '+record.invNo+'）');
 }
 function loadInvoiceToForm(invNo){
   /* 同じ伝票を読み込み直す場合（台帳の「開く」プレビューからの「この内容を編集」等）は、確認しても
@@ -2089,10 +2161,8 @@ function buildVehicleDetailHTML(v){
   return `
   <div class="fsec">
     <h2>車両：${escapeHtml(v.regNo)||'(ナンバー未登録)'}</h2>
-    <div class="frow2">
-      <div class="frow"><label>登録番号</label><input type="text" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="regNo" value="${escapeHtml(v.regNo)}"></div>
-      <div class="frow"><label>車名</label><input type="text" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="carName" value="${escapeHtml(v.carName)}"></div>
-    </div>
+    <div class="frow"><label>登録番号</label><input type="text" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="regNo" value="${escapeHtml(v.regNo)}"></div>
+    <div class="frow"><label>車名</label><input type="text" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="carName" value="${escapeHtml(v.carName)}"></div>
     <div class="frow2">
       <div class="frow"><label>型式</label><input type="text" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="modelType" value="${escapeHtml(v.modelType)}"></div>
       <div class="frow"><label>原動機</label><input type="text" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="engine" value="${escapeHtml(v.engine)}"></div>
@@ -2503,26 +2573,47 @@ function restoreJSON(e){
     try{
       /* 旧形式のバックアップ（振込先bankAccounts・値引調整③sangakuが未対応の頃のデータ）でも、
          起動時と同じ移行処理を通すことで振込先情報等が消えないようにする（第3回修正） */
-      if(data.shop) shop = normalizeShopData(data.shop);
-      if(data.ledger) ledger = normalizeLedgerData(data.ledger);
-      if(data.customers) customers = normalizeCustomersData(data.customers);
-      if(data.vehicles) vehicles = data.vehicles;
-      if(data.templates) templates = Object.assign(createDefaultTemplates(), data.templates);
+      /* 検証・変換はすべて一時変数に対して行い、途中でいずれかが失敗しても実データ（shop/ledger/
+         customers/vehicles/templates）を一切書き換えないようにする。すべて成功した場合のみ最後に
+         まとめて実変数へ代入することで、「復元に失敗しました」と表示されたのに実際は一部だけ
+         書き換わっているというデータ不整合を防ぐ（中優先度修正。なお、ここでの「アトミック」は
+         メモリ上の検証・代入の一体性を指し、各localStorageキーへの書き込み自体を1つのトランザクション
+         にするものではない） */
+      const tmpShop = data.shop ? normalizeShopData(data.shop) : shop;
+      const tmpLedger = data.ledger ? normalizeLedgerData(data.ledger) : ledger;
+      const tmpCustomers = data.customers ? normalizeCustomersData(data.customers) : customers;
+      const tmpVehicles = data.vehicles ? normalizeVehiclesData(data.vehicles) : vehicles;
+      if(data.templates!==undefined && (data.templates===null || typeof data.templates!=='object')){
+        throw new Error('テンプレートデータの形式が不正です');
+      }
+      const tmpTemplates = data.templates ? Object.assign(createDefaultTemplates(), data.templates) : templates;
+
+      shop = tmpShop;
+      ledger = tmpLedger;
+      customers = tmpCustomers;
+      vehicles = tmpVehicles;
+      templates = tmpTemplates;
       /* 復元後のledger/customersを踏まえ、伝票No・お客様コードの高水位マークも追いつかせる（第5回修正） */
       ensureSeqBaseline();
-      saveShop();
-      saveLedgerToStorage();
-      saveCustomersToStorage();
-      saveVehiclesToStorage();
-      saveTemplatesToStorage();
+      const okShop = saveShop();
+      const okLedger = saveLedgerToStorage();
+      const okCustomers = saveCustomersToStorage();
+      const okVehicles = saveVehiclesToStorage();
+      const okTemplates = saveTemplatesToStorage();
       renderSettingsView();
       renderLedgerView();
-      showToast('復元しました');
+      /* setStoreItem側で保存失敗時のエラートーストは既に表示されているため、直後に矛盾する
+         成功トーストを出さないようガードする（中優先度修正） */
+      if(okShop && okLedger && okCustomers && okVehicles && okTemplates) showToast('復元しました');
     }catch(err){
       showToast('復元に失敗しました：ファイル形式を確認してください');
     }finally{
       e.target.value = ''; // 同じファイルを続けて選択した場合もchangeイベントが発火するようリセット
     }
+  };
+  reader.onerror = function(){
+    showToast('ファイルの読み込みに失敗しました。もう一度お試しください');
+    e.target.value = '';
   };
   reader.readAsText(file);
 }
@@ -2587,6 +2678,11 @@ loadedInvNo = state.invNo;
 seedItemsForType(state.type);
 itemsTouched = false;
 renderCreateView();
+/* プライベートブラウズ等でlocalStorageが使えない場合、入力内容は画面を閉じると消える
+   （memStoreへのフォールバックのみ）。以前は無警告だったため起動時に1回だけ案内する（軽微修正） */
+if(!STORAGE_OK){
+  showToast('この端末では入力内容が保存されません（プライベートブラウズ等の可能性があります）。作業前にバックアップの書き出し方法をご確認ください');
+}
 syncDirtyBaseline();
 </script>
 </body>
