@@ -534,13 +534,28 @@ function formatPhone(raw){
   return d.slice(0,a)+'-'+d.slice(a,a+4)+'-'+d.slice(a+4);
 }
 /* 整形関数(formatPostal/formatPhone等)適用後、input.valueへの代入でカーソルが末尾に飛ばないよう、
-   整形前後の文字数差分からカーソル位置を再計算して復元する（第2回修正：郵便番号/TEL/FAX入力の不具合対応） */
+   カーソル位置を復元する。整形前後の「文字数の差分」だけで位置を計算すると、桁数上限による末尾の
+   数字の切り捨てとハイフン位置の移動が重なった際に計算がずれ、入力中の欄の途中で数字を挿入すると
+   カーソルが誤った位置に移動して以降の入力が乱れる不具合があった（第3回修正）。
+   カーソルより前にある「数字の個数」を数え、整形後の文字列でも同じ個数の数字の直後にカーソルを置く
+   ことで、ハイフン位置や桁の切り捨てが起きても正しい位置に復元する */
 function setFormattedValueKeepCursor(el, formatter){
   const oldPos = el.selectionStart;
-  const oldLen = el.value.length;
+  const digitsBeforeCursor = el.value.slice(0, oldPos).replace(/[^0-9]/g,'').length;
   const formatted = formatter(el.value);
   el.value = formatted;
-  const newPos = Math.max(0, oldPos + (formatted.length - oldLen));
+  let newPos = formatted.length;
+  if(digitsBeforeCursor === 0){
+    newPos = 0;
+  } else {
+    let seen = 0;
+    for(let i=0;i<formatted.length;i++){
+      if(/[0-9]/.test(formatted[i])){
+        seen++;
+        if(seen===digitsBeforeCursor){ newPos = i+1; break; }
+      }
+    }
+  }
   el.setSelectionRange(newPos, newPos);
   return formatted;
 }
@@ -781,13 +796,13 @@ function getNextInvNo(){
   const base = Math.max((Number(shop.startNo)||1)-1, nums.length?Math.max(...nums):0, Number(shop.invoiceSeq)||0);
   return String(base+1).padStart(6,'0');
 }
-/* 伝票Noを実際に払い出す（フォームに反映する）タイミングでのみ呼ぶ。高水位マークを進めて
-   永続化することで、そのレコードを保存せず・後で削除しても番号が再利用されないようにする（第5回修正） */
-function issueInvNo(){
-  const invNo = getNextInvNo();
+/* 伝票Noの高水位マークを、実際に台帳へ保存された伝票No基準で進める。新規作成ボタンや起動時点では
+   getNextInvNo()で表示用の番号を計算するだけにとどめ、高水位マークは進めない。実際に「台帳に保存」した
+   タイミングでのみこの関数を呼んで確定させることで、保存せずに新規作成を繰り返しただけで伝票Noが
+   欠番として消費されてしまう不具合を防ぐ（第3回修正） */
+function commitInvNo(invNo){
   const n = parseInt(invNo,10);
   if(!isNaN(n) && n > (Number(shop.invoiceSeq)||0)){ shop.invoiceSeq = n; saveShop(); }
-  return invNo;
 }
 /* 起動時・バックアップ復元時に、既存データの最大値で高水位マークを追いつかせる移行処理。
    ledger/customersの読み込み完了後に呼び出す必要がある（第5回修正） */
@@ -933,8 +948,8 @@ function buildDoc(s){
   <table class="veh-table">
     <tr><td>登録番号</td><td>車名</td><td>型式</td><td>原動機</td><td>車台番号</td></tr>
     <tr><td>${escapeHtml(s.vehicle.regNo)}</td><td>${escapeHtml(s.vehicle.carName)}</td><td>${escapeHtml(s.vehicle.modelType)}</td><td>${escapeHtml(s.vehicle.engine)}</td><td>${escapeHtml(s.vehicle.chassisNo)}</td></tr>
-    <tr><td class="shodo-hl">初度</td><td>登録年月日</td><td>型式指定</td><td>類別区分番号</td><td>走行距離</td></tr>
-    <tr><td class="shodo-hl">${formatMonthJP(s.vehicle.shodo)||escapeHtml(s.vehicle.shodo)}</td><td>${formatDateJP(s.vehicle.regDate)||escapeHtml(s.vehicle.regDate)}</td><td>${escapeHtml(s.vehicle.shikiShitei)}</td><td>${escapeHtml(s.vehicle.ruibetsu)}</td><td>${escapeHtml(s.vehicle.mileage)}</td></tr>
+    <tr><td class="shodo-hl">初度</td><td class="shodo-hl">登録年月日</td><td>型式指定</td><td>類別区分番号</td><td>走行距離</td></tr>
+    <tr><td>${formatMonthJP(s.vehicle.shodo)||escapeHtml(s.vehicle.shodo)}</td><td>${formatDateJP(s.vehicle.regDate)||escapeHtml(s.vehicle.regDate)}</td><td>${escapeHtml(s.vehicle.shikiShitei)}</td><td>${escapeHtml(s.vehicle.ruibetsu)}</td><td>${escapeHtml(s.vehicle.mileage)}</td></tr>
   </table>
 
   <table class="items-table${dense}">
@@ -1104,10 +1119,8 @@ function buildFormHTML(){
 
   <div class="fsec">
     <h2>車両情報</h2>
-    <div class="frow2">
-      <div class="frow"><label>登録番号</label><input type="text" id="f-veh-reg-no" value="${escapeHtml(s.vehicle.regNo)}"></div>
-      <div class="frow"><label>車名</label><input type="text" id="f-veh-car-name" value="${escapeHtml(s.vehicle.carName)}"></div>
-    </div>
+    <div class="frow"><label>登録番号</label><input type="text" id="f-veh-reg-no" value="${escapeHtml(s.vehicle.regNo)}"></div>
+    <div class="frow"><label>車名</label><input type="text" id="f-veh-car-name" value="${escapeHtml(s.vehicle.carName)}"></div>
     <div class="frow2">
       <div class="frow"><label>型式</label><input type="text" id="f-veh-model-type" value="${escapeHtml(s.vehicle.modelType)}"></div>
       <div class="frow"><label>原動機</label><input type="text" id="f-veh-engine" value="${escapeHtml(s.vehicle.engine)}"></div>
@@ -1138,14 +1151,14 @@ function buildFormHTML(){
 
   <div class="fsec">
     <h2>諸費用</h2>
-    <div class="frow"><label>自賠責保険料</label><input type="number" id="f-cost-jibaiseki" value="${escapeHtml(s.costs.jibaiseki)}"></div>
-    <div class="frow"><label>重量税</label><input type="number" id="f-cost-jyuryozei" value="${escapeHtml(s.costs.jyuryozei)}"></div>
-    <div class="frow"><label>印紙［OSS］</label><input type="number" id="f-cost-inshi" value="${escapeHtml(s.costs.inshi)}"></div>
+    <div class="frow"><label>自賠責保険料</label><input type="number" id="f-cost-jibaiseki" value="${escapeHtml(s.costs.jibaiseki||'')}"></div>
+    <div class="frow"><label>重量税</label><input type="number" id="f-cost-jyuryozei" value="${escapeHtml(s.costs.jyuryozei||'')}"></div>
+    <div class="frow"><label>印紙［OSS］</label><input type="number" id="f-cost-inshi" value="${escapeHtml(s.costs.inshi||'')}"></div>
     ${buildExtraCostRowHTML('extra1', s.costs.extra1)}
-    <div class="frow"><label>技術情報管理手数料</label><input type="number" id="f-cost-gijutsu" value="${escapeHtml(s.costs.gijutsu)}"></div>
-    <div class="frow"><label>テスター計測検査費</label><input type="number" id="f-cost-tester" value="${escapeHtml(s.costs.tester)}"></div>
-    <div class="frow"><label>事務手数料</label><input type="number" id="f-cost-jimu" value="${escapeHtml(s.costs.jimu)}"></div>
-    <div class="frow"><label>代行料</label><input type="number" id="f-cost-daikou" value="${escapeHtml(s.costs.daikou)}"></div>
+    <div class="frow"><label>技術情報管理手数料</label><input type="number" id="f-cost-gijutsu" value="${escapeHtml(s.costs.gijutsu||'')}"></div>
+    <div class="frow"><label>テスター計測検査費</label><input type="number" id="f-cost-tester" value="${escapeHtml(s.costs.tester||'')}"></div>
+    <div class="frow"><label>事務手数料</label><input type="number" id="f-cost-jimu" value="${escapeHtml(s.costs.jimu||'')}"></div>
+    <div class="frow"><label>代行料</label><input type="number" id="f-cost-daikou" value="${escapeHtml(s.costs.daikou||'')}"></div>
     ${buildExtraCostRowHTML('extra2', s.costs.extra2)}
     ${buildExtraCostRowHTML('extra3', s.costs.extra3)}
   </div>
@@ -1307,15 +1320,29 @@ function pickVehicle(vehId){
   if(box) box.classList.remove('open');
   showToast('車両を選択しました（'+(v.regNo||'')+'）');
 }
-/* sourceField==='company'の場合は会社名欄からの新規登録なので、companyNameに登録する（宛名/個人名欄は空のまま） */
+/* sourceField==='company'の場合は会社名欄からの新規登録なので、companyNameに登録する（宛名/個人名欄はそのまま維持）。
+   会社名欄→宛名欄の順で続けて新規登録した場合、既に採番済みの同一顧客（state.customer.code）に追記する形にし、
+   別人として二重登録して片方の項目（会社名や宛名）が消えてしまわないようにする（第3回修正・第6回修正） */
 function registerNewCustomerInline(name, sourceField){
   if(!name) return;
-  const code = issueCustomerCode();
   const isCompany = sourceField==='company';
-  const c = { id: generateId('c', customers), name: isCompany?'':name, companyName: isCompany?name:'', companyKana:'', kana:'', tel:'', postal:'', address:'', code, email:'' };
-  customers.push(c);
+  const already = state.customer.code && customers.find(x=>x.code===state.customer.code);
+  let c;
+  if(already){
+    c = already;
+    if(isCompany) c.companyName = name; else c.name = name;
+  } else {
+    const code = issueCustomerCode();
+    c = { id: generateId('c', customers),
+      name: isCompany ? (state.customer.name||'') : name,
+      companyName: isCompany ? name : (state.customer.companyName||''),
+      companyKana: state.customer.companyKana||'', kana: state.customer.kana||'',
+      tel: state.customer.tel||'', postal: state.customer.postal||'', address: state.customer.address||'',
+      code, email: state.customer.email||'' };
+    customers.push(c);
+  }
   saveCustomersToStorage();
-  state.customer = { name:c.name, companyName:c.companyName, companyKana:'', kana:'', postal:'', address:'', code, tel:'', email:'' };
+  state.customer = { name:c.name, companyName:c.companyName, companyKana:c.companyKana||'', kana:c.kana||'', postal:c.postal||'', address:c.address||'', code:c.code, tel:c.tel||'', email:c.email||'' };
   /* 新規登録した顧客はまだ車両を持たないため、前の顧客の車両情報が残らないよう空にする（第3回修正） */
   state.vehicle = createEmptyVehicle();
   renderCreateView();
@@ -1652,6 +1679,7 @@ function saveInvoiceToLedger(){
   record.totals = computeTotals(state);
   if(idx>=0) ledger[idx] = record; else ledger.unshift(record);
   saveLedgerToStorage();
+  commitInvNo(state.invNo); // 実際に台帳へ保存された伝票Noで高水位マークを確定する（第3回修正）
   loadedInvNo = state.invNo; // 保存後はこの伝票Noが「現在フォームに読み込まれている伝票」になる
   syncDirtyBaseline();
   showToast('台帳に保存しました（伝票No '+record.invNo+'）');
@@ -2460,7 +2488,7 @@ document.getElementById('main-tabs').addEventListener('click', function(e){
 document.getElementById('btn-new').addEventListener('click', function(){
   if(isFormDirty() && !confirm('入力中の内容がまだ保存されていません。\n破棄して続けてよろしいですか？')) return;
   state = createDefaultState();
-  state.invNo = issueInvNo();
+  state.invNo = getNextInvNo();
   loadedInvNo = state.invNo;
   seedItemsForType(state.type);
   itemsTouched = false;
@@ -2495,7 +2523,7 @@ window.addEventListener('beforeprint', function(){
    起動
    ============================================================ */
 ensureSeqBaseline();
-state.invNo = issueInvNo();
+state.invNo = getNextInvNo();
 loadedInvNo = state.invNo;
 seedItemsForType(state.type);
 itemsTouched = false;
