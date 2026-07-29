@@ -1428,31 +1428,34 @@ function wireBankAccountChecks(){
     renderPreview();
   });
 }
-/* 郵便番号・電話番号：入力の都度ハイフンを自動整形して反映する */
-function wireFormatInput(id, path, formatter){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.addEventListener('input', function(){
-    const formatted = setFormattedValueKeepCursor(this, formatter);
-    setDeep(state, path, formatted);
-    renderPreview();
-  });
-}
-/* かな欄：入力の都度カタカナに自動変換して反映する。IME変換確定前（isComposing中）に上書きすると
-   変換状態が壊れてひらがなが残ってしまうため、変換確定後（compositionend）にのみ変換する。
-   この結線ロジックはwireKanaInput()とwireCustomerDetail()内2箇所で重複していたため、
-   wireKanaField()として共通化した（第5回修正） */
-function wireKanaField(el, onApply){
+/* かな欄・郵便番号/電話番号欄など「入力の都度、値を自動整形して反映する」欄の共通結線ロジック。
+   IME変換確定前（isComposing中）に値を上書きすると変換状態が壊れる（かな欄ならひらがなが残る、
+   郵便番号・電話番号欄ならiPad等のIME変換候補バー表示中の合成文字列と既存値が混ざり桁が重複・
+   欠落する）ため、変換確定後（compositionend）にのみformatterを適用する。
+   この結線ロジックはwireKanaInput()とwireCustomerDetail()内2箇所（かな欄）、および
+   wireFormatInput()・顧客カルテのcd-postal/cd-tel・bindFormatted()（郵便番号・電話番号欄、計7箇所）
+   で重複していたため、wireFormattedField()として共通化した（第5回修正でかな欄のみ共通化、
+   第10回修正で郵便番号・電話番号欄にも横展開） */
+function wireFormattedField(el, formatter, onApply){
   if(!el) return;
   let composing = false;
   const apply = function(){
-    const kana = toKatakana(el.value);
-    el.value = kana;
-    onApply(kana);
+    const formatted = setFormattedValueKeepCursor(el, formatter);
+    onApply(formatted);
   };
   el.addEventListener('compositionstart', function(){ composing = true; });
   el.addEventListener('compositionend', function(){ composing = false; apply(); });
   el.addEventListener('input', function(e){ if(e.isComposing || composing) return; apply(); });
+}
+/* 郵便番号・電話番号：入力の都度ハイフンを自動整形して反映する */
+function wireFormatInput(id, path, formatter){
+  wireFormattedField(document.getElementById(id), formatter, formatted=>{
+    setDeep(state, path, formatted);
+    renderPreview();
+  });
+}
+function wireKanaField(el, onApply){
+  wireFormattedField(el, toKatakana, onApply);
 }
 function wireKanaInput(id, path){
   wireKanaField(document.getElementById(id), kana=>{ setDeep(state, path, kana); renderPreview(); });
@@ -2137,16 +2140,12 @@ function wireCustomerDetail(c){
     c.honorific = honorific;
     saveCustomersToStorage();
   });
-  const postalEl = document.getElementById('cd-postal');
-  if(postalEl) postalEl.addEventListener('input', function(){
-    const v = setFormattedValueKeepCursor(this, formatPostal);
-    c.postal = v;
+  wireFormattedField(document.getElementById('cd-postal'), formatPostal, formatted=>{
+    c.postal = formatted;
     saveCustomersToStorage();
   });
-  const telEl = document.getElementById('cd-tel');
-  if(telEl) telEl.addEventListener('input', function(){
-    const v = setFormattedValueKeepCursor(this, formatPhone);
-    c.tel = v;
+  wireFormattedField(document.getElementById('cd-tel'), formatPhone, formatted=>{
+    c.tel = formatted;
     saveCustomersToStorage();
     const searchInput = document.getElementById('cust-search-input');
     renderCustomerList(searchInput ? searchInput.value : '');
@@ -2333,10 +2332,8 @@ function buildSettingsHTML(){
     <div class="frow"><label>事業者名</label><input type="text" id="s-name" value="${escapeHtml(shop.name)}"></div>
     <div class="frow"><label>指定工場表記</label><input type="text" id="s-kikan" placeholder="例：九州運輸局指定整備工場" value="${escapeHtml(shop.kikan)}"></div>
     <div class="frow"><label>郵便番号</label><input type="text" inputmode="numeric" autocomplete="off" id="s-postal" value="${escapeHtml(shop.postal)}"></div>
-    <div class="frow2">
-      <div class="frow"><label>代表者肩書き</label><input type="text" id="s-rep-title" placeholder="例：代表取締役" value="${escapeHtml(shop.repTitle)}"></div>
-      <div class="frow"><label>代表者</label><input type="text" id="s-rep" value="${escapeHtml(shop.rep)}"></div>
-    </div>
+    <div class="frow"><label>代表者肩書き</label><input type="text" id="s-rep-title" placeholder="例：代表取締役" value="${escapeHtml(shop.repTitle)}"></div>
+    <div class="frow"><label>代表者</label><input type="text" id="s-rep" value="${escapeHtml(shop.rep)}"></div>
     <div class="frow"><label>住所</label><input type="text" id="s-address" value="${escapeHtml(shop.address)}"></div>
     <div class="frow"><label>TEL</label><input type="text" inputmode="numeric" autocomplete="off" id="s-tel" value="${escapeHtml(shop.tel)}"></div>
     <div class="frow"><label>FAX</label><input type="text" inputmode="numeric" autocomplete="off" id="s-fax" value="${escapeHtml(shop.fax)}"></div>
@@ -2387,9 +2384,8 @@ function wireSettings(){
   bind('s-name','name'); bind('s-kikan','kikan'); bind('s-rep','rep'); bind('s-rep-title','repTitle');
   bind('s-address','address'); bind('s-invoice-no','invoiceNo');
   const bindFormatted = (id, key, formatter) => {
-    document.getElementById(id).addEventListener('input', function(){
-      const v = setFormattedValueKeepCursor(this, formatter);
-      shop[key] = v;
+    wireFormattedField(document.getElementById(id), formatter, formatted=>{
+      shop[key] = formatted;
       saveShop();
     });
   };
