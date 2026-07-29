@@ -1530,6 +1530,49 @@ function wireKanaField(el, onApply){
 function wireKanaInput(id, path){
   wireKanaField(document.getElementById(id), kana=>{ setDeep(state, path, kana); renderPreview(); });
 }
+/* 会社名（個人名）欄の入力から、かな欄を自動生成する。
+   ブラウザにはIME変換後の「読み」を直接取得するAPIが存在しないため、日本語入力が
+   「ひらがな入力→変換確定」という過程を経る性質を利用する。compositionupdateで
+   変換確定前の最後のひらがな状態を覚えておき、compositionend（変換確定）のたびに
+   それを読みとして積み上げる。一括変換（ひらがなを経由しない変換）や貼り付け、
+   ローマ字綴りそのままの入力では読みを取得できないため、その場合は空欄のまま
+   （ユーザーの手入力に委ねる）。
+   かな欄が一度でも手動編集された場合はそれ以降の自動上書きを停止し、手入力を優先する
+   （新規顧客登録・別顧客への切替時はフォームが再構築されるため、この判定は自動的にリセットされる） */
+function wireCompanyNameKanaAutoFill(nameEl, kanaEl, onKanaChange){
+  if(!nameEl || !kanaEl) return;
+  let autoActive = !kanaEl.value; // 開始時点でかな欄が空の場合のみ自動追従を有効にする
+  let readingBuffer = '';         // 会社名欄でこれまでに変換確定した読みの累積
+  let lastKanaState = '';         // 直近のcompositionupdateで捕捉した「まだ変換していないひらがな」状態
+  const isKanaOnly = s => /^[ぁ-んー\s]*$/.test(s);
+
+  function applyAutoKana(){
+    if(!autoActive) return;
+    const kana = toKatakana(readingBuffer);
+    kanaEl.value = kana;
+    onKanaChange(kana);
+  }
+  nameEl.addEventListener('compositionstart', function(){ lastKanaState = ''; });
+  nameEl.addEventListener('compositionupdate', function(e){
+    const data = e.data || '';
+    if(isKanaOnly(data)) lastKanaState = data;
+  });
+  nameEl.addEventListener('compositionend', function(e){
+    const finalData = e.data || '';
+    readingBuffer += isKanaOnly(finalData) ? finalData : (lastKanaState || finalData);
+    applyAutoKana();
+  });
+  nameEl.addEventListener('input', function(e){
+    if(e.isComposing) return;
+    /* IMEを介さない削除操作（バックスペース等）は、どの読みが不要になったか特定できないため、
+       蓄積した読みを一旦リセットする（名前欄が空になった場合はかな欄も追従して空にする） */
+    if(this.value===''){ readingBuffer=''; applyAutoKana(); }
+    else if(e.inputType && e.inputType.indexOf('delete')===0){ readingBuffer=''; }
+  });
+  /* かな欄への実際のユーザー入力（プログラムによるkanaEl.value代入はinputイベントを発火しないため
+     区別できる）を検知したら、以降はこの欄への自動上書きを止める */
+  kanaEl.addEventListener('input', function(){ autoActive = false; });
+}
 /* 受付担当者・整備担当者：設定シート登録済みリストからの入力候補（サジェスト） */
 function wireStaffSuggest(inputId, boxId, listGetter, statePath){
   const input = document.getElementById(inputId);
@@ -1589,6 +1632,9 @@ function wireForm(){
 
   wireSimpleInput('f-cust-company-name','customer.companyName');
   wireKanaInput('f-cust-company-kana','customer.companyKana');
+  wireCompanyNameKanaAutoFill(document.getElementById('f-cust-company-name'), document.getElementById('f-cust-company-kana'), kana=>{
+    setDeep(state, 'customer.companyKana', kana); renderPreview();
+  });
   wireCompanySuggest();
   wireHonorificSeg('cust-honorific-seg', function(honorific){ state.customer.honorific = honorific; renderPreview(); });
   wireFormatInput('f-cust-postal','customer.postal', formatPostal);
@@ -2201,6 +2247,12 @@ function wireCustomerDetail(c){
   /* IME変換確定前（isComposing中）に値を上書きすると変換状態が壊れるため、compositionend後にのみ変換する
      （共通化：wireKanaField()。第5回修正） */
   wireKanaField(document.getElementById('cd-company-kana'), kana=>{
+    c.companyKana = kana;
+    saveCustomersToStorage();
+    const searchInput = document.getElementById('cust-search-input');
+    renderCustomerList(searchInput ? searchInput.value : '');
+  });
+  wireCompanyNameKanaAutoFill(document.getElementById('cd-company-name'), document.getElementById('cd-company-kana'), kana=>{
     c.companyKana = kana;
     saveCustomersToStorage();
     const searchInput = document.getElementById('cust-search-input');
