@@ -1351,6 +1351,14 @@ function wireCompanySuggest(){
   if(!input || !box) return;
   input.addEventListener('input', function(){ showCustSuggest(this.value, box); });
   input.addEventListener('focus', function(){ showCustSuggest(this.value, box); });
+  /* 候補（「＋新規登録」等）をクリックした際、先にinputのblurが発生して選択前に候補が
+     閉じてしまわないよう、box内でのmousedownによるフォーカス移動そのものを止める
+     （クリックイベント自体はそのまま候補選択ハンドラに届く） */
+  box.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  /* 他の入力欄へ移動する等、会社名欄からフォーカスが外れたら候補ボックスを閉じる。
+     以前は候補を選ぶか「新規登録」を押すまで開いたままになり、他の欄を編集しても
+     残り続けていた */
+  input.addEventListener('blur', function(){ box.classList.remove('open'); });
   wireSuggestBoxActions(box);
 }
 /* サジェストボックス内の候補クリックをイベント委譲で処理する。
@@ -1596,6 +1604,12 @@ function wireStaffSuggest(inputId, boxId, listGetter, statePath){
     box.classList.remove('open');
     renderPreview();
   });
+  /* 候補をクリックする際、先にinputのblurが発生して選択前に候補が閉じてしまわないよう、
+     box内でのmousedownによるフォーカス移動そのものを止める（会社名サジェストと同じ対処） */
+  box.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  /* 他の入力欄へ移動する等、フォーカスが外れたら候補ボックスを閉じる。
+     以前は候補を選ぶまで開いたままになり、他の欄を編集しても残り続けていた */
+  input.addEventListener('blur', function(){ box.classList.remove('open'); });
 }
 /* 値引・調整③欄（自由項目：項目名・金額）の結線 */
 function wireSangakuRow(){
