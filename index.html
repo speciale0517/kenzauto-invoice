@@ -938,6 +938,11 @@ let loadedInvNo = state.invNo;
 let lastSyncedStateJSON = '';
 function syncDirtyBaseline(){ lastSyncedStateJSON = JSON.stringify(state); }
 function isFormDirty(){ return JSON.stringify(state) !== lastSyncedStateJSON; }
+/* registerNewCustomerInline()が直近で新規発行した顧客コード。会社名欄から続けて「＋新規登録」を
+   押した場合はこの顧客への追記とみなすが、pickCustomer()等で既存顧客を選択した後に押した場合は
+   別人として扱う必要があるため、「コードが採番済みかどうか」だけでなく「そのコードを自分自身が
+   直前に発行したかどうか」で判定する（静的バグチェックで発見・第14回修正） */
+let inlineRegisteredCode = null;
 
 /* ============================================================
    計算（フェーズ0の検算ロジックを共通関数化）
@@ -1399,6 +1404,7 @@ function applyVehicleToState(v){
 function pickCustomer(custId){
   const c = customers.find(x=>x.id===custId);
   if(!c) return;
+  inlineRegisteredCode = null; // 別の顧客に切り替わるため、直前に自分が発行したコードの記憶をリセット
   state.customer = { companyName:c.companyName||'', companyKana:c.companyKana||'', honorific:c.honorific||'御中', postal:c.postal||'', address:c.address||'', code:c.code||'', tel:c.tel||'', email:c.email||'' };
   const vehs = vehicles.filter(v=>v.customerId===custId);
   document.getElementById('cust-company-suggest').classList.remove('open');
@@ -1437,10 +1443,14 @@ function pickVehicle(vehId){
 /* 会社名（個人名）欄からの新規登録。同じ請求書内で続けて新規登録した場合、既に採番済みの同一顧客
    （state.customer.code）に追記する形にし、別人として二重登録してしまわないようにする
    （第3回修正・第6回修正）。第8回修正：宛名（担当者名）欄の廃止に伴い、会社名（個人名）欄のみを
-   対象にするよう簡略化 */
+   対象にするよう簡略化。
+   第14回修正：「state.customer.codeが採番済みか」だけで追記判定すると、サジェストから既存顧客Aを
+   選択した直後（pickCustomer()経由でstate.customer.codeにAのコードが入る）に名前欄を別人Bへ書き換えて
+   「＋新規登録」を押した場合、顧客Aのレコードが誤って「B」に改名されてしまう不具合があった。
+   「直近でこの関数自身が新規発行したコードかどうか」（inlineRegisteredCode）で判定するよう修正 */
 function registerNewCustomerInline(name){
   if(!name) return;
-  const already = state.customer.code && customers.find(x=>x.code===state.customer.code);
+  const already = inlineRegisteredCode && state.customer.code===inlineRegisteredCode && customers.find(x=>x.code===inlineRegisteredCode);
   let c;
   if(already){
     c = already;
@@ -1453,6 +1463,7 @@ function registerNewCustomerInline(name){
       tel: state.customer.tel||'', postal: state.customer.postal||'', address: state.customer.address||'',
       code, email: state.customer.email||'' };
     customers.push(c);
+    inlineRegisteredCode = code; // 以降、続けて登録し直しても同一顧客への追記として扱う
   }
   saveCustomersToStorage();
   state.customer = { companyName:c.companyName, companyKana:c.companyKana||'', honorific:c.honorific||'御中', postal:c.postal||'', address:c.address||'', code:c.code, tel:c.tel||'', email:c.email||'' };
@@ -1552,7 +1563,12 @@ function wireCompanyNameKanaAutoFill(nameEl, kanaEl, onKanaChange){
   let autoActive = !kanaEl.value; // 開始時点でかな欄が空の場合のみ自動追従を有効にする
   let readingBuffer = '';         // 会社名欄でこれまでに変換確定した読みの累積
   let lastKanaState = '';         // 直近のcompositionupdateで捕捉した「まだ変換していないひらがな」状態
-  const isKanaOnly = s => /^[ぁ-んー\s]*$/.test(s);
+  /* ひらがな・カタカナいずれで確定されても読みとして採用する。IME予測変換で「けんす」→「ケンズ」
+     のようにカタカナ候補を選択して確定するケースがあり、ひらがなのみを判定対象にしていると
+     カタカナ確定時にlastKanaState（変換前の古い状態）へフォールバックしてしまい、濁点等の
+     変換内容が反映されない不具合があった（静的バグチェックで発見。例：「けんす」→予測変換「ケンズ」
+     選択→「オート」で「ケンスオート」になってしまう。第14回修正） */
+  const isKanaOnly = s => /^[ぁ-んァ-ヶー\s]*$/.test(s);
 
   function applyAutoKana(){
     if(!autoActive) return;
@@ -1721,6 +1737,7 @@ function clearFormForRetry(){
   if(!confirm('入力中の内容をすべてクリアします。伝票Noはそのまま維持されます。よろしいですか？')) return;
   const keepInvNo = state.invNo;
   state = createDefaultState();
+  inlineRegisteredCode = null; // まっさらな状態に切り替わるため、直前に自分が発行したコードの記憶をリセット
   state.invNo = keepInvNo;
   seedItemsForType(state.type);
   itemsTouched = false;
@@ -1891,6 +1908,7 @@ function loadInvoiceToForm(invNo){
   const rec = ledger.find(r=>r.invNo===invNo);
   if(!rec) return;
   state = JSON.parse(JSON.stringify(rec));
+  inlineRegisteredCode = null; // 別の顧客に切り替わるため、直前に自分が発行したコードの記憶をリセット
   delete state.savedAt; delete state.totals;
   loadedInvNo = state.invNo;
   itemsTouched = true; // 保存済みの実データなので、種別を切替えても無断で消さない
@@ -2051,10 +2069,10 @@ function renderCustomerList(query){
     const vehs = vehicles.filter(v=>v.customerId===c.id);
     const tags = vehs.map(v=>{
       const soon = isShakenSoon(v.nextShaken);
-      return `<span class="cust-veh-tag${soon?' soon':''}" onclick="event.stopPropagation(); selectCustomerVehicle('${escapeHtml(c.id)}','${escapeHtml(v.id)}')">${escapeHtml(v.regNo)||'(ナンバー未登録)'}</span>`;
+      return `<span class="cust-veh-tag${soon?' soon':''}" data-action="select-customer-vehicle" data-cust-id="${escapeHtml(c.id)}" data-veh-id="${escapeHtml(v.id)}">${escapeHtml(v.regNo)||'(ナンバー未登録)'}</span>`;
     }).join('');
     const cnText = getCustomerDisplayName(c) || '（氏名未入力）';
-    return `<div class="cust-item${c.id===selectedCustomerId?' selected':''}" onclick="selectCustomer('${escapeHtml(c.id)}')">
+    return `<div class="cust-item${c.id===selectedCustomerId?' selected':''}" data-action="select-customer" data-cust-id="${escapeHtml(c.id)}">
       <div class="cn">${escapeHtml(cnText)}</div>
       <div class="ci">${escapeHtml(c.companyKana||'')} ${escapeHtml(c.tel||'')} ${c.code?('コード'+escapeHtml(c.code)):''}</div>
       <div>${tags}</div>
@@ -2126,7 +2144,7 @@ function buildCustomerDetailHTML(c){
     <div class="frow"><label>郵便番号</label><input type="text" inputmode="numeric" autocomplete="off" id="cd-postal" value="${escapeHtml(c.postal||'')}"></div>
     <div class="frow"><label>住所</label><input type="text" id="cd-address" value="${escapeHtml(c.address||'')}"></div>
     <div class="frow"><label>メール</label><input type="text" id="cd-email" placeholder="車検リマインドのメール送信に使用" value="${escapeHtml(c.email||'')}"></div>
-    <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" onclick="deleteCustomer('${escapeHtml(c.id)}')">🗑 この顧客を削除</button></div>
+    <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" data-action="delete-customer" data-id="${escapeHtml(c.id)}">🗑 この顧客を削除</button></div>
   </div>
   `;
 
@@ -2134,16 +2152,16 @@ function buildCustomerDetailHTML(c){
     html += `
     <div class="fsec" style="text-align:center; color:#999; padding:24px 16px;">
       車両未登録<br>
-      <button class="add-row-btn" style="margin-top:12px;" onclick="addVehicleToCustomer('${escapeHtml(c.id)}')">＋ 車両を追加</button>
+      <button class="add-row-btn" style="margin-top:12px;" data-action="add-vehicle" data-id="${escapeHtml(c.id)}">＋ 車両を追加</button>
     </div>`;
     return html;
   }
 
   html += `<div class="veh-tabs" id="veh-tabs">`;
   vehs.forEach((v,i)=>{
-    html += `<button class="${v.id===selectedVehicleId?'active':''}" onclick="selectVehicleTab('${escapeHtml(v.id)}')">${escapeHtml(getVehTabLabel(v,i))}</button>`;
+    html += `<button class="${v.id===selectedVehicleId?'active':''}" data-action="select-vehicle-tab" data-id="${escapeHtml(v.id)}">${escapeHtml(getVehTabLabel(v,i))}</button>`;
   });
-  html += `<button class="add-veh-tab" onclick="addVehicleToCustomer('${escapeHtml(c.id)}')">＋ 車両を追加</button></div>`;
+  html += `<button class="add-veh-tab" data-action="add-vehicle" data-id="${escapeHtml(c.id)}">＋ 車両を追加</button></div>`;
 
   const selVeh = vehs.find(v=>v.id===selectedVehicleId);
   if(selVeh){
@@ -2200,18 +2218,37 @@ function buildVehicleLedgerHTML(v){
   html += `</div>`;
   return html;
 }
-/* 車両別過去請求書一覧のボタン（開く/編集/拡大/印刷/共有）をイベント委譲で処理する（第3回修正）。
+/* 顧客一覧の車両タグ・顧客カードのクリックをイベント委譲で処理する。バックアップJSON経由でid値に
+   細工されたonclick文字列組み立てXSS（第3回修正の伝票No・検索文字列と同種の脆弱性）を防ぐため、
+   data属性＋addEventListenerに統一する（第14回修正）。#cust-list-paneは静的コンテナのため
+   一度だけ結線する */
+document.getElementById('cust-list-pane').addEventListener('click', function(e){
+  const tagEl = e.target.closest('[data-action="select-customer-vehicle"]');
+  if(tagEl){ selectCustomerVehicle(tagEl.dataset.custId, tagEl.dataset.vehId); return; }
+  const itemEl = e.target.closest('[data-action="select-customer"]');
+  if(itemEl) selectCustomer(itemEl.dataset.custId);
+});
+/* 車両別過去請求書一覧のボタン（開く/編集/拡大/印刷/共有）、および顧客・車両削除／車両追加／車両タブ
+   切替のボタンをイベント委譲で処理する（第3回修正、第14回修正でid系アクションを追加）。
    #cust-detail-paneは静的コンテナのため一度だけ結線する */
 document.getElementById('cust-detail-pane').addEventListener('click', function(e){
   const btn = e.target.closest('button[data-action]');
-  if(!btn || !btn.dataset.invno) return;
-  const invNo = btn.dataset.invno;
+  if(!btn) return;
   const action = btn.dataset.action;
-  if(action==='toggle') toggleCustLedgerPreview(invNo);
-  else if(action==='edit') loadInvoiceToForm(invNo);
-  else if(action==='zoom') openLedgerZoom(invNo);
-  else if(action==='print') printLedgerRecord(invNo);
-  else if(action==='share') shareCustLedgerRecord(invNo, btn);
+  if(btn.dataset.invno){
+    const invNo = btn.dataset.invno;
+    if(action==='toggle') toggleCustLedgerPreview(invNo);
+    else if(action==='edit') loadInvoiceToForm(invNo);
+    else if(action==='zoom') openLedgerZoom(invNo);
+    else if(action==='print') printLedgerRecord(invNo);
+    else if(action==='share') shareCustLedgerRecord(invNo, btn);
+  } else if(btn.dataset.id){
+    const id = btn.dataset.id;
+    if(action==='delete-customer') deleteCustomer(id);
+    else if(action==='add-vehicle') addVehicleToCustomer(id);
+    else if(action==='select-vehicle-tab') selectVehicleTab(id);
+    else if(action==='delete-vehicle') deleteVehicle(id);
+  }
 });
 function toggleCustLedgerPreview(invNo){
   expandedCustLedgerInvNo = (expandedCustLedgerInvNo === invNo) ? null : invNo;
@@ -2241,7 +2278,7 @@ function buildVehicleDetailHTML(v){
       <div class="frow"><label>次回車検日</label><input type="date" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="nextShaken" value="${escapeHtml(v.nextShaken)}"></div>
       <div class="frow"><label>次回点検日</label><input type="date" class="vfield" data-veh="${escapeHtml(v.id)}" data-key="nextTenken" value="${escapeHtml(v.nextTenken)}"></div>
     </div>
-    <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" onclick="deleteVehicle('${escapeHtml(v.id)}')">🗑 この車両を削除</button></div>
+    <div class="action-bar"><button class="save" style="flex:none; padding:8px 16px;" data-action="delete-vehicle" data-id="${escapeHtml(v.id)}">🗑 この車両を削除</button></div>
   </div>
   `;
 }
@@ -2369,10 +2406,10 @@ function buildReminderRowsHTML(targets){
       <td>${toWarekiShort(v.nextShaken)||''}</td>
       <td class="rem-days ${daysClass}">${daysLabel}</td>
       <td class="reminder-actions">
-        <button ${tel?'':'disabled'} onclick="sendReminderSMS('${escapeHtml(v.id)}')">SMS</button>
-        <button ${email?'':'disabled'} onclick="sendReminderMail('${escapeHtml(v.id)}')">メール</button>
-        <button onclick="sendReminderLine('${escapeHtml(v.id)}')">LINE</button>
-        <button onclick="copyReminderMsg('${escapeHtml(v.id)}')">コピー</button>
+        <button ${tel?'':'disabled'} data-action="sms" data-veh-id="${escapeHtml(v.id)}">SMS</button>
+        <button ${email?'':'disabled'} data-action="mail" data-veh-id="${escapeHtml(v.id)}">メール</button>
+        <button data-action="line" data-veh-id="${escapeHtml(v.id)}">LINE</button>
+        <button data-action="copy" data-veh-id="${escapeHtml(v.id)}">コピー</button>
       </td>
     </tr>`;
   }).join('');
@@ -2421,6 +2458,19 @@ function renderReminderView(){
     });
   }
 }
+/* 車検リマインド送信ボタン（SMS/メール/LINE/コピー）をイベント委譲で処理する。バックアップJSON
+   経由でvehId値に細工されたonclick文字列組み立てXSSを防ぐため、data属性＋addEventListenerに
+   統一する（第14回修正）。#reminder-bodyは静的コンテナのため一度だけ結線する */
+document.getElementById('reminder-body').addEventListener('click', function(e){
+  const btn = e.target.closest('button[data-action][data-veh-id]');
+  if(!btn) return;
+  const vehId = btn.dataset.vehId;
+  const action = btn.dataset.action;
+  if(action==='sms') sendReminderSMS(vehId);
+  else if(action==='mail') sendReminderMail(vehId);
+  else if(action==='line') sendReminderLine(vehId);
+  else if(action==='copy') copyReminderMsg(vehId);
+});
 
 /* ============================================================
    設定
@@ -2704,6 +2754,7 @@ document.getElementById('main-tabs').addEventListener('click', function(e){
 document.getElementById('btn-new').addEventListener('click', function(){
   if(isFormDirty() && !confirm('入力中の内容がまだ保存されていません。\n破棄して続けてよろしいですか？')) return;
   state = createDefaultState();
+  inlineRegisteredCode = null; // まっさらな状態に切り替わるため、直前に自分が発行したコードの記憶をリセット
   state.invNo = getNextInvNo();
   loadedInvNo = state.invNo;
   seedItemsForType(state.type);
