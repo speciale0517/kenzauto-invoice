@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FLASH体操教室 ホームページ制作のご提案</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  *{ box-sizing:border-box; }
+  :root{
+    --ink:#1a1a18; --ink2:#4a4945; --ink3:#87857b;
+    --rule:#e2e0d8; --tint:#f6f5f0; --paper:#ffffff;
+    --a:#1baf7a; --aBg:#e6f6f0; --aLine:#9fdcc4;
+    --b:#2a78d6; --bBg:#eaf2fd; --bLine:#b3d2f6;
+    --o:#eb6834; --oBg:#fdeee7;
+    --navy:#16324f;
+  }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:"IPAPGothic","IPAGothic","Noto Sans JP",sans-serif; color:var(--ink);
+        -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .slide{ width:1122px; height:792px; position:relative; overflow:hidden; background:var(--paper);
+          page-break-after:always; }
+  .slide:last-child{ page-break-after:auto; }
+  .pad{ position:absolute; inset:0; padding:44px 56px 56px; display:flex; flex-direction:column; }
+  .chip{ display:inline-block; background:var(--navy); color:#fff; font-size:10pt; padding:3px 13px;
+         border-radius:13px; letter-spacing:.06em; }
+  .stitle{ font-size:25pt; line-height:1.3; margin:11px 0 5px; letter-spacing:.01em; }
+  .ssub{ font-size:12pt; color:var(--ink3); margin:0 0 20px; line-height:1.6; }
+  .foot{ position:absolute; left:56px; right:56px; bottom:20px; display:flex; justify-content:space-between;
+         font-size:8.5pt; color:#b5b3a8; border-top:1px solid #efeee8; padding-top:8px;}
+  .fill{ flex:1; }
+  p{ margin:0 0 10px; line-height:1.8; font-size:12pt; }
+  .lead{ font-size:13.5pt; line-height:1.85; }
+  b{ font-weight:700; }
+  .hl{ background:linear-gradient(transparent 58%, #ffe9a8 58%); }
+  /* cards */
+  .row{ display:flex; gap:22px; }
+  .card{ flex:1; border:1px solid var(--rule); border-radius:12px; padding:22px 24px; background:var(--paper); }
+  .card h4{ font-size:14pt; margin:0 0 8px; }
+  .card p{ font-size:11pt; line-height:1.75; margin:0; color:var(--ink2); }
+  /* AB */
+  .ab{ display:flex; gap:20px; align-items:stretch; }
+  .ab .side{ flex:1; border-radius:14px; padding:22px 24px 24px; }
+  .ab .sA{ background:var(--aBg); border:2px solid var(--aLine); }
+  .ab .sB{ background:var(--bBg); border:2px solid var(--bLine); }
+  .ab .tag{ display:inline-block; font-size:10.5pt; color:#fff; padding:3px 14px; border-radius:12px; }
+  .sA .tag{ background:var(--a); } .sB .tag{ background:var(--b); }
+  .ab h3{ font-size:17pt; margin:10px 0 4px; }
+  .ab .cap{ font-size:10.5pt; color:var(--ink2); margin:0 0 14px; }
+  .vsdot{ align-self:center; width:52px; text-align:center; font-size:15pt; color:var(--ink3); }
+  .big{ font-size:30pt; line-height:1.2; }
+  .big small{ font-size:13pt; }
+  .kv{ font-size:11.5pt; line-height:1.9; color:var(--ink2); }
+  .kv b{ color:var(--ink); font-size:12.5pt; }
+  /* table */
+  table{ border-collapse:separate; border-spacing:0; width:100%; font-size:11.5pt; }
+  th,td{ padding:11px 14px; text-align:left; border-bottom:1px solid var(--rule); line-height:1.6; }
+  th{ font-size:10.5pt; color:var(--ink3); font-weight:normal; border-bottom:2px solid var(--rule); }
+  td.c,th.c{ text-align:center; }
+  .tA{ background:var(--aBg); } .tB{ background:var(--bBg); }
+  .good{ color:#0d7a53; } .bad{ color:#b52b2a; } .warn{ color:#b8471d; }
+  .note{ background:var(--tint); border-left:5px solid var(--o); border-radius:0 10px 10px 0;
+         padding:15px 20px; font-size:11.5pt; line-height:1.8; }
+  .note b{ color:var(--o); }
+  svg{ display:block; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. 表紙 ============ -->
+<section class="slide">
+  <svg viewBox="0 0 1122 792" style="position:absolute;inset:0;width:1122px;height:792px">
+    <rect x="0" y="0" width="1122" height="792" fill="#ffffff"/>
+    <path d="M0 0 L508 0 L452 792 L0 792 Z" fill="#16324f"/>
+    <path d="M508 0 L528 0 L472 792 L452 792 Z" fill="#eb6834" opacity="0.85"/>
+    <g>
+      <ellipse cx="820" cy="662" rx="230" ry="16" fill="#f1f4f8"/>
+      <rect x="600" y="636" width="452" height="26" rx="13" fill="#eaf2fd"/>
+      <rect x="742" y="548" width="164" height="30" rx="7" fill="#e0c398"/>
+      <rect x="754" y="578" width="140" height="24" rx="4" fill="#cfae7f"/>
+      <rect x="766" y="602" width="116" height="24" rx="4" fill="#bd9865"/>
+      <path d="M636 630 Q824 380 1012 630" fill="none" stroke="#eb6834" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="3 17"/>
+      <g transform="translate(824,404) rotate(-8)">
+        <rect x="-52" y="-16" width="104" height="34" rx="17" fill="#2a78d6"/>
+        <circle cx="64" cy="-6" r="25" fill="#2a78d6"/>
+        <rect x="26" y="8" width="20" height="62" rx="10" fill="#2a78d6" transform="rotate(20 36 39)"/>
+        <rect x="-70" y="-6" width="64" height="19" rx="9.5" fill="#1f5fae" transform="rotate(-34 -38 4)"/>
+        <rect x="-78" y="16" width="64" height="19" rx="9.5" fill="#1f5fae" transform="rotate(-14 -46 26)"/>
+      </g>
+      <g fill="#f5c451">
+        <circle cx="1012" cy="322" r="8"/><circle cx="1060" cy="404" r="5"/><circle cx="962" cy="262" r="4.5"/>
+      </g>
+    </g>
+  </svg>
+  <div class="pad" style="padding:76px 56px 56px">
+    <div style="width:400px">
+      <div style="font-size:10.5pt;color:#8fb6e3;letter-spacing:.22em">ご提案書・御見積書</div>
+      <div style="width:56px;height:5px;background:#eb6834;margin:22px 0 26px"></div>
+      <div style="font-size:27pt;color:#ffffff;line-height:1.45">FLASH体操教室<br>ホームページ<br>制作のご提案</div>
+      <div style="font-size:13pt;color:#b9d2ec;line-height:1.85;margin-top:26px">
+        0歳から全国大会まで。<br>その11年の積み重ねが、<br>きちんと伝わるサイトへ。
+      </div>
+      <div style="margin-top:56px;font-size:11pt;color:#cfe0f0;line-height:2.1;border-top:1px solid #2d4f75;padding-top:18px">
+        合同会社FLASH体操教室　御中<br>
+        <span style="color:#8fb6e3;font-size:10pt">2026年9月16日　／　3rdStage　担当：福田</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. 今のサイトでもったいないこと ============ -->
+<section class="slide">
+  <div class="pad">
+    <div><span class="chip">01</span></div>
+    <div class="stitle">いまのホームページで、もったいないこと</div>
+    <p class="ssub">作りが悪いのではなく、お使いのサービスの「仕様の限界」です</p>
+
+    <div class="row grow" style="gap:20px">
+      <div class="card" style="border-top:5px solid #e34948">
+        <svg viewBox="0 0 120 92" style="width:120px;height:92px;margin:0 auto 12px">
+          <rect x="30" y="40" width="60" height="44" rx="7" fill="#fdecec" stroke="#e34948" stroke-width="3"/>
+          <path d="M42 40 V28 a18 18 0 0 1 32 -11" fill="none" stroke="#e34948" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="60" cy="60" r="6" fill="#e34948"/>
+          <rect x="57" y="62" width="6" height="12" rx="3" fill="#e34948"/>
+        </svg>
+        <h4 style="text-align:center">① 鍵がかかっていません</h4>
+        <p>体験のお申し込みで、<b>お子さまのお名前・年齢・ご連絡先</b>を入力していただくのに、
+          その通信に鍵がかかっていない状態です。ブラウザにも警告が出ます。</p>
+      </div>
+      <div class="card" style="border-top:5px solid #eb6834">
+        <svg viewBox="0 0 120 92" style="width:120px;height:92px;margin:0 auto 12px">
+          <rect x="16" y="20" width="52" height="64" rx="4" fill="#f6f5f0" stroke="#87857b" stroke-width="2.5"/>
+          <g fill="#d8d6cc"><rect x="24" y="28" width="12" height="10"/><rect x="42" y="28" width="12" height="10"/>
+            <rect x="24" y="44" width="12" height="10"/><rect x="42" y="44" width="12" height="10"/>
+            <rect x="24" y="60" width="12" height="10"/></g>
+          <rect x="41" y="59" width="14" height="12" fill="#eb6834"/>
+          <path d="M78 52 h26" stroke="#eb6834" stroke-width="3" stroke-linecap="round"/>
+          <text x="86" y="44" font-size="11" fill="#eb6834" font-family="IPAPGothic,sans-serif">間借り</text>
+        </svg>
+        <h4 style="text-align:center">② 住所が「他社ビルの一室」</h4>
+        <p>いまのURLは、サービス会社の住所の中の一区画です。
+          <b>解約するとサイトごと消えてしまい、11年分の積み重ねが残りません。</b></p>
+      </div>
+      <div class="card" style="border-top:5px solid #2a78d6">
+        <svg viewBox="0 0 120 92" style="width:120px;height:92px;margin:0 auto 12px">
+          <rect x="34" y="14" width="52" height="66" rx="5" fill="#ffffff" stroke="#2a78d6" stroke-width="3"/>
+          <g stroke="#b3d2f6" stroke-width="3.5" stroke-linecap="round">
+            <path d="M44 32 h32"/><path d="M44 44 h32"/><path d="M44 56 h20"/>
+          </g>
+          <g fill="#c9c7bd"><rect x="92" y="22" width="18" height="24" rx="3"/><rect x="92" y="52" width="18" height="24" rx="3"/></g>
+          <text x="95" y="90" font-size="10" fill="#c9c7bd" font-family="IPAPGothic,sans-serif">…</text>
+        </svg>
+        <h4 style="text-align:center">③ 1ページしかありません</h4>
+        <p>コースが6つあるのに、1ページでは<b>コースごとの料金・曜日・持ち物</b>を書き切れません。
+          保護者さまが知りたいことに答えられていない状態です。</p>
+      </div>
+    </div>
+
+    <div class="fill"></div>
+    <div class="note">
+      <b>ここがポイント</b>　この3つはすべて、新しいホームページにすることで<b>まとめて解決します。</b>
+      鍵（SSL）と自分の住所（独自ドメイン）は、これからご説明するどちらのプランにも標準で含まれています。
+    </div>
+  </div>
+  <div class="foot"><span>FLASH体操教室 ホームページ制作のご提案</span><span>3rdStage</span></div>
+</section>
+
+<!-- ============ 3. 強み ============ -->
+<section class="slide">
+  <div class="pad">
+    <div><span class="chip">02</span></div>
+    <div class="stitle">FLASH体操教室の「強み」は、2つあります</div>
+    <p class="ssub">調べてみて分かったこと。どちらも今のサイトでは、ほとんど伝わっていません</p>
+
+    <div style="display:flex;gap:26px;align-items:flex-start;flex:1">
+      <div style="flex:1.25">
+        <div style="font-size:14.5pt;margin-bottom:6px">強み①　0歳から全国大会まで、ひとつの教室で見られる</div>
+        <p style="font-size:11.5pt;color:var(--ink2);margin-bottom:10px">
+          「小さいうちに通わせて、本気になったらそのまま上のコースへ」が教室の中で完結します。
+          宮崎市内では<b>とても珍しい体制</b>です。</p>
+        <svg viewBox="0 0 600 310" style="width:100%;height:auto">
+          <g>
+            <rect x="8"   y="245" width="92" height="52"  rx="5" fill="#eaf2fd"/>
+            <rect x="106" y="205" width="92" height="92"  rx="5" fill="#d8e8fb"/>
+            <rect x="204" y="165" width="92" height="132" rx="5" fill="#c2dbf8"/>
+            <rect x="302" y="125" width="92" height="172" rx="5" fill="#a7cbf4"/>
+            <rect x="400" y="85"  width="92" height="212" rx="5" fill="#7fb2ee"/>
+            <rect x="498" y="45"  width="92" height="252" rx="5" fill="#2a78d6"/>
+          </g>
+          <g font-size="12" fill="#16324f" text-anchor="middle" font-family="IPAPGothic,sans-serif">
+            <text x="54" y="270">未就園児</text><text x="152" y="230">キッズ</text><text x="250" y="190">アクティブ</text>
+            <text x="348" y="150">アクロバット</text><text x="446" y="110">育成</text>
+          </g>
+          <text x="544" y="72" font-size="12.5" fill="#ffffff" text-anchor="middle" font-family="IPAPGothic,sans-serif">選手</text>
+          <text x="544" y="90" font-size="10.5" fill="#cde2fb" text-anchor="middle" font-family="IPAPGothic,sans-serif">全国大会へ</text>
+          <g font-size="11" fill="#87857b" text-anchor="middle" font-family="IPAPGothic,sans-serif">
+            <text x="54" y="20">0歳</text><text x="544" y="20">全国</text>
+          </g>
+          <path d="M54 30 H520" stroke="#e2e0d8" stroke-width="1.5" stroke-dasharray="5 5"/>
+          <path d="M520 30 l-8 -5 v10 z" fill="#e2e0d8"/>
+        </svg>
+      </div>
+      <div style="flex:1;border-left:1px solid var(--rule);padding-left:26px">
+        <div style="font-size:14.5pt;margin-bottom:6px">強み②　幼稚園・保育園への出張指導</div>
+        <p style="font-size:11.5pt;color:var(--ink2)">
+          市内のこども園のお知らせに、<b>年度をまたいで何度も</b>FLASH体操教室の指導の記事が載っていました。
+          単発ではなく、続いているお取引です。</p>
+        <svg viewBox="0 0 360 150" style="width:100%;height:auto;margin:6px 0 10px">
+          <rect x="6" y="48" width="104" height="72" rx="8" fill="#e6f6f0" stroke="#1baf7a" stroke-width="2.5"/>
+          <path d="M6 48 L58 18 L110 48" fill="none" stroke="#1baf7a" stroke-width="2.5" stroke-linejoin="round"/>
+          <text x="58" y="92" font-size="12" fill="#0d7a53" text-anchor="middle" font-family="IPAPGothic,sans-serif">FLASH</text>
+          <g stroke="#1baf7a" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M120 84 h108"/></g>
+          <polygon points="232,84 220,77 220,91" fill="#1baf7a"/>
+          <rect x="242" y="48" width="112" height="72" rx="8" fill="#ffffff" stroke="#87857b" stroke-width="2.5"/>
+          <path d="M242 48 L298 18 L354 48" fill="none" stroke="#87857b" stroke-width="2.5" stroke-linejoin="round"/>
+          <text x="298" y="92" font-size="12" fill="#4a4945" text-anchor="middle" font-family="IPAPGothic,sans-serif">幼稚園・保育園</text>
+          <text x="176" y="72" font-size="11" fill="#1baf7a" text-anchor="middle" font-family="IPAPGothic,sans-serif">出張指導</text>
+        </svg>
+        <div class="note" style="padding:12px 16px;font-size:11pt">
+          <b>もったいない</b>　園の先生が外部指導を探すときは、まず検索します。
+          <b>「対応しています」というページがないと、実績があっても候補に入りません。</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="fill"></div>
+    <div style="background:var(--navy);color:#fff;border-radius:12px;padding:16px 24px;font-size:12.5pt;line-height:1.75">
+      新しいホームページでは、<b style="color:#ffd98a">この2つの強みを前面に出す構成</b>にします。
+      新しく何かを始める必要はありません。<b style="color:#ffd98a">すでにお持ちのものを、見えるようにするだけです。</b>
+    </div>
+  </div>
+  <div class="foot"><span>FLASH体操教室 ホームページ制作のご提案</span><span>3rdStage</span></div>
+</section>
