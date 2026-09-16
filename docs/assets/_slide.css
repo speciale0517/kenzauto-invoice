@@ -22,6 +22,7 @@
   .foot{ position:absolute; left:56px; right:56px; bottom:20px; display:flex; justify-content:space-between;
          font-size:8.5pt; color:#b5b3a8; border-top:1px solid #efeee8; padding-top:8px;}
   .fill{ flex:1; }
+  .grow{ flex:1; }
   p{ margin:0 0 10px; line-height:1.8; font-size:12pt; }
   .lead{ font-size:13.5pt; line-height:1.85; }
   b{ font-weight:700; }
