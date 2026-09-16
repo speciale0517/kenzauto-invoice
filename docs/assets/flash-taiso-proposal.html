@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FLASH体操教室 ホームページ制作 社内共有資料</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 16mm 14mm; }
+  * { box-sizing: border-box; }
+  :root{
+    --ink:#1a1a18; --ink2:#4a4945; --ink3:#77756c;
+    --rule:#dedcd4; --surface:#fcfcfb; --tint:#f4f3ee;
+    --blue:#2a78d6; --orange:#eb6834; --aqua:#1baf7a; --red:#e34948;
+    --bluebg:#eaf2fd; --orangebg:#fdeee7; --aquabg:#e6f6f0; --redbg:#fdecec;
+  }
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"IPAPGothic","IPAGothic","Noto Sans JP",sans-serif;
+    color:var(--ink); background:#fff;
+    font-size:10.2pt; line-height:1.72; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .page{ page-break-after:always; }
+  .page:last-child{ page-break-after:auto; }
+
+  /* ---- 表紙 ---- */
+  .cover{ padding-top:44mm; }
+  .cover .kicker{ font-size:10pt; color:var(--ink3); letter-spacing:.14em; }
+  .cover h1{ font-size:25pt; line-height:1.4; margin:12px 0 4px; letter-spacing:.01em; }
+  .cover h2{ font-size:13pt; color:var(--ink2); font-weight:normal; margin:0 0 30px; line-height:1.6; }
+  .cover .bar{ height:5px; width:74px; background:var(--blue); margin:26px 0; }
+  .cover .meta{ font-size:10pt; color:var(--ink2); line-height:2.0; border-top:1px solid var(--rule); padding-top:14px; margin-top:34px;}
+  .cover .meta b{ display:inline-block; width:8.5em; color:var(--ink3); font-weight:normal; }
+  .cover .purpose{ background:var(--tint); border-left:4px solid var(--blue); padding:14px 18px; font-size:10pt; line-height:1.85; }
+
+  /* ---- 見出し ---- */
+  h3.sec{ font-size:14.5pt; margin:0 0 3px; letter-spacing:.01em; }
+  h3.sec .num{ color:var(--blue); margin-right:.5em; }
+  .sub{ font-size:9.2pt; color:var(--ink3); margin:0 0 16px; padding-bottom:10px; border-bottom:2px solid var(--rule); }
+  h4{ font-size:11pt; margin:20px 0 7px; padding-left:9px; border-left:4px solid var(--blue); line-height:1.4;}
+  h5{ font-size:10pt; margin:14px 0 5px; color:var(--ink2); }
+  p{ margin:0 0 9px; }
+  ul,ol{ margin:6px 0 10px; padding-left:1.35em; }
+  li{ margin-bottom:4px; }
+  .small{ font-size:8.8pt; color:var(--ink3); line-height:1.65; }
+
+  /* ---- 表 ---- */
+  table{ border-collapse:collapse; width:100%; font-size:9.2pt; margin:8px 0 12px; }
+  th,td{ border:1px solid var(--rule); padding:5.5px 8px; text-align:left; vertical-align:top; line-height:1.55;}
+  th{ background:var(--tint); font-size:8.8pt; color:var(--ink2); white-space:nowrap; }
+  td.num,th.num{ text-align:right; white-space:nowrap; }
+  tr.total td{ background:var(--bluebg); font-size:10pt; }
+  tr.total td:first-child{ color:var(--ink); }
+
+  /* ---- 補足ボックス ---- */
+  .note{ background:var(--tint); border:1px solid var(--rule); border-left:4px solid var(--aqua);
+         padding:10px 14px; margin:10px 0 14px; font-size:9pt; line-height:1.75; }
+  .note .t{ font-size:9pt; color:var(--aqua); margin-bottom:3px; letter-spacing:.04em;}
+  .warn{ background:var(--redbg); border:1px solid #f4c9c9; border-left:4px solid var(--red);
+         padding:10px 14px; margin:10px 0 14px; font-size:9pt; line-height:1.75; }
+  .warn .t{ color:var(--red); margin-bottom:3px; }
+  .key{ background:var(--bluebg); border:1px solid #c6ddf8; border-left:4px solid var(--blue);
+        padding:11px 15px; margin:10px 0 14px; font-size:9.4pt; line-height:1.8; }
+  .key .t{ color:var(--blue); margin-bottom:3px; }
+
+  /* ---- サマリ数字 ---- */
+  .stats{ display:flex; gap:9px; margin:14px 0 18px; }
+  .stat{ flex:1; border:1px solid var(--rule); border-top:3px solid var(--blue); padding:11px 12px 12px; background:var(--surface); }
+  .stat .l{ font-size:8.2pt; color:var(--ink3); line-height:1.4; min-height:2.3em;}
+  .stat .v{ font-size:17pt; color:var(--blue); line-height:1.25; margin-top:3px; }
+  .stat .v small{ font-size:9pt; }
+  .stat .d{ font-size:8pt; color:var(--ink3); line-height:1.45; margin-top:3px;}
+
+  /* ---- 図表キャプション ---- */
+  figure{ margin:14px 0 6px; }
+  figcaption{ font-size:9.6pt; margin-bottom:7px; color:var(--ink); }
+  figcaption span{ color:var(--ink3); font-size:8.6pt; }
+  .src{ font-size:7.8pt; color:var(--ink3); margin-top:2px; line-height:1.55;}
+  svg{ width:100%; height:auto; display:block; }
+
+  .two{ display:flex; gap:14px; }
+  .two > div{ flex:1; }
+  .tag{ display:inline-block; font-size:8pt; padding:1px 7px; border-radius:9px; margin-right:4px; }
+  .tag.a{ background:var(--aquabg); color:#0d7a53; }
+  .tag.b{ background:var(--orangebg); color:#b8471d; }
+  .tag.c{ background:var(--redbg); color:#b52b2a; }
+  .glo{ font-size:9pt; }
+  .glo dt{ color:var(--blue); margin-top:9px; }
+  .glo dd{ margin:1px 0 0 0; color:var(--ink2); line-height:1.7; }
+  .foot{ font-size:8pt; color:var(--ink3); border-top:1px solid var(--rule); padding-top:7px; margin-top:16px; }
+</style>
+</head>
+<body>
+
+<!-- ========== 表紙 ========== -->
+<section class="page cover">
+  <div class="kicker">社内共有資料 / 案件検討</div>
+  <h1>FLASH体操教室<br>ホームページ制作のご提案</h1>
+  <h2>宮崎市佐土原町・合同会社FLASH体操教室<br>制作実績づくりを兼ねた初回受注案件の検討</h2>
+  <div class="bar"></div>
+
+  <div class="purpose">
+    <b>この資料の目的</b><br>
+    営業担当・福田の実家が運営する体操教室から、ホームページ制作の相談を受けています。<br>
+    <b>自社の制作実績（ポートフォリオ）を確保する初回案件</b>として受注したいため、
+    予算20万円以内で成立するかを、市場相場の調査をもとに検証しました。<br>
+    社内での受注可否の判断材料としてご確認ください。
+  </div>
+
+  <div class="meta">
+    <div><b>案件名</b>FLASH体操教室 公式サイト リニューアル</div>
+    <div><b>クライアント</b>合同会社FLASH体操教室（宮崎県宮崎市佐土原町）</div>
+    <div><b>提案金額</b>198,000円（税込）／ 制作費 180,000円（税別）</div>
+    <div><b>想定期間</b>約6週間（着手〜公開）</div>
+    <div><b>作成日</b>2026年9月16日</div>
+  </div>
+</section>
+
+<!-- ========== 1. 結論サマリ ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">01</span>結論サマリ</h3>
+  <p class="sub">まずこの1ページだけ読めば全体がわかります</p>
+
+  <div class="stats">
+    <div class="stat"><div class="l">提案金額<br>（税込）</div><div class="v">198,000<small>円</small></div><div class="d">制作費 180,000円＋消費税</div></div>
+    <div class="stat"><div class="l">同種サービスの<br>相場中央値との比較</div><div class="v">44<small>%</small></div><div class="d">Studio制作代行の中央値45万円に対して</div></div>
+    <div class="stat"><div class="l">想定工数<br>（実働）</div><div class="v">5〜6<small>人日</small></div><div class="d">実働36〜52時間／時給換算 約4,000円</div></div>
+    <div class="stat"><div class="l">公開までの<br>期間</div><div class="v">6<small>週間</small></div><div class="d">素材が期限どおり揃った場合</div></div>
+  </div>
+
+  <h4>3行でいうと</h4>
+  <ol>
+    <li><b>20万円は「安売り」ではない。</b>個人・フリーランスへの制作依頼の相場は10〜30万円で、198,000円はその中〜上位。値付けとして無理をしていません。</li>
+    <li><b>20万円に収める方法は「値引き」ではなく「工程を削る設計」。</b>ノーコードツール採用・ページ数を6枚に限定・原稿は先方記入、の3点で工数を5〜6人日に収めます。</li>
+    <li><b>受注の狙いは金額ではなく実績。</b>値引き分の対価として、制作事例の公開許可・お客様の声・公開後の成果数値・園への紹介を契約条件に入れます。</li>
+  </ol>
+
+  <div class="key">
+    <div class="t">■ この案件を推す最大の理由</div>
+    実績としていちばん価値が出るのは「きれいなサイトを作った」ではなく、<b>「公開3か月で体験申込が月2件→7件に増えた」という数字</b>です。
+    FLASH体操教室は現在ホームページがほぼ機能していない状態なので、<b>改善幅が大きく、数字が出やすい</b>。
+    次の営業で使える“実績”を、最短・最小コストで作れる案件だと判断しています。
+  </div>
+
+  <h4>判断いただきたいこと</h4>
+  <table>
+    <tr><th style="width:26%">項目</th><th>内容</th></tr>
+    <tr><td>受注可否</td><td>制作費 180,000円（税別）での受注可否</td></tr>
+    <tr><td>値引きの承認</td><td>通常価格328,000円 →「初回制作事例協力割引」として148,000円の値引き</td></tr>
+    <tr><td>契約条件</td><td>実績公開許可・お客様の声・成果数値の共有・紹介依頼を条件に含めること</td></tr>
+    <tr><td>体制</td><td>約6週間、実働5〜6人日の工数確保</td></tr>
+  </table>
+
+  <div class="warn">
+    <div class="t">■ 調査上の制約（先に共有）</div>
+    調査環境のネットワーク制限により、<b>現行サイト（http://kitenn.jp/flash/）へ直接アクセスできませんでした。</b>
+    本資料の「現状の課題」は、検索エンジンに登録されている情報と、利用されているサービスの公開仕様から再構成したものです。
+    受注が決まり次第、実機での確認を行い、内容を確定情報に差し替えます。
+  </div>
+</section>
+
+<!-- ========== 2. 案件概要 ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">02</span>案件概要 — どんな教室か</h3>
+  <p class="sub">提案の前提となるクライアントの基礎情報</p>
+
+  <table>
+    <tr><th style="width:24%">名称</th><td>合同会社FLASH体操教室（法人番号 2350003002139）</td></tr>
+    <tr><th>創業</th><td>2015年ごろ（法人番号指定日 2015年10月5日）／<b>創業11年目</b></td></tr>
+    <tr><th>所在地</th><td>宮崎市佐土原町下那珂 中溝2711-74</td></tr>
+    <tr><th>代表</th><td>福田 氏（営業担当・福田の実家）</td></tr>
+    <tr><th>連絡先</th><td>080-5252-5766（<b>携帯電話のみ</b>）</td></tr>
+    <tr><th>コース</th><td>未就園児（0〜3歳・保護者同伴）／キッズ（3歳〜小学生）／アクティブ（小学生）／
+      アクロバット（県内試合出場）／体操競技・育成／体操競技・選手（全国大会出場）の<b>全6コース</b></td></tr>
+    <tr><th>設備</th><td>マット・とび箱・鉄棒・平均台・トランポリン・つり輪</td></tr>
+  </table>
+
+  <h4>調査でわかった、この教室の「強み」と「もったいない点」</h4>
+
+  <h5>強み①　0歳から全国大会まで、ひとつの教室で見られる</h5>
+  <p>未就園児コースから全国大会を目指す選手コースまで揃っている教室は、宮崎市内では希少です。
+  「小さいうちに通わせて、本気になったらそのまま上のコースへ」という導線が教室内で完結します。
+  <b>これが最大の訴求材料</b>ですが、現在の1ページのサイトではまったく伝わっていません。</p>
+
+  <h5>強み②　幼稚園・保育園への出張指導という“隠れた収益チャネル”がある</h5>
+  <p>宮崎市内の認定こども園のお知らせページに、FLASH体操教室による指導の記事が<b>年度をまたいで複数回</b>掲載されていました。
+  つまり<b>単発ではなく継続的な取引</b>があります。法人向けの指導は単価が高く収益が安定しますが、
+  現在のサイトにはこの入口が見当たりません。新サイトでは「園・学校向け 出張体操指導」を独立したページとして用意します。</p>
+
+  <div class="note">
+    <div class="t">■ 補足：なぜ「園への出張指導ページ」を作るのか</div>
+    園の先生が外部指導を探すとき、まず検索します。そのときに「出張指導に対応しています／実績はこちらです」というページがないと、
+    <b>実績があるのに候補に入れません。</b>すでに取引がある園の紹介経由で広がる可能性もあり、費用対効果が高い1ページです。
+  </div>
+
+  <h5>もったいない点　競合はすでにWebで先行している</h5>
+  <table>
+    <tr><th style="width:30%">教室</th><th>Webの状況</th></tr>
+    <tr><td>アドバンススポーツクラブ</td><td>独自ドメイン・暗号化通信あり。市内7会場。事業部ごとにサイトを保有</td></tr>
+    <tr><td>NORTHスポーツクラブ</td><td>独自ドメイン。2023年開業と新しいが、会場別の日時・料金を掲載し、<b>電話／サイト／LINEの3経路</b>で体験予約を受付</td></tr>
+    <tr><td>ポリッシュ ほか</td><td>独自ドメインで運営</td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ ひとことで言うと</div>
+    <b>FLASH体操教室は、中身（11年の実績・0歳〜全国大会）では勝っていて、器（ホームページ）で負けている</b>状態です。
+    中身を作り直す必要はないので、器を整えるだけで効果が出やすい。これが「数字の実績を作りやすい」と判断した根拠です。
+  </div>
+</section>
+
+<!-- ========== 3. 現状の課題 ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">03</span>現状の課題 — 今のホームページ</h3>
+  <p class="sub">なぜ作り直す必要があるのか</p>
+
+  <table>
+    <tr><th style="width:24%">URL</th><td>http://kitenn.jp/flash/</td></tr>
+    <tr><th>利用サービス</th><td>「KITENN」（アイコムティ株式会社／宮崎市）が提供する<b>1ページ型ホームページサービス</b></td></tr>
+    <tr><th>費用</th><td>年額 11,000円（税込）</td></tr>
+    <tr><th>構成</th><td><b>1ページのみ</b>（サービス仕様上の上限）</td></tr>
+    <tr><th>ドメイン</th><td>独自ドメインなし。<b>他社ドメインの一部を間借りしている状態</b></td></tr>
+    <tr><th>通信</th><td><b>暗号化されていない（http://）</b></td></tr>
+    <tr><th>問い合わせ</th><td>フォームに希望曜日・クラスを記入 → 後日折り返し連絡</td></tr>
+  </table>
+
+  <h4>優先度の高い課題 3つ</h4>
+
+  <h5><span class="tag c">最優先</span>① 通信が暗号化されていない</h5>
+  <p>ブラウザに「保護されていない通信」という警告が表示されます。それ以上に問題なのは、
+  <b>子どもの氏名・年齢・保護者の連絡先を、暗号化されていない状態で送信させている</b>ことです。
+  個人情報の扱いとして、ここだけでも作り直しの理由になります。</p>
+
+  <div class="note">
+    <div class="t">■ 補足：http と https の違い（郵便でたとえると）</div>
+    <b>http＝ハガキ</b>。途中で誰でも中身を読めます。<b>https＝封書</b>。中身は宛先にしか読めません。<br>
+    体験申込フォームは、子どもの名前・年齢・保護者の電話番号を書いて送るものです。これをハガキで送っている、というのが今の状態です。
+    なお https 化は、独自ドメインを取れば<b>追加費用なしで自動的に付いてきます</b>（今回使うツールの標準機能）。
+  </div>
+
+  <h5><span class="tag c">最優先</span>② 独自ドメインがなく、他社の住所を間借りしている</h5>
+  <p>URL が「kitenn.jp（サービス提供会社のドメイン）／flash（その中の一区画）」という構造です。
+  検索エンジンからの評価が自社に貯まらず、名刺やチラシに載せるURLとしても弱い。
+  そして最大の問題は、<b>サービスを解約した瞬間にサイトが消える</b>ことです。11年分の露出を他社に握られています。</p>
+
+  <div class="note">
+    <div class="t">■ 補足：独自ドメインとは（住所でたとえると）</div>
+    <b>独自ドメイン＝自社の土地に建てた家</b>（例：flash-gym.jp）。引っ越しても住所を持ち運べます。<br>
+    <b>今の状態＝他社ビルの一室を間借り</b>（kitenn.jp の中の一区画）。ビルのオーナーの都合で退去になれば、住所ごと消えます。<br>
+    費用は<b>年1,500〜4,500円程度</b>。ここを削る理由はありません。
+  </div>
+
+  <h5><span class="tag b">重要</span>③ 1ページしかなく、判断に必要な情報が載っていない</h5>
+  <p>コースが6つあるのに、1ページでは<b>コースごとの料金・曜日・時間・会場・持ち物</b>を書き切れません。
+  保護者が知りたい「うちの子はどのコース？」「いくら？」「いつ？」に答えられていない状態で、これが離脱の最大要因です。</p>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">03</span>現状の課題<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">その他の課題と、移行にあたっての技術的な注意</p>
+  <h4>その他の課題</h4>
+  <ul>
+    <li><b>予約導線が弱い</b>：フォーム送信→後日連絡。競合はLINEで即応しています。問い合わせの熱量は数時間で冷めます。</li>
+    <li><b>料金が検索で出てこない</b>：習い事選びで「料金非公開」は最大級の離脱要因です。</li>
+    <li><b>Instagram公式アカウントが確認できない</b>：体操は「動き」が商品なので、短い縦型動画との相性が非常に良いのに使えていない可能性があります。</li>
+    <li><b>SNSでシェアしたときにサムネイル画像が出ない</b>と推測されます。地域の習い事は口コミ＝LINEでのURL共有が主な広がり方なので、ここは効きます。</li>
+    <li><b>Googleマップ（Googleビジネスプロフィール）の整備状況が不明</b>。「宮崎市 体操教室」の実際の主戦場は地図検索です。</li>
+  </ul>
+
+  <div class="warn">
+    <div class="t">■ 移行時の技術的な注意（見積に織り込み済み）</div>
+    現在のURLは他社ドメインのため、<b>「旧URLにアクセスした人を新URLへ自動転送する設定」が使えない可能性が高い</b>です。
+    そのため、検索エンジンの評価を引き継げない前提で計画します。対策として、①新旧サイトを3〜6か月並行運用し旧ページに移転告知を出す
+    ②Googleマップ・SNS・名刺・チラシのURLを一斉に差し替える ③新ドメインで検索エンジンへの登録を公開初日に行う、を作業に含めています。
+  </div>
+</section>
+
+<!-- ========== 4. 他社比較グラフ ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">04</span>他社比較 — 198,000円は高いのか、安いのか</h3>
+  <p class="sub">2026年の市場相場のなかでの位置づけ</p>
+
+  <figure>
+    <figcaption>図1. 依頼先別 ホームページ制作費の相場レンジと、今回の提案額<br>
+      <span>横軸＝制作費（万円）。青い帯が各依頼先の相場の幅、オレンジの縦線が今回の提案額。</span></figcaption>
+    <svg viewBox="0 0 700 318" role="img" aria-label="依頼先別の制作費相場レンジと今回の提案額の比較">
+      <rect x="0" y="0" width="700" height="318" fill="#fcfcfb"/>
+      <!-- gridlines -->
+      <g stroke="#e8e6de" stroke-width="1">
+        <line x1="170" y1="32" x2="170" y2="252"/>
+        <line x1="255.8" y1="32" x2="255.8" y2="252"/>
+        <line x1="341.7" y1="32" x2="341.7" y2="252"/>
+        <line x1="427.5" y1="32" x2="427.5" y2="252"/>
+        <line x1="513.3" y1="32" x2="513.3" y2="252"/>
+        <line x1="599.2" y1="32" x2="599.2" y2="252"/>
+        <line x1="685" y1="32" x2="685" y2="252"/>
+      </g>
+      <!-- bars -->
+      <g fill="#2a78d6">
+        <rect x="221.5" y="45" width="463.5" height="14" rx="4"/>
+        <rect x="307.3" y="81" width="120.2" height="14" rx="4"/>
+        <rect x="221.5" y="117" width="120.2" height="14" rx="4"/>
+        <rect x="221.5" y="153" width="67.5" height="14" rx="4"/>
+        <rect x="187.2" y="189" width="68.6" height="14" rx="4"/>
+        <rect x="170" y="225" width="25.8" height="14" rx="4"/>
+      </g>
+      <!-- median marker on Studio row -->
+      <rect x="246" y="151" width="2.5" height="18" fill="#0d366b"/>
+      <!-- row labels -->
+      <g font-size="11" fill="#1a1a18" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="157" y="56">宮崎県内の制作会社</text>
+        <text x="157" y="92">中小の制作会社</text>
+        <text x="157" y="128">一般的な制作会社</text>
+        <text x="157" y="164">Studio制作代行</text>
+        <text x="157" y="200">フリーランス（個人）</text>
+        <text x="157" y="236">テンプレート型・格安</text>
+      </g>
+      <!-- value labels -->
+      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="223" y="41">30〜300万円</text>
+        <text x="309" y="77">80〜150万円</text>
+        <text x="223" y="113">30〜100万円</text>
+        <text x="223" y="149">30〜80万円</text>
+        <text x="294" y="165" fill="#0d366b">中央値45万円</text>
+        <text x="208" y="185">10〜50万円</text>
+        <text x="208" y="221">0〜15万円</text>
+      </g>
+      <!-- reference line -->
+      <line x1="204" y1="30" x2="204" y2="256" stroke="#eb6834" stroke-width="2.5"/>
+      <g font-size="10" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="210" y="25">◀ 今回の提案 19.8万円（税込）</text>
+      </g>
+      <!-- axis -->
+      <line x1="170" y1="252" x2="685" y2="252" stroke="#a9a79d" stroke-width="1"/>
+      <g font-size="9" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="170" y="267">0</text><text x="255.8" y="267">50</text><text x="341.7" y="267">100</text>
+        <text x="427.5" y="267">150</text><text x="513.3" y="267">200</text><text x="599.2" y="267">250</text>
+        <text x="685" y="267">300</text>
+        <text x="427.5" y="284">制作費（万円）</text>
+      </g>
+      <!-- legend -->
+      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <rect x="170" y="298" width="22" height="10" rx="3" fill="#2a78d6"/>
+        <text x="198" y="307">依頼先ごとの相場レンジ</text>
+        <rect x="330" y="296" width="2.5" height="14" fill="#eb6834"/>
+        <text x="340" y="307">今回の提案額（198,000円／税込）</text>
+      </g>
+    </svg>
+    <div class="src">出典：お名前.com WEB学園／格安ホームページ.jp／Xserver／StockSun／Studio制作代行の相場解説記事（いずれも2026年版）。
+      ※大手制作会社（300万円〜）は今回の比較対象外のため図から除外。※サブスク型は初期費用0円だが月額5,000〜30,000円が別途発生。</div>
+  </figure>
+
+  <h4>このグラフの読み方</h4>
+  <ul>
+    <li><b>198,000円は、フリーランス（個人）相場10〜50万円の中に収まっています。</b>下限を割り込んだ安売りではありません。</li>
+    <li><b>宮崎県内の制作会社の下限（30万円）を下回っています。</b>地方だから安いということはなく、宮崎でも下限は30万円です。</li>
+    <li><b>同じツール（Studio）を使った制作代行の中央値45万円に対して、約44%。</b>「相場の半額以下」と根拠を持って言えます。これはクライアントへの説明材料としても強い数字です。</li>
+  </ul>
+
+  <div class="warn">
+    <div class="t">■ 「初期費用0円」のサブスク型は、今回は選べません</div>
+    月額制で初期費用0円のサービスも存在しますが、これは<b>「所有」ではなく「利用」</b>です。
+    解約するとサイトは削除され、データもドメインも手元に残りません。<br>
+    FLASH体操教室は<b>まさに今「他社のドメイン配下で、解約＝サイト消滅」という状態で困っている</b>ので、
+    同じ構造の契約に移すのは提案として筋が通りません。この選択肢は最初から外しています。
+  </div>
+</section>
+
+<!-- ========== 5. 見積 ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">05</span>見積の内訳</h3>
+  <p class="sub">通常価格からどこをいくら削ったか</p>
+
+  <div class="key">
+    <div class="t">■ 提示のしかた</div>
+    通常価格 <b>328,000円</b>（税別）　→　初回制作事例協力割引 <b>−148,000円</b>　→　<b>今回制作費 180,000円（税別）／ 198,000円（税込）</b><br>
+    <span style="font-size:8.8pt;color:#4a4945">※最初から20万円を「定価」にすると、2件目以降の案件で価格を上げられなくなります。
+    通常価格を提示したうえでの割引という形にしておけば、次回は定価から交渉を始められます。</span>
+  </div>
+
+  <figure>
+    <figcaption>図2. 項目別 通常価格と今回価格の比較<br><span>横軸＝金額（千円・税別）。合計は通常328,000円に対し今回180,000円。</span></figcaption>
+    <svg viewBox="0 0 700 338" role="img" aria-label="見積項目ごとの通常価格と今回価格の比較">
+      <rect x="0" y="0" width="700" height="338" fill="#fcfcfb"/>
+      <g stroke="#e8e6de" stroke-width="1">
+        <line x1="175" y1="36" x2="175" y2="278"/><line x1="253.3" y1="36" x2="253.3" y2="278"/>
+        <line x1="331.7" y1="36" x2="331.7" y2="278"/><line x1="410" y1="36" x2="410" y2="278"/>
+        <line x1="488.3" y1="36" x2="488.3" y2="278"/><line x1="566.7" y1="36" x2="566.7" y2="278"/>
+        <line x1="645" y1="36" x2="645" y2="278"/>
+      </g>
+      <rect x="175" y="47"  width="235"   height="16" rx="4" fill="#eb6834"/>
+      <rect x="175" y="66"  width="137"   height="16" rx="4" fill="#2a78d6"/>
+      <rect x="175" y="93"  width="391.7" height="16" rx="4" fill="#eb6834"/>
+      <rect x="175" y="112" width="215.4" height="16" rx="4" fill="#2a78d6"/>
+      <rect x="175" y="139" width="430.8" height="16" rx="4" fill="#eb6834"/>
+      <rect x="175" y="158" width="235"   height="16" rx="4" fill="#2a78d6"/>
+      <rect x="175" y="185" width="117.5" height="16" rx="4" fill="#eb6834"/>
+      <rect x="175" y="204" width="58.75" height="16" rx="4" fill="#2a78d6"/>
+      <rect x="175" y="231" width="109.7" height="16" rx="4" fill="#eb6834"/>
+      <rect x="175" y="250" width="58.75" height="16" rx="4" fill="#2a78d6"/>
+      <g font-size="10.5" fill="#1a1a18" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="162" y="69">ディレクション・設計</text>
+        <text x="162" y="115">デザイン</text>
+        <text x="162" y="161">Studio実装（6ページ）</text>
+        <text x="162" y="207">原稿整理・流し込み</text>
+        <text x="162" y="253">公開設定・計測導入</text>
+      </g>
+      <g font-size="9" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="416" y="59">60,000</text><text x="318" y="78">35,000</text>
+        <text x="573" y="105">100,000</text><text x="396" y="124">55,000</text>
+        <text x="612" y="151">110,000</text><text x="416" y="170">60,000</text>
+        <text x="298" y="197">30,000</text><text x="240" y="216">15,000</text>
+        <text x="291" y="243">28,000</text><text x="240" y="262">15,000</text>
+      </g>
+      <line x1="175" y1="278" x2="645" y2="278" stroke="#a9a79d" stroke-width="1"/>
+      <g font-size="9" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="175" y="293">0</text><text x="253.3" y="293">20</text><text x="331.7" y="293">40</text>
+        <text x="410" y="293">60</text><text x="488.3" y="293">80</text><text x="566.7" y="293">100</text>
+        <text x="645" y="293">120</text>
+        <text x="410" y="310">金額（千円・税別）</text>
+      </g>
+      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <rect x="175" y="322" width="22" height="10" rx="3" fill="#eb6834"/>
+        <text x="203" y="331">通常価格（合計 328,000円）</text>
+        <rect x="400" y="322" width="22" height="10" rx="3" fill="#2a78d6"/>
+        <text x="428" y="331">今回価格（合計 180,000円）</text>
+      </g>
+    </svg>
+  </figure>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">05</span>見積の内訳<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">項目別の内訳と、クライアント側に発生するランニング費用</p>
+  <table>
+    <tr><th>項目</th><th>内容</th><th class="num">通常</th><th class="num">今回</th></tr>
+    <tr><td>ディレクション・要件定義・設計</td><td>ヒアリング、サイト構成の設計</td><td class="num">60,000</td><td class="num">35,000</td></tr>
+    <tr><td>デザイン</td><td>トップpage 1枚＋下層共通テンプレート1枚</td><td class="num">100,000</td><td class="num">55,000</td></tr>
+    <tr><td>Studio実装（全6ページ）</td><td>スマホ対応込み</td><td class="num">110,000</td><td class="num">60,000</td></tr>
+    <tr><td>原稿整理・流し込み</td><td>※原稿はクライアント提供</td><td class="num">30,000</td><td class="num">15,000</td></tr>
+    <tr><td>公開設定・計測導入</td><td>独自ドメイン接続／暗号化／アクセス解析／検索エンジン登録／SNSサムネイル／Googleマップ初期設定</td><td class="num">28,000</td><td class="num">15,000</td></tr>
+    <tr class="total"><td colspan="2">合計（税別）</td><td class="num">328,000</td><td class="num">180,000</td></tr>
+    <tr class="total"><td colspan="2">合計（税込）</td><td class="num">360,800</td><td class="num">198,000</td></tr>
+  </table>
+
+  <h4>別途：クライアント名義で直接契約いただく実費（年間）</h4>
+  <table>
+    <tr><th>項目</th><th class="num">年額</th></tr>
+    <tr><td>独自ドメイン</td><td class="num">1,500〜4,500円</td></tr>
+    <tr><td>Studio Business プラン（年払い）</td><td class="num">約47,760円</td></tr>
+    <tr><td>LINE公式アカウント</td><td class="num">0円〜</td></tr>
+    <tr class="total"><td>年間ランニング合計</td><td class="num">約5〜6万円</td></tr>
+  </table>
+
+  <div class="note">
+    <div class="t">■ 補足：なぜランニング費用を見積に含めないのか（3つの理由）</div>
+    ① 見積の総額が下がり、20万円の予算枠に収まる<br>
+    ② 当社が立て替える必要がなくなり、請求漏れ・未回収のリスクが消える<br>
+    ③ <b>ドメインと各種アカウントがクライアント名義になる</b> — 将来の移管トラブルを防げます。
+    現在まさに「他社サービス依存」で困っている教室なので、この説明は先方にも通りやすいです。
+  </div>
+
+  <p class="small">※ 現行は年11,000円のため、<b>ランニングは年4〜5万円上がります</b>。ここは必ず事前合意を取ります。
+  説明としては「月謝7,000円の生徒が1人、1年間続けば約8.4万円。体験申込が年に1件増えれば回収できる投資です」という伝え方をします。</p>
+</section>
+
+<!-- ========== 6. コスト設計 ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">06</span>コスト設計 — どこを削り、どこを守るか</h3>
+  <p class="sub">20万円は「値引き」ではなく「仕様の設計」で実現します</p>
+
+  <div class="key">
+    <div class="t">■ 大前提：20万円＝実働5〜6人日が上限</div>
+    ホームページ制作の人日単価は概ね3〜5万円です。逆算すると <b>20万円で使える工数は5〜6人日（実働36〜52時間）</b>。<br>
+    198,000円 ÷ 50時間 ＝ <b>時給約4,000円</b>。この枠に入る仕様を最初に切ることが、赤字を出さない唯一の方法です。
+  </div>
+
+  <div class="note">
+    <div class="t">■ 補足：「人日（にんにち）」とは</div>
+    <b>1人が1日作業した量＝1人日</b>。「5人日」は、1人で5日かかる作業量という意味です。
+    Web制作の見積は、この人日×単価で組み立てるのが一般的です。
+  </div>
+
+  <h4><span class="tag a">削る</span>20万円に収めるための7つの施策</h4>
+  <table>
+    <tr><th style="width:32%">施策</th><th class="num" style="width:15%">削減額の目安</th><th>理由</th></tr>
+    <tr><td><b>① ノーコードツール（Studio）を使い、プログラミング工程を持たない</b></td><td class="num">構造的に<br>数十万円</td>
+      <td>外部の実装者への外注が不要になり、制作期間も短縮されます。<b>20万円を成立させている土台</b>がこれです</td></tr>
+    <tr><td><b>② ページ数を12枚→6枚に絞る</b></td><td class="num">1.5〜15万円</td>
+      <td>下層ページの相場は1枚あたり5,000〜50,000円。6枚減らせば相場ベースでこの額が消えます</td></tr>
+    <tr><td><b>③ 原稿はクライアントに記入してもらう</b></td><td class="num">3〜10万円</td>
+      <td>文章作成の外注は1ページ数万円が相場。ヒアリングシートに書いてもらい、当社は整形・推敲のみ担当します</td></tr>
+    <tr><td><b>④ デザイン案の作り込み工程を省き、Studio上で直接デザインする</b></td><td class="num">2〜5万円</td>
+      <td>「デザイン案を作って承認 → あらためて実装」という二度手間をなくします。※トップページだけはラフを共有して合意を取ります</td></tr>
+    <tr><td><b>⑤ 予約システム・会員管理機能を作らない</b></td><td class="num">10万円以上</td>
+      <td>LINE公式アカウント（無料枠）＋フォームで代替。この規模の教室に予約システムは過剰です</td></tr>
+    <tr><td><b>⑥ ロゴ・イラストを新規制作しない</b></td><td class="num">3〜8万円</td>
+      <td>既存ロゴを使用します</td></tr>
+    <tr><td><b>⑦ 修正回数を「デザイン2回・原稿2回」に固定する</b></td><td class="num">青天井の防止</td>
+      <td>安く受けた案件が赤字化する最大の原因は修正の無限ループです。<b>身内案件ほど「もう少しだけ」が起きやすい</b>ため、金額より先に回数を合意します</td></tr>
+  </table>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">06</span>コスト設計<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">判断が必要な項目と、守るべき項目</p>
+  <h4><span class="tag b">判断が要る</span>撮影をどうするか</h4>
+  <p>撮影の相場は<b>商用の半日撮影で3〜4万円</b>（出張撮影の高単価帯では半日10万円）。20万円の枠の15〜20%を占めるため、削減効果は最大です。
+  一方で<b>写真の質＝体操教室サイトの質</b>でもあります。</p>
+  <div class="key">
+    <div class="t">■ 推奨する折衷案</div>
+    低単価のカメラマンに<b>2〜3時間だけ（15,000〜30,000円）</b>依頼し、レッスン風景と講師のカットだけ押さえる。
+    器具・外観・駐車場・待機スペースは当社がスマートフォンで撮影する。<br>
+    → 費用を抑えつつ、サイトの印象を決める部分だけプロ品質を確保できます。この費用は<b>オプション扱い</b>とし、先方に選んでもらいます。
+  </div>
+
+  <h4><span class="tag c">守る</span>絶対に削ってはいけない3項目</h4>
+  <table>
+    <tr><th style="width:30%">項目</th><th>削ってはいけない理由</th></tr>
+    <tr><td><b>① 独自ドメイン＋通信の暗号化</b></td>
+      <td>今回の依頼の根本原因がこれです。ここを直さないなら作り直す意味がありません。費用は年1,500〜4,500円。削る理由が存在しません</td></tr>
+    <tr><td><b>② アクセス解析・検索エンジン登録・フォーム送信の計測</b></td>
+      <td><b>実績づくりが目的なら、ここが最重要です。</b>きれいなサイトは「見せられる」だけですが、
+      「公開3か月で体験申込が月2件→7件」は<b>営業で使える数字の実績</b>になります。作業は0.5人日以下で、費用対効果が圧倒的です</td></tr>
+    <tr><td><b>③ スマートフォン実機での表示確認</b></td>
+      <td>保護者の閲覧はほぼスマホです。ここを飛ばすと公開後に修正対応が発生し、かえって工数が増えます</td></tr>
+  </table>
+
+  <h4>自社としての最低金額は「15万円」</h4>
+  <table>
+    <tr><th>金額</th><th class="num">時給換算（実働50時間）</th><th>判断</th></tr>
+    <tr><td>200,000円</td><td class="num">約4,000円</td><td>妥当。今回の提案額</td></tr>
+    <tr><td>150,000円</td><td class="num">約3,000円</td><td>ぎりぎり許容。実績づくりの対価と割り切る範囲</td></tr>
+    <tr><td>100,000円</td><td class="num">約2,000円</td><td><b>実績目的でも赤字。受けるべきではない</b></td></tr>
+  </table>
+  <p class="small">※ 15万円を下回る場合は、値引きではなく<b>「仕様をさらに削る」</b>ことでしか成立しません（ページ数を3枚にする等）。</p>
+</section>
+
+<!-- ========== 7. 作業の流れ ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">07</span>作業の流れ — 着手から公開まで6週間</h3>
+  <p class="sub">誰が・いつ・何をするか</p>
+
+  <figure>
+    <figcaption>図3. 制作スケジュール（全6週間）<br><span>色は担当を示します。教室側の作業が遅れると、全体が後ろにずれます。</span></figcaption>
+    <svg viewBox="0 0 700 386" role="img" aria-label="着手から公開までの6週間の作業スケジュール">
+      <rect x="0" y="0" width="700" height="386" fill="#fcfcfb"/>
+      <!-- week headers -->
+      <g font-size="9.5" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="235.8" y="38">1週目</text><text x="317.5" y="38">2週目</text><text x="399.2" y="38">3週目</text>
+        <text x="480.8" y="38">4週目</text><text x="562.5" y="38">5週目</text><text x="644.2" y="38">6週目</text>
+      </g>
+      <g stroke="#e8e6de" stroke-width="1">
+        <line x1="195" y1="44" x2="195" y2="338"/><line x1="276.7" y1="44" x2="276.7" y2="338"/>
+        <line x1="358.3" y1="44" x2="358.3" y2="338"/><line x1="440" y1="44" x2="440" y2="338"/>
+        <line x1="521.7" y1="44" x2="521.7" y2="338"/><line x1="603.3" y1="44" x2="603.3" y2="338"/>
+        <line x1="685" y1="44" x2="685" y2="338"/>
+      </g>
+      <!-- bars: y centers 58,91,124,157,190,223,256,289,322 ; h=16 -->
+      <rect x="196.5" y="50"  width="78.7"  height="16" rx="4" fill="#1baf7a"/>
+      <rect x="196.5" y="83"  width="160.4" height="16" rx="4" fill="#2a78d6"/>
+      <rect x="196.5" y="116" width="242"   height="16" rx="4" fill="#eb6834"/>
+      <rect x="278.2" y="149" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
+      <rect x="278.2" y="182" width="242"   height="16" rx="4" fill="#2a78d6"/>
+      <rect x="359.8" y="215" width="242"   height="16" rx="4" fill="#2a78d6"/>
+      <rect x="523.2" y="248" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
+      <rect x="523.2" y="281" width="160.4" height="16" rx="4" fill="#1baf7a"/>
+      <rect x="604.8" y="314" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
+      <!-- bottleneck marker -->
+      <text x="443" y="128" font-size="9.5" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">★ 最大のボトルネック</text>
+      <!-- row labels -->
+      <g font-size="10.5" fill="#1a1a18" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="182" y="62">① ヒアリング・要件定義</text>
+        <text x="182" y="95">② サイト構成・設計</text>
+        <text x="182" y="128">③ 原稿・写真の準備</text>
+        <text x="182" y="161">④ ドメイン取得・初期設定</text>
+        <text x="182" y="194">⑤ デザイン制作</text>
+        <text x="182" y="227">⑥ Studio実装</text>
+        <text x="182" y="260">⑦ 原稿流し込み・実機確認</text>
+        <text x="182" y="293">⑧ 修正対応（2回まで）</text>
+        <text x="182" y="326">⑨ 公開・計測設定・告知</text>
+      </g>
+      <line x1="195" y1="338" x2="685" y2="338" stroke="#a9a79d" stroke-width="1"/>
+      <!-- legend -->
+      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <rect x="195" y="360" width="22" height="10" rx="3" fill="#2a78d6"/><text x="223" y="369">当社（制作）</text>
+        <rect x="320" y="360" width="22" height="10" rx="3" fill="#eb6834"/><text x="348" y="369">教室側</text>
+        <rect x="420" y="360" width="22" height="10" rx="3" fill="#1baf7a"/><text x="448" y="369">両者（打合せ・確認）</text>
+      </g>
+    </svg>
+  </figure>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">07</span>作業の流れ<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">各工程の内容、納期リスク、公開タイミング</p>
+  <h4>各工程の内容</h4>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:24%">工程</th><th style="width:12%">担当</th><th>やること</th></tr>
+    <tr><td>①</td><td>ヒアリング・要件定義</td><td>両者</td><td>目的・目標の確認、掲載方針（料金公開の可否、顔出しの可否）の決定。所要60〜90分</td></tr>
+    <tr><td>②</td><td>サイト構成・設計</td><td>当社</td><td>6ページの構成と、各ページに何を載せるかを確定</td></tr>
+    <tr><td>③</td><td><b>原稿・写真の準備</b></td><td><b>教室側</b></td><td>ヒアリングシートへの記入、写真の提供・撮影、肖像権同意の確認</td></tr>
+    <tr><td>④</td><td>ドメイン取得・初期設定</td><td>当社</td><td>独自ドメインの取得（クライアント名義）、Studioの契約・接続</td></tr>
+    <tr><td>⑤</td><td>デザイン制作</td><td>当社</td><td>トップページ＋下層テンプレートのデザイン</td></tr>
+    <tr><td>⑥</td><td>Studio実装</td><td>当社</td><td>全6ページの構築、スマホ対応</td></tr>
+    <tr><td>⑦</td><td>原稿流し込み・実機確認</td><td>当社</td><td>文章・写真の反映、スマートフォン実機での表示確認</td></tr>
+    <tr><td>⑧</td><td>修正対応</td><td>両者</td><td>デザイン2回・原稿2回まで。それ以上は追加見積</td></tr>
+    <tr><td>⑨</td><td>公開・計測設定・告知</td><td>当社</td><td>公開、アクセス解析の設置、検索エンジン登録、Googleマップ更新、旧サイトへの移転告知</td></tr>
+  </table>
+
+  <div class="warn">
+    <div class="t">■ 納期が延びる原因の9割は「③ 原稿と写真が集まらない」</div>
+    工程③だけが教室側の作業で、しかも1〜3週目にまたがります。ここが遅れると④以降がすべて後ろにずれます。<br>
+    対策として、<b>契約時に素材の提出期限を明記し、遅延した分は納期を後ろ倒しにする条項</b>を入れます
+    （当社が残業で吸収すると、実質的な値引きになってしまうため）。
+  </div>
+
+  <h4>公開タイミングについて（重要）</h4>
+  <p>体操教室の入会需要は<b>①4月（新年度）②夏休み前後</b>の2つがピークで、検索が伸びるのは<b>1〜3月</b>です。</p>
+  <div class="key">
+    <div class="t">■ 逆算すると</div>
+    <b>12月中旬〜1月上旬の公開</b>を狙えば、1〜3月の需要期をまるごと取れます。そこから6週間を逆算すると、
+    <b>着手のデッドラインは10月中旬〜11月上旬</b>。<br>
+    現在9月中旬なので、<b>今動けば新年度の入会シーズンに間に合います</b>。これは先方への提案時にも強い後押し材料になります。
+  </div>
+</section>
+
+<!-- ========== 8. 実績確保 ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">08</span>会社としての損得 — 値引きの「対価」に何を取るか</h3>
+  <p class="sub">148,000円の値引きを、何に変えて回収するか</p>
+
+  <p>この案件の狙いは利益ではなく実績です。したがって、値引き分の対価として<b>以下を契約・合意事項に明記</b>します。
+  これがないと「ただ安く作っただけ」で終わり、本来の目的を達成できません。</p>
+
+  <table>
+    <tr><th style="width:34%">取り決める内容</th><th>何の役に立つか</th></tr>
+    <tr><td><b>制作実績としての公開許可</b><br><span class="small">自社サイト・提案資料・SNSへの掲載</span></td>
+      <td>ポートフォリオに載せられる。次の商談で「実績はこちらです」と出せる</td></tr>
+    <tr><td><b>お客様の声（推薦コメント）</b><br><span class="small">公開後1〜2か月時点</span></td>
+      <td>第三者の評価は自社の説明より説得力があります。<b>顔写真付きなら価値は倍</b></td></tr>
+    <tr><td><b>公開後3か月の成果数値の共有許可</b><br><span class="small">体験申込件数・問い合わせ件数</span></td>
+      <td><b>これが最大の資産。</b>「体験申込 月2件→7件」という数字は、デザインの見栄えより営業で効きます</td></tr>
+    <tr><td><b>紹介の依頼</b><br><span class="small">同業の教室、取引のある幼稚園・保育園</span></td>
+      <td>出張指導で園とのつながりがあるため、<b>園の紹介はかなり現実的</b>。次の案件の種になります</td></tr>
+    <tr><td>修正回数の上限（デザイン2回・原稿2回）</td><td>赤字化の防止</td></tr>
+    <tr><td>素材提出期限と、遅延時の納期スライド条項</td><td>納期遅延の責任を明確にする</td></tr>
+  </table>
+
+  <h4>身内案件ならではのリスクと対策</h4>
+  <table>
+    <tr><th style="width:36%">リスク</th><th>対策</th></tr>
+    <tr><td><b>伝言ゲームになる</b><br><span class="small">福田を経由して実家とやり取りすると、確認の往復で工数が倍になる</span></td>
+      <td><b>意思決定者（教室の代表）と直接つながる。</b>福田は同席で構いませんが、確認は本人に行います</td></tr>
+    <tr><td><b>「ついでにこれも」が無限に増える</b></td><td>見積書に<b>「やらないこと」を明記</b>。追加は都度見積とします</td></tr>
+    <tr><td><b>請求しづらくなる／支払いが後回しになる</b></td><td><b>着手金50%・納品時50%</b>を最初に取り決める。身内だからこそ書面で</td></tr>
+    <tr><td><b>修正が口頭で飛んでくる</b></td><td>修正依頼はLINEでも構わないので<b>必ずテキストで</b>。修正回数のカウント根拠になります</td></tr>
+  </table>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">08</span>会社としての損得<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">オプション項目と補助金について</p>
+  <h4>「やらないこと」＝オプション（別途見積）として提示する項目</h4>
+  <table>
+    <tr><th>オプション</th><th class="num">金額</th></tr>
+    <tr><td>プロによる撮影（2〜3時間・レッスン風景＋講師）</td><td class="num">15,000〜40,000円</td></tr>
+    <tr><td>コース個別ページの追加</td><td class="num">15,000円／ページ</td></tr>
+    <tr><td>ロゴ制作</td><td class="num">30,000〜80,000円</td></tr>
+    <tr><td>保守・更新代行</td><td class="num">月5,000円〜</td></tr>
+    <tr><td>予約・月謝決済システムの連携</td><td class="num">第2フェーズで別途</td></tr>
+  </table>
+  <p class="small">※ 保守費の相場は月5,000〜20,000円が約6割（平均41,000円）。今回は制作費に含めず、<b>月額の別契約</b>として提案します。</p>
+
+  <div class="note">
+    <div class="t">■ 補足：補助金について</div>
+    小規模事業者向けの補助金でウェブ関連費が対象になる制度もありますが、
+    <b>今回の規模（20万円）では申請書類の作成や事後報告の手間に見合わない可能性が高い</b>と判断しています。
+    素直に自費で進め、早く公開したほうが得策です。※制度内容は時期によって変わるため、検討する場合は申請時点の公募要領で確認が必要です。
+  </div>
+</section>
+
+<!-- ========== 9. 用語集 ========== -->
+<section class="page">
+  <h3 class="sec"><span class="num">09</span>用語集</h3>
+  <p class="sub">本資料に出てくる専門用語の補足</p>
+
+  <div class="two">
+    <div>
+      <dl class="glo">
+        <dt>HTTPS／SSL（エスエスエル）</dt>
+        <dd>通信を暗号化する仕組み。URLが https:// で始まっていれば有効。http:// は暗号化されていない状態です。</dd>
+
+        <dt>独自ドメイン</dt>
+        <dd>自社専用のインターネット上の住所（例：flash-gym.jp）。年1,500〜4,500円程度。サービスを変えても持ち運べます。</dd>
+
+        <dt>サブディレクトリ</dt>
+        <dd>他社ドメインの中の一区画（例：kitenn.jp<b>/flash/</b>）。他社ビルの一室を間借りしている状態にあたります。</dd>
+
+        <dt>ノーコード</dt>
+        <dd>プログラミングを書かずにWebサイトを作れるツールの総称。実装工程が短縮されるため、制作費を下げられます。</dd>
+
+        <dt>Studio（スタジオ）</dt>
+        <dd>日本製のノーコードツール。管理画面が日本語で、暗号化・スマホ対応が標準。今回の提案で採用するツールです。</dd>
+
+        <dt>CMS</dt>
+        <dd>専門知識なしでサイトの文章や写真を更新できる仕組み。これがあると「お知らせ」を教室側で更新でき、保守費を抑えられます。</dd>
+
+        <dt>レスポンシブ対応</dt>
+        <dd>パソコン・スマホ・タブレットのどの画面幅でも見やすく表示される作り。今は必須です。</dd>
+
+        <dt>LP（ランディングページ）</dt>
+        <dd>1ページで完結する縦長のページ。相場は5万円程度。今のFLASHのサイトはこれに近い構成です。</dd>
+      </dl>
+    </div>
+    <div>
+      <dl class="glo">
+        <dt>SEO</dt>
+        <dd>Google等の検索結果で上位に表示されるようにする施策。</dd>
+
+        <dt>MEO／Googleビジネスプロフィール</dt>
+        <dd>Googleマップ上の店舗情報。「宮崎市 体操教室」で検索したとき、実際にいちばん見られるのは地図です。</dd>
+
+        <dt>GA4／Search Console</dt>
+        <dd>いずれもGoogleの無料ツール。GA4は「何人が来て、どこを見て、申込したか」、Search Consoleは「どんな検索語で来たか」がわかります。<b>成果を数字で語るために必須</b>。</dd>
+
+        <dt>OGP</dt>
+        <dd>LINEやSNSでURLを共有したときに表示されるサムネイル画像とタイトルの設定。未設定だとリンクが味気なく、クリックされません。</dd>
+
+        <dt>301リダイレクト</dt>
+        <dd>旧URLにアクセスした人を新URLへ自動転送する設定。今回は他社ドメインのため使えない可能性が高く、代替策を計画に入れています。</dd>
+
+        <dt>人日（にんにち）</dt>
+        <dd>1人が1日作業する量。「5人日」＝1人なら5日かかる作業量。Web制作の見積の基本単位です。</dd>
+
+        <dt>ディレクション費</dt>
+        <dd>進行管理・要件定義・設計にかかる費用。相場は制作費総額の10〜30%。作らずに済ませるとやり直しが発生します。</dd>
+
+        <dt>サブスク型ホームページ</dt>
+        <dd>初期費用0円・月額制のサービス。安く見えますが<b>「所有」ではなく「利用」</b>で、解約するとサイトもデータも消えます。</dd>
+
+        <dt>CVR（コンバージョン率）</dt>
+        <dd>サイトを見た人のうち、体験申込などに至った割合。</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>主な出典（すべて2026年時点の公開情報）</b><br>
+    相場全般：お名前.com WEB学園／格安ホームページ.jp／あきばれホームページ／週刊Web担当者ガイド｜
+    フリーランス相場：Xserver／シーズプランニング／StockSun｜
+    ページ単価・ディレクション費：Web幹事／Bties／GIG／LIG｜
+    Studio：Studio公式 料金プラン／Studio制作代行の相場解説記事｜
+    撮影費：OrderPhotoStudio／Lancers／出張撮影ナビ｜
+    サブスク型の注意点：シンク／jarea／Speever｜
+    宮崎の地域相場：StockSun／humhum／Web幹事｜
+    クライアント情報：企業INDEXナビ（法人番号 2350003002139）／Yahoo!マップ／KITENN（アイコムティ株式会社）｜
+    競合：アドバンススポーツクラブ／NORTHスポーツクラブ 各公式サイト
+    <br><br>
+    作成：2026年9月16日／本資料は社内検討用です。
+  </div>
+</section>
+
+</body>
+</html>
