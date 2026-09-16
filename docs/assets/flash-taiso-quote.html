@@ -43,24 +43,36 @@
   figcaption{ font-size:9.6pt; margin-bottom:7px; }
   figcaption span{ color:var(--ink3); font-size:8.6pt; }
   .foot{ font-size:8pt; color:var(--ink3); border-top:1px solid var(--rule); padding-top:7px; margin-top:16px; }
-  .cover{ padding-top:30mm; }
+  .cover{ padding-top:24mm; }
   .cover .kicker{ font-size:10pt; color:var(--ink3); letter-spacing:.14em; }
-  .cover h1{ font-size:24pt; line-height:1.45; margin:12px 0 6px; }
-  .cover h2{ font-size:12.5pt; color:var(--ink2); font-weight:normal; margin:0 0 26px; line-height:1.7; }
-  .cover .bar{ height:5px; width:74px; background:var(--blue); margin:24px 0; }
-  .cover .to{ font-size:12pt; border-bottom:1px solid var(--rule); padding-bottom:10px; margin-bottom:22px;}
-  .cover .amt{ background:var(--bluebg); border:1px solid #c6ddf8; padding:16px 20px; margin:22px 0; }
-  .cover .amt .l{ font-size:9.5pt; color:var(--ink2); }
-  .cover .amt .v{ font-size:23pt; color:var(--blue); line-height:1.3; }
-  .cover .amt .v small{ font-size:11pt; }
-  .cover .amt .d{ font-size:9pt; color:var(--ink2); }
-  .cover .from{ font-size:9.5pt; color:var(--ink2); line-height:1.9; margin-top:30px; border-top:1px solid var(--rule); padding-top:14px;}
+  .cover h1{ font-size:23pt; line-height:1.45; margin:12px 0 6px; }
+  .cover h2{ font-size:12pt; color:var(--ink2); font-weight:normal; margin:0 0 22px; line-height:1.7; }
+  .cover .bar{ height:5px; width:74px; background:var(--blue); margin:22px 0; }
+  .cover .to{ font-size:12pt; border-bottom:1px solid var(--rule); padding-bottom:10px; margin-bottom:18px;}
+  .cover .from{ font-size:9.5pt; color:var(--ink2); line-height:1.9; margin-top:22px; border-top:1px solid var(--rule); padding-top:12px;}
   .cover .from b{ display:inline-block; width:7em; color:var(--ink3); font-weight:normal; }
-  .pill{ display:inline-block; font-size:8.5pt; padding:2px 9px; border-radius:10px; background:var(--bluebg); color:#184f95; margin-right:5px;}
+  .plans{ display:flex; gap:12px; margin:18px 0; }
+  .plan{ flex:1; border:1px solid var(--rule); padding:14px 16px 16px; }
+  .plan.a{ border-top:4px solid var(--aqua); }
+  .plan.b{ border-top:4px solid var(--blue); background:var(--bluebg); border-color:#c6ddf8;}
+  .plan .nm{ font-size:11pt; }
+  .plan .nm small{ font-size:8pt; color:var(--ink3); display:block; }
+  .plan .pr{ font-size:19pt; color:var(--blue); line-height:1.35; margin-top:6px;}
+  .plan.a .pr{ color:#0d7a53; }
+  .plan .pr small{ font-size:10pt; }
+  .plan .row{ font-size:9pt; color:var(--ink2); line-height:1.75; margin-top:6px;}
+  .plan .row b{ color:var(--ink); }
+  .badge{ display:inline-block; font-size:8pt; padding:2px 8px; border-radius:10px; background:#fff; border:1px solid var(--rule); color:var(--ink2); margin-top:8px;}
+  .plan.b .badge{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .step{ font-size:9pt; }
+  .vs th{ text-align:center; }
+  .vs td.c{ text-align:center; }
+  .ok{ color:#0d7a53; } .ng{ color:#b52b2a; } .mid{ color:#b8471d; }
 </style>
 </head>
 <body>
 
+<!-- ===== 表紙 ===== -->
 <section class="page cover">
   <div class="kicker">ご提案書 ・ 御見積書</div>
   <h1>FLASH体操教室<br>公式ホームページ 制作のご提案</h1>
@@ -69,32 +81,43 @@
 
   <div class="to">合同会社FLASH体操教室　御中</div>
 
-  <div class="amt">
-    <div class="l">御見積金額（税込）</div>
-    <div class="v">198,000<small> 円</small></div>
-    <div class="d">制作費 180,000円（税別）＋ 消費税 18,000円　／　納期：ご発注・素材ご提出から約6週間</div>
+  <p style="font-size:9.6pt;line-height:1.85">
+    サイトの「作り方」には2つの方法があり、<b>費用のかかり方がまったく違います。</b><br>
+    どちらが良い・悪いではなく、<b>「早く公開したいか」「長く安く使いたいか」</b>で選んでいただく形になります。
+    両方の御見積をご用意しましたので、比べてご検討ください。
+  </p>
+
+  <div class="plans">
+    <div class="plan a">
+      <div class="nm">プランA：Studio版<small>既製のサイト作成サービスを使って作る</small></div>
+      <div class="pr">187,000<small> 円（税込）</small></div>
+      <div class="row">納期　<b>約6週間</b>（早い）<br>年間維持費　<b>約50,000円</b></div>
+      <div class="badge">とにかく早く公開したい方向け</div>
+    </div>
+    <div class="plan b">
+      <div class="nm">プランB：3rdStage作成版<small>3rdStageがゼロから作る</small></div>
+      <div class="pr">198,000<small> 円（税込）</small></div>
+      <div class="row">納期　<b>約8週間</b>（+2週間）<br>年間維持費　<b>約5,000円</b></div>
+      <div class="badge">3年使うなら、こちらが約12万円お得</div>
+    </div>
   </div>
 
-  <p class="small">
-    <span class="pill">全6ページ</span><span class="pill">スマートフォン対応</span><span class="pill">通信の暗号化（SSL）</span>
-    <span class="pill">独自ドメイン</span><span class="pill">お知らせは自社で更新可能</span><span class="pill">LINE連携</span>
-    <span class="pill">Googleマップ初期設定</span><span class="pill">アクセス解析導入</span>
-  </p>
-
-  <p class="small" style="margin-top:18px">
-    このたびは、ホームページ制作についてご相談をいただき、誠にありがとうございます。<br>
-    貴教室の現状と、宮崎市内の同業他社の状況を調べたうえで、<b>「限られたご予算のなかで、いちばん成果に直結する部分から整える」</b>
-    という方針でご提案をまとめました。ご検討のほど、よろしくお願い申し上げます。
-  </p>
+  <div class="key" style="margin-top:4px">
+    <div class="t">■ いちばんお伝えしたいこと</div>
+    現在の維持費は<b>年11,000円</b>です。プランAにすると<b>年約50,000円に上がります</b>が、プランBなら
+    <b>年約5,000円と、今よりも安くなります。</b><br>
+    そのかわり、プランBは公開までに<b>2週間ほど長くかかります。</b>この2週間をどう考えるか、が選択のポイントです。
+  </div>
 
   <div class="from">
+    <div><b>発行元</b>3rdStage</div>
     <div><b>発行日</b>2026年9月16日</div>
     <div><b>見積有効期限</b>発行日より30日間</div>
     <div><b>ご担当</b>福田</div>
   </div>
 </section>
 
-<!-- ===== 01 現状とご提案の方向性 ===== -->
+<!-- ===== 01 現状 ===== -->
 <section class="page">
   <h3 class="sec"><span class="num">01</span>現状と、ご提案の方向性</h3>
   <p class="sub">なぜ今、作り直しをおすすめするのか</p>
@@ -102,23 +125,23 @@
   <p>現在のホームページは、1ページ完結型のサービスをご利用のため、<b>サービスの仕様上どうしても越えられない制約</b>が3つあります。
   いずれも「作りが悪い」という話ではなく、<b>使っている仕組みの限界</b>です。</p>
 
-  <h4>ご提案の理由 ①　お問い合わせフォームが暗号化されていません</h4>
+  <h4>① お問い合わせフォームが暗号化されていません</h4>
   <p>現在のURLは <code>http://</code> で始まっており、通信が暗号化されていない状態です。
   体験申込フォームでは<b>お子さまのお名前・年齢・保護者さまのご連絡先</b>をご入力いただくため、ここは最優先で対応すべき点だと考えます。
   ブラウザに「保護されていない通信」という警告が出ることで、申込を途中でやめてしまう方も一定数いらっしゃいます。</p>
   <div class="note">
     <div class="t">■ 郵便にたとえると</div>
-    <b>http ＝ ハガキ</b>（途中で誰でも中身が読めます）／<b>https ＝ 封書</b>（宛先にしか読めません）。<br>
+    <b>http ＝ ハガキ</b>（途中で誰でも中身が読めます）／<b>https ＝ 封書</b>（宛先にしか読めません）。
     今は、お子さまのお名前とご連絡先を<b>ハガキで送っていただいている</b>状態です。<br>
-    なお、独自ドメインを取得すれば、暗号化（SSL）は<b>追加費用なしで自動的に付いてきます</b>。
+    なお暗号化（SSL）は、<b>プランA・プランBのどちらでも追加費用なしで付いてきます。</b>
   </div>
 
-  <h4>ご提案の理由 ②　URLが他社のドメインの一部になっています</h4>
+  <h4>② URLが他社のドメインの一部になっています</h4>
   <p>現在のURLは、サービス提供会社のドメインの中の一区画という構造です。たとえるなら<b>「自社の土地に建てた家」ではなく「他社ビルの一室を間借り」</b>している状態で、
   サービスを解約された場合、<b>11年かけて蓄積された検索エンジンからの評価とアクセスが、そのまま消えてしまいます。</b>
   独自ドメインの費用は年1,500〜4,500円程度です。ここは確保しておくことを強くおすすめします。</p>
 
-  <h4>ご提案の理由 ③　1ページでは、6つのコースを説明しきれません</h4>
+  <h4>③ 1ページでは、6つのコースを説明しきれません</h4>
   <p>貴教室には未就園児コースから体操競技・選手コースまで<b>6つのコース</b>がありますが、1ページではコースごとの
   <b>対象年齢・曜日・時間・料金・持ち物</b>を書き切ることができません。
   保護者さまがいちばん知りたい「うちの子はどのコース？」「いくら？」「いつ？」に答えられていないことが、
@@ -132,22 +155,294 @@
     新しいサイトでは、この2点を前面に出す構成にします。
   </div>
 
-  <h4>ご提案の方針</h4>
-  <p>ご予算を踏まえ、<b>「豪華に作る」のではなく「成果に直結する部分から確実に押さえる」</b>方針としました。
-  具体的には、<b>①暗号化と独自ドメインの確保　②6コースを説明しきれるページ構成　③体験申込までの導線（LINE連携・常時表示の予約ボタン）</b>
-  の3点に絞って投資し、装飾的な要素や予約システムなどは今回は見送っています。</p>
-
   <p class="small">※ 本ご提案は、公開情報にもとづく調査をもとに作成しています。現行サイトの管理画面や契約内容については、
   お打ち合わせの際に実際の画面を拝見したうえで、最終的な内容を確定させていただきます。</p>
 </section>
 
-<!-- ===== 02 サイト構成 ===== -->
+<!-- ===== 02 2つのプラン ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">02</span>サイト構成（全6ページ）</h3>
-  <p class="sub">どんなページを作るか</p>
+  <h3 class="sec"><span class="num">02</span>2つのプランをご提案します</h3>
+  <p class="sub">サイトの「作り方」によって、費用のかかり方がまったく違います</p>
+
+  <p>ホームページの費用には、<b>最初にかかる「制作費」</b>と、<b>毎年かかり続ける「維持費」</b>の2つがあります。
+  この2つのバランスが、プランAとプランBでは正反対です。</p>
+
+  <table class="vs">
+    <tr><th style="width:26%"></th><th style="width:37%">プランA：Studio版</th><th style="width:37%">プランB：3rdStage作成版</th></tr>
+    <tr><td><b>作り方</b></td>
+      <td class="c">既製のサイト作成サービス<br>「Studio」を使って作る</td>
+      <td class="c">3rdStageがゼロから<br>組み立てて作る</td></tr>
+    <tr><td><b>制作費（税込）</b></td><td class="c" style="font-size:12pt">187,000円</td><td class="c" style="font-size:12pt">198,000円</td></tr>
+    <tr><td><b>納期</b></td><td class="c ok" style="font-size:11pt">約6週間</td><td class="c mid" style="font-size:11pt">約8週間</td></tr>
+    <tr><td><b>年間維持費</b></td><td class="c mid" style="font-size:11pt">約50,000円</td><td class="c ok" style="font-size:11pt">約5,000円</td></tr>
+    <tr><td><b>現在（年11,000円）と比べて</b></td><td class="c">年 約39,000円 <b class="mid">増える</b></td><td class="c">年 約6,000円 <b class="ok">減る</b></td></tr>
+    <tr><td><b>3年間の合計</b></td><td class="c">337,000円</td><td class="c" style="font-size:11pt"><b>213,000円</b></td></tr>
+    <tr><td><b>ご自身での更新</b></td><td class="c ok">できます</td><td class="c ok">できます</td></tr>
+  </table>
 
   <figure>
-    <figcaption>図1. サイトマップ<br><span>トップページを入口に、目的別の5ページへ分岐します。</span></figcaption>
+    <figcaption>図1. 3年間でかかる費用の合計（制作費＋維持費）<br>
+      <span>プランBは制作費が1万1千円高いぶん、公開直後はAより上にありますが、約3か月で逆転します。</span></figcaption>
+    <svg viewBox="0 0 700 330" role="img" aria-label="プランAとプランBの3年間の累計費用の比較">
+      <rect x="0" y="0" width="700" height="330" fill="#fcfcfb"/>
+      <g stroke="#e8e6de" stroke-width="1">
+        <line x1="90" y1="270" x2="668" y2="270"/><line x1="90" y1="206" x2="668" y2="206"/>
+        <line x1="90" y1="142" x2="668" y2="142"/><line x1="90" y1="78" x2="668" y2="78"/>
+      </g>
+      <g stroke="#dedcd4" stroke-width="1">
+        <line x1="280" y1="40" x2="280" y2="270"/><line x1="470" y1="40" x2="470" y2="270"/><line x1="660" y1="40" x2="660" y2="270"/>
+      </g>
+      <!-- Plan A line -->
+      <polyline points="90,150.5 280,118.6 470,86.6 660,54.7" fill="none" stroke="#1baf7a" stroke-width="2.5"/>
+      <g fill="#1baf7a"><circle cx="90" cy="150.5" r="4"/><circle cx="280" cy="118.6" r="4"/><circle cx="470" cy="86.6" r="4"/><circle cx="660" cy="54.7" r="4.5"/></g>
+      <!-- Plan B line -->
+      <polyline points="90,143.5 280,140.3 470,137.1 660,133.9" fill="none" stroke="#2a78d6" stroke-width="2.5"/>
+      <g fill="#2a78d6"><circle cx="90" cy="143.5" r="4"/><circle cx="280" cy="140.3" r="4"/><circle cx="470" cy="137.1" r="4"/><circle cx="660" cy="133.9" r="4.5"/></g>
+      <!-- end labels -->
+      <text x="655" y="45" font-size="10" fill="#1baf7a" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">プランA 累計 337,000円</text>
+      <text x="655" y="154" font-size="10" fill="#2a78d6" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">プランB 累計 213,000円</text>
+      <!-- crossover -->
+      <circle cx="136" cy="147" r="6" fill="none" stroke="#eb6834" stroke-width="2"/>
+      <line x1="136" y1="153" x2="136" y2="186" stroke="#eb6834" stroke-width="1.2"/>
+      <text x="142" y="192" font-size="9.5" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">約3か月でプランBが安くなります</text>
+      <!-- gap callout -->
+      <text x="480" y="105" font-size="10.5" fill="#1a1a18" font-family="IPAPGothic,IPAGothic,sans-serif">3年間で</text>
+      <text x="480" y="120" font-size="10.5" fill="#1a1a18" font-family="IPAPGothic,IPAGothic,sans-serif">約124,000円の差</text>
+      <!-- axes -->
+      <line x1="90" y1="270" x2="668" y2="270" stroke="#a9a79d" stroke-width="1"/>
+      <line x1="90" y1="40" x2="90" y2="270" stroke="#a9a79d" stroke-width="1"/>
+      <g font-size="9" fill="#77756c" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="82" y="274">0</text><text x="82" y="210">10万</text><text x="82" y="146">20万</text><text x="82" y="82">30万</text>
+      </g>
+      <g font-size="9.5" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="90" y="288">公開時</text><text x="280" y="288">1年後</text><text x="470" y="288">2年後</text><text x="660" y="288">3年後</text>
+      </g>
+      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <rect x="200" y="308" width="22" height="4" rx="2" fill="#1baf7a"/><text x="228" y="314">プランA（Studio版）</text>
+        <rect x="390" y="308" width="22" height="4" rx="2" fill="#2a78d6"/><text x="418" y="314">プランB（3rdStage作成版）</text>
+      </g>
+    </svg>
+  </figure>
+</section>
+
+<!-- ===== 03 Studioとは ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">03</span>プランA：Studioとは何か</h3>
+  <p class="sub">サイト作りに必要なものが一式そろった、月額制のサービスです</p>
+
+  <p><b>Studio（スタジオ）</b>は、日本の会社が提供しているホームページ作成サービスです。
+  「サイトを置いておく場所」「安全な通信の仕組み」「自分で更新できる仕組み」「問い合わせフォーム」——
+  <b>ホームページの運営に必要なものが、最初から一式そろっています。</b></p>
+
+  <p>マンションにたとえると<b>「家具・家電つきの賃貸物件」</b>です。すぐ住み始められるかわりに、毎月の家賃がかかります。</p>
+
+  <h4>Studioに含まれているもの</h4>
+  <table>
+    <tr><th style="width:26%">項目</th><th>内容</th></tr>
+    <tr><td>サーバー（置き場所）</td><td>サイトを公開しておくための場所。契約や設定は不要です</td></tr>
+    <tr><td><b>SSL（通信の暗号化）</b></td><td>独自ドメインに<b>自動で適用</b>されます。現在の最優先課題がこれで解決します</td></tr>
+    <tr><td><b>更新機能（CMS）</b></td><td>お知らせなどを<b>教室のみなさまご自身で更新できる</b>管理画面</td></tr>
+    <tr><td>問い合わせフォーム</td><td>標準機能として用意されています</td></tr>
+    <tr><td>スマホ・タブレット対応</td><td>画面の大きさに合わせて自動で整います</td></tr>
+    <tr><td>SNS共有時の設定</td><td>LINEなどでURLを送ったときのサムネイル画像の設定</td></tr>
+  </table>
+
+  <h4>Studioの費用</h4>
+  <table>
+    <tr><th style="width:44%">項目</th><th class="num" style="width:22%">金額</th><th>備考</th></tr>
+    <tr><td>Studio Businessプラン（年払い）</td><td class="num">47,760円／年</td><td>月あたり3,980円</td></tr>
+    <tr><td>独自ドメイン</td><td class="num">1,500〜4,500円／年</td><td>ご希望の文字列によります</td></tr>
+    <tr class="total"><td>年間合計</td><td class="num">約50,000円／年</td><td></td></tr>
+  </table>
+
+  <div class="note">
+    <div class="t">■ この金額は高いのでしょうか</div>
+    「サーバー＋暗号化＋更新機能＋フォーム」を別々に契約すると、同じくらいの金額になります。
+    <b>Studioが特別に高いわけではありません。</b><br>
+    ただし、<b>使い続けるかぎり毎年かかり続けます。</b>10年使えば約50万円です。ここがプランBとの分かれ目になります。
+  </div>
+
+  <div class="warn">
+    <div class="t">■ 注意点</div>
+    <b>Studioの利用をやめると、サイトは表示されなくなります。</b>（作った内容は他社サービスへそのまま移せません）<br>
+    ただし<b>独自ドメインは貴教室名義でお取りいただく</b>ので、現在のように「他社ドメインの中の一区画」という状態にはなりません。
+    やめる場合でも、ドメインは手元に残ります。
+  </div>
+</section>
+
+<!-- ===== 04 3rdStage作成とは ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">04</span>プランB：3rdStage作成版とは何か</h3>
+  <p class="sub">既製のサービスを使わず、3rdStageがゼロから組み立てます</p>
+
+  <p>プランBは、既製のサービスを使わずに<b>3rdStageがホームページそのものをゼロから作り、
+  無料で使える仕組みを組み合わせて公開する</b>方法です。</p>
+
+  <p>先ほどの例えでいうと<b>「注文住宅を建てる」</b>にあたります。建てるのに少し時間はかかりますが、
+  <b>建ててしまえば毎月の家賃はかかりません。</b></p>
+
+  <h4>プランBで使うもの</h4>
+  <table>
+    <tr><th style="width:28%">項目</th><th style="width:16%">費用</th><th>内容</th></tr>
+    <tr><td>独自ドメイン</td><td>1,500〜4,500円／年</td><td>プランAと同じです</td></tr>
+    <tr><td><b>Cloudflare Pages</b><br>（置き場所）</td><td><b>0円</b></td>
+      <td>世界中の企業サイトが使っている大手インフラ会社の無料枠です。<b>SSL（暗号化）も自動</b>で付きます。
+        表示速度はむしろ速くなります</td></tr>
+    <tr><td><b>microCMS</b><br>（更新機能）</td><td><b>0円</b></td>
+      <td>日本製の更新管理サービスの無料枠。<b>Studioと同じように、教室のみなさまが管理画面からお知らせを更新できます</b></td></tr>
+    <tr><td>問い合わせフォーム</td><td><b>0円</b></td><td>無料のフォームサービスを利用します</td></tr>
+    <tr class="total"><td>年間合計</td><td colspan="2"><b>約3,000〜5,000円／年</b>（＝ 実質ドメイン代のみ）</td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ なぜ無料で済むのですか</div>
+    「サイトを置いておくだけ」であれば、大手各社が<b>小規模サイト向けに無料枠を用意している</b>からです。
+    貴教室のような規模であれば、無料枠の範囲に十分おさまります。<br>
+    Studioの月額料金は、<b>「誰でも簡単に作れる編集画面」への対価</b>が大きな部分を占めます。
+    作るのが3rdStageであれば、その編集画面は不要になる、というのがプランBの考え方です。
+  </div>
+
+  <h4>プランBの、もうひとつの利点</h4>
+  <p><b>ホームページのデータ一式を、貴教室にお渡しします。</b>
+  将来もし3rdStage以外の会社にご依頼される場合も、そのデータを渡せば引き継ぎができます。
+  特定のサービスに縛られることがありません。</p>
+
+  <div class="warn">
+    <div class="t">■ 正直にお伝えする注意点</div>
+    ① <b>公開まで2週間ほど長くかかります。</b>更新の仕組みと公開環境を一から組み立てるためです。<br>
+    ② <b>デザインやページ構成の変更は、3rdStageへのご依頼が必要です。</b>
+      （プランAも、実際にはご自身でレイアウトを変更されることはほとんどないと思いますが、仕組み上は可能です）<br>
+    ③ <b>無料枠の内容は、将来提供各社の都合で変わる可能性があります。</b>
+      その場合でもドメインとデータは手元に残るため、別の置き場所へ移すことができます（その際は移設費用を別途頂戴します）。
+  </div>
+</section>
+
+<!-- ===== 05 更新操作の違い ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">05</span>ご自身で更新するときの操作</h3>
+  <p class="sub">いちばん気になる部分だと思いますので、手順を並べてご説明します</p>
+
+  <p>例として、<b>「今週土曜は休講します」というお知らせを1本追加する場合</b>の手順です。</p>
+
+  <figure>
+    <figcaption>図2. お知らせを1本追加するときの操作手順<br>
+      <span>どちらも専門知識は不要です。スマートフォンからも操作できます。</span></figcaption>
+    <svg viewBox="0 0 700 252" role="img" aria-label="プランAとプランBでお知らせを更新する手順の比較">
+      <rect x="0" y="0" width="700" height="252" fill="#fcfcfb"/>
+      <text x="0" y="24" font-size="10.5" fill="#0d7a53" font-family="IPAPGothic,IPAGothic,sans-serif">プランA（Studio版）　所要 約3分</text>
+      <g fill="#e6f6f0" stroke="#1baf7a" stroke-width="1.3">
+        <rect x="8" y="34" width="150" height="56" rx="5"/><rect x="182" y="34" width="150" height="56" rx="5"/>
+        <rect x="356" y="34" width="150" height="56" rx="5"/><rect x="530" y="34" width="150" height="56" rx="5"/>
+      </g>
+      <g font-size="9.5" fill="#1a1a18" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="83" y="54">① ログイン</text><text x="257" y="54">②「お知らせ」を開く</text>
+        <text x="431" y="54">③ 入力する</text><text x="605" y="54">④「公開」を押す</text>
+      </g>
+      <g font-size="8.2" fill="#4a4945" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="83" y="70">Studioの管理画面に</text><text x="83" y="81">IDとパスワードで</text>
+        <text x="257" y="70">「新規追加」を</text><text x="257" y="81">押します</text>
+        <text x="431" y="70">タイトル・本文・写真</text><text x="431" y="81">を入れます</text>
+        <text x="605" y="70">すぐにサイトへ</text><text x="605" y="81">反映されます</text>
+      </g>
+      <g stroke="#a9a79d" stroke-width="1.4" fill="none">
+        <path d="M162 62 L178 62"/><path d="M336 62 L352 62"/><path d="M510 62 L526 62"/>
+      </g>
+      <g fill="#a9a79d"><polygon points="178,62 172,58.5 172,65.5"/><polygon points="352,62 346,58.5 346,65.5"/><polygon points="526,62 520,58.5 520,65.5"/></g>
+
+      <text x="0" y="132" font-size="10.5" fill="#184f95" font-family="IPAPGothic,IPAGothic,sans-serif">プランB（3rdStage作成版）　所要 約3分＋反映待ち1〜2分</text>
+      <g fill="#eaf2fd" stroke="#2a78d6" stroke-width="1.3">
+        <rect x="8" y="142" width="122" height="56" rx="5"/><rect x="146" y="142" width="122" height="56" rx="5"/>
+        <rect x="284" y="142" width="122" height="56" rx="5"/><rect x="422" y="142" width="122" height="56" rx="5"/>
+      </g>
+      <rect x="560" y="142" width="122" height="56" rx="5" fill="#fdeee7" stroke="#eb6834" stroke-width="1.3"/>
+      <g font-size="9.5" fill="#1a1a18" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="69" y="162">① ログイン</text><text x="207" y="162">②「お知らせ」を開く</text>
+        <text x="345" y="162">③ 入力する</text><text x="483" y="162">④「公開」を押す</text>
+        <text x="621" y="162">⑤ 1〜2分待つ</text>
+      </g>
+      <g font-size="8.2" fill="#4a4945" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="69" y="178">microCMSの画面に</text><text x="69" y="189">IDとパスワードで</text>
+        <text x="207" y="178">「追加」を</text><text x="207" y="189">押します</text>
+        <text x="345" y="178">タイトル・本文・写真</text><text x="345" y="189">を入れます</text>
+        <text x="483" y="178">ここまでは</text><text x="483" y="189">プランAと同じ</text>
+        <text x="621" y="178">自動で反映されます</text><text x="621" y="189">（この待ち時間だけが差）</text>
+      </g>
+      <g stroke="#a9a79d" stroke-width="1.4" fill="none">
+        <path d="M134 170 L142 170"/><path d="M272 170 L280 170"/><path d="M410 170 L418 170"/><path d="M548 170 L556 170"/>
+      </g>
+      <g fill="#a9a79d"><polygon points="142,170 136,166.5 136,173.5"/><polygon points="280,170 274,166.5 274,173.5"/><polygon points="418,170 412,166.5 412,173.5"/><polygon points="556,170 550,166.5 550,173.5"/></g>
+      <text x="350" y="228" font-size="10" fill="#eb6834" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">操作の手間はほぼ同じです。違いは「反映までに1〜2分待つ」だけです。</text>
+    </svg>
+  </figure>
+
+  <h4>ご自身でできること・3rdStageへのご依頼が必要なこと</h4>
+  <table class="vs">
+    <tr><th style="width:40%">やりたいこと</th><th>プランA（Studio版）</th><th>プランB（3rdStage作成版）</th></tr>
+    <tr><td>お知らせの追加・修正・削除</td><td class="c ok">ご自身でできます</td><td class="c ok">ご自身でできます</td></tr>
+    <tr><td>コースの料金・曜日の変更</td><td class="c ok">ご自身でできます</td><td class="c ok">ご自身でできます</td></tr>
+    <tr><td>写真の差し替え</td><td class="c ok">ご自身でできます</td><td class="c ok">ご自身でできます</td></tr>
+    <tr><td>コーチの追加・入れ替え</td><td class="c ok">ご自身でできます</td><td class="c ok">ご自身でできます</td></tr>
+    <tr><td>ページのデザイン・並び順の変更</td><td class="c mid">操作を覚えれば可能</td><td class="c ng">3rdStageへご依頼</td></tr>
+    <tr><td>新しいページを増やす</td><td class="c mid">操作を覚えれば可能</td><td class="c ng">3rdStageへご依頼</td></tr>
+  </table>
+  <p class="small">※ 買い切りでのご契約のため、公開後のご依頼はその都度のお見積となります（軽微な修正 5,000円〜／ページ追加 15,000円〜）。
+  なお公開後1か月間の不具合対応は無償で承ります。</p>
+</section>
+
+<!-- ===== 06 メリット・デメリット ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">06</span>それぞれのメリット・デメリット</h3>
+  <p class="sub">判断していただくために、良い点も悪い点も並べます</p>
+
+  <h4>プランA：Studio版</h4>
+  <table>
+    <tr><th style="width:12%"></th><th>内容</th></tr>
+    <tr><td class="ok"><b>メリット</b></td>
+      <td>・<b>公開が2週間早い</b>（約6週間）。年内に間に合わせやすい<br>
+        ・サイトの置き場所・暗号化・更新機能が<b>Studio側の責任</b>で提供される<br>
+        ・仕組み上は、レイアウトの変更や新しいページの追加もご自身で可能<br>
+        ・世の中で広く使われているサービスのため、<b>他社に引き継ぐときも説明しやすい</b></td></tr>
+    <tr><td class="ng"><b>デメリット</b></td>
+      <td>・<b>年間約50,000円が、使い続けるかぎりかかり続ける</b>（10年で約50万円）<br>
+        ・現在の年11,000円と比べると<b>年間約39,000円の増加</b><br>
+        ・Studioの利用をやめるとサイトは表示されなくなる（内容を他社サービスへ移せない）<br>
+        ・将来Studio側が値上げした場合、その影響を受ける</td></tr>
+  </table>
+
+  <h4>プランB：3rdStage作成版</h4>
+  <table>
+    <tr><th style="width:12%"></th><th>内容</th></tr>
+    <tr><td class="ok"><b>メリット</b></td>
+      <td>・<b>年間約5,000円。現在の年11,000円より安くなる</b><br>
+        ・<b>3年で約124,000円、10年では約45万円の差</b>になる<br>
+        ・ホームページのデータ一式をお渡しするため、<b>特定のサービスに縛られない</b><br>
+        ・お知らせ・料金・写真・コーチの更新は、<b>プランAとほぼ同じ手軽さでご自身でできる</b><br>
+        ・表示速度が速い（大手インフラ会社の配信網を利用するため）</td></tr>
+    <tr><td class="ng"><b>デメリット</b></td>
+      <td>・<b>公開までに2週間長くかかる</b>（約8週間）<br>
+        ・デザインやページ構成の変更は<b>3rdStageへのご依頼が必要</b>（都度お見積）<br>
+        ・お知らせを更新してから<b>反映まで1〜2分かかる</b><br>
+        ・無料枠の内容は将来変わる可能性がある（その場合は移設費用が発生します）</td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ 3rdStageとしての考え</div>
+    <b>公開時期に特別な事情がなければ、プランBをおすすめします。</b><br>
+    理由は、①維持費が現在より安くなるため、今後何年続けても負担が増えないこと
+    ②ご自身での更新のしやすさが、プランAとほとんど変わらないこと
+    ③データをお渡しできるため、将来どの会社にでも引き継げること、の3点です。<br><br>
+    逆に、<b>「どうしても年内に公開したい」「4月の入会シーズンに確実に間に合わせたい」</b>という場合は、
+    2週間の差が効いてきますので、プランAをお選びください。
+  </div>
+</section>
+
+<!-- ===== 07 サイト構成 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">07</span>サイト構成（全6ページ）</h3>
+  <p class="sub">ページ構成・デザインは、プランA・プランBで違いはありません</p>
+
+  <figure>
+    <figcaption>図3. サイトマップ<br><span>トップページを入口に、目的別の5ページへ分岐します。</span></figcaption>
     <svg viewBox="0 0 700 348" role="img" aria-label="サイトマップ。トップページから5つの下層ページへ分岐する構成">
       <rect x="0" y="0" width="700" height="348" fill="#fcfcfb"/>
       <rect x="250" y="26" width="200" height="46" rx="6" fill="#2a78d6"/>
@@ -198,47 +493,30 @@
     実績があっても候補に入りません。すでにお取引のある園からのご紹介も受けやすくなります。<br>
     月謝収入と違い<b>法人契約は単価が高く収入が安定する</b>ため、1ページ分の投資として最も効果が見込める箇所だと考えています。
   </div>
-
-  <div class="note">
-    <div class="t">■ 「よくあるご質問」ページを入れている理由</div>
-    「運動が苦手でも大丈夫ですか」「駐車場はありますか」「きょうだい割引はありますか」——
-    こうしたご質問にサイトで先に答えておくことで、<b>お問い合わせのお電話が減り、指導に集中していただけます。</b>
-    同時に、不安が解消された状態でお問い合わせが来るため、体験から入会につながりやすくなります。
-  </div>
 </section>
 
-<!-- ===== 03 トップページ構成 ===== -->
+<!-- ===== 08 トップページ ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">03</span>トップページの構成</h3>
+  <h3 class="sec"><span class="num">08</span>トップページの構成</h3>
   <p class="sub">上から順に、どんな情報を並べるか</p>
 
   <figure>
-    <figcaption>図2. トップページの構成イメージと、スマートフォンでの見え方<br>
+    <figcaption>図4. トップページの構成イメージと、スマートフォンでの見え方<br>
       <span>上から下へ読み進めるうちに、自然と「体験に申し込む」までたどり着く並び順にしています。</span></figcaption>
     <svg viewBox="0 0 700 452" role="img" aria-label="トップページの構成イメージとスマートフォン表示">
       <rect x="0" y="0" width="700" height="452" fill="#fcfcfb"/>
       <text x="20" y="20" font-size="9.5" fill="#77756c" font-family="IPAPGothic,IPAGothic,sans-serif">パソコンでの表示（上から下へ）</text>
-      <!-- blocks -->
-      <g stroke="#2a78d6" stroke-width="1.3" fill="#eaf2fd">
-        <rect x="20" y="30" width="410" height="64" rx="5"/>
-      </g>
+      <g stroke="#2a78d6" stroke-width="1.3" fill="#eaf2fd"><rect x="20" y="30" width="410" height="64" rx="5"/></g>
       <g stroke="#c6ddf8" stroke-width="1.3" fill="#ffffff">
-        <rect x="20" y="102" width="410" height="40" rx="5"/>
-        <rect x="20" y="150" width="410" height="56" rx="5"/>
-        <rect x="20" y="214" width="410" height="40" rx="5"/>
-        <rect x="20" y="262" width="410" height="40" rx="5"/>
+        <rect x="20" y="102" width="410" height="40" rx="5"/><rect x="20" y="150" width="410" height="56" rx="5"/>
+        <rect x="20" y="214" width="410" height="40" rx="5"/><rect x="20" y="262" width="410" height="40" rx="5"/>
         <rect x="20" y="310" width="410" height="40" rx="5"/>
       </g>
-      <g stroke="#eb6834" stroke-width="1.3" fill="#fdeee7">
-        <rect x="20" y="358" width="410" height="48" rx="5"/>
-      </g>
+      <g stroke="#eb6834" stroke-width="1.3" fill="#fdeee7"><rect x="20" y="358" width="410" height="48" rx="5"/></g>
       <g font-size="10" fill="#1a1a18" font-family="IPAPGothic,IPAGothic,sans-serif">
-        <text x="34" y="50">① ファーストビュー</text>
-        <text x="34" y="122">② お知らせ</text>
-        <text x="34" y="170">③ コース紹介（6コース）</text>
-        <text x="34" y="234">④ FLASHが選ばれる理由</text>
-        <text x="34" y="282">⑤ 料金のご案内</text>
-        <text x="34" y="330">⑥ コーチ紹介</text>
+        <text x="34" y="50">① ファーストビュー</text><text x="34" y="122">② お知らせ</text>
+        <text x="34" y="170">③ コース紹介（6コース）</text><text x="34" y="234">④ FLASHが選ばれる理由</text>
+        <text x="34" y="282">⑤ 料金のご案内</text><text x="34" y="330">⑥ コーチ紹介</text>
         <text x="34" y="378">⑦ 無料体験のお申し込み</text>
       </g>
       <g font-size="8.2" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
@@ -252,7 +530,6 @@
         <text x="34" y="343">顔写真・経歴・お子さまへのメッセージ</text>
         <text x="34" y="391">フォーム＋LINE＋電話の3経路。アクセス・駐車場も併記</text>
       </g>
-      <!-- phone -->
       <text x="490" y="20" font-size="9.5" fill="#77756c" font-family="IPAPGothic,IPAGothic,sans-serif">スマートフォンでの表示</text>
       <rect x="490" y="30" width="170" height="368" rx="20" fill="#ffffff" stroke="#a9a79d" stroke-width="1.6"/>
       <rect x="500" y="46" width="150" height="336" rx="6" fill="#f4f3ee"/>
@@ -274,11 +551,17 @@
     </svg>
   </figure>
 
+  <div class="key">
+    <div class="t">■ スマートフォンでの「固定ボタン」について</div>
+    保護者さまの閲覧は、ほとんどがスマートフォンです。「申し込もう」と思った瞬間に申込ボタンが画面になければ、そのまま離脱してしまいます。
+    そこで<b>画面下部に「無料体験を予約」ボタンを常時固定</b>し、どのページのどこを見ていても1タップで申込へ進めるようにします。
+    費用はかかりませんが、お問い合わせ数に直結する部分です。
+  </div>
 </section>
 
-<!-- ===== 04 各ページ掲載内容 ===== -->
+<!-- ===== 09 各ページ ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">04</span>各ページの掲載内容</h3>
+  <h3 class="sec"><span class="num">09</span>各ページの掲載内容</h3>
   <p class="sub">それぞれのページに何を載せるか</p>
 
   <table>
@@ -303,107 +586,126 @@
       <td>申込のハードルを下げる。<b>3つの経路を用意します</b></td></tr>
   </table>
 
-  <h4>すべてのページに共通する仕組み</h4>
-  <div class="key">
-    <div class="t">■ スマートフォンでの「固定ボタン」について</div>
-    保護者さまの閲覧は、ほとんどがスマートフォンです。
-    「申し込もう」と思った瞬間に申込ボタンが画面になければ、そのまま離脱してしまいます。<br>
-    そこで<b>画面下部に「無料体験を予約」ボタンを常時固定</b>し、どのページのどこを見ていても1タップで申込へ進めるようにします。
-    費用はかかりませんが、お問い合わせ数に直結する部分です。
-  </div>
   <div class="note">
     <div class="t">■ 料金は、ぜひ公開させてください</div>
-    習い事選びにおいて「料金が書かれていない」は、保護者さまが検討をやめる最大の理由のひとつです。<br>
+    習い事選びにおいて「料金が書かれていない」は、保護者さまが検討をやめる最大の理由のひとつです。
     宮崎市内の同業他社も、会場別の日時と料金を掲載しています。<b>公開していないこと自体が、比較の土俵から外れる原因</b>になります。
     もし「コースが複雑で書きにくい」ということであれば、表の形にまとめるところをこちらでお手伝いします。
   </div>
 
   <div class="note">
     <div class="t">■ お知らせは、教室のみなさまご自身で更新できます</div>
-    休講のお知らせ、体験会の告知、大会の結果報告などは、<b>専門知識なしで更新できる仕組み</b>を入れてお渡しします。
+    休講のお知らせ、体験会の告知、大会の結果報告などは、<b>プランA・プランBのどちらでも</b>専門知識なしで更新できます。
     公開後に操作方法をご説明しますので、毎回制作会社に依頼して費用が発生する、ということはありません。
   </div>
 </section>
 
-<!-- ===== 05 御見積 ===== -->
+<!-- ===== 10 御見積 ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">05</span>御見積</h3>
-  <p class="sub">制作費の内訳</p>
+  <h3 class="sec"><span class="num">10</span>御見積</h3>
+  <p class="sub">両プランの内訳</p>
 
+  <h4>プランA：Studio版</h4>
   <table>
-    <tr><th style="width:26%">項目</th><th>内容</th><th class="num" style="width:16%">金額（税別）</th></tr>
-    <tr><td>ディレクション・<br>要件定義・サイト設計</td>
-      <td>お打ち合わせ、サイト構成の設計、掲載内容の整理</td><td class="num">35,000</td></tr>
-    <tr><td>デザイン制作</td>
-      <td>トップページ、および下層ページ共通デザインの作成</td><td class="num">55,000</td></tr>
-    <tr><td>サイト構築（全6ページ）</td>
-      <td>ページの構築、スマートフォン・タブレット対応、お知らせ更新機能の設定</td><td class="num">60,000</td></tr>
-    <tr><td>原稿の整理・掲載</td>
-      <td>ご提出いただいた原稿の整形・推敲、写真の加工と配置</td><td class="num">15,000</td></tr>
-    <tr><td>公開設定</td>
-      <td>独自ドメインの接続、通信の暗号化（SSL）設定、お問い合わせフォーム設置、
-        アクセス解析の導入、検索エンジンへの登録、SNS共有時のサムネイル設定、Googleマップの初期設定</td><td class="num">15,000</td></tr>
-    <tr><td colspan="2" style="text-align:right">小計</td><td class="num">180,000</td></tr>
-    <tr><td colspan="2" style="text-align:right">消費税（10%）</td><td class="num">18,000</td></tr>
+    <tr><th style="width:44%">項目</th><th>内容</th><th class="num" style="width:16%">金額（税別）</th></tr>
+    <tr><td>ディレクション・要件定義・サイト設計</td><td>お打ち合わせ、サイト構成の設計</td><td class="num">30,000</td></tr>
+    <tr><td>デザイン制作</td><td>トップページ、下層ページ共通デザイン</td><td class="num">55,000</td></tr>
+    <tr><td>サイト構築（全6ページ）</td><td>Studio上での構築、スマホ・タブレット対応</td><td class="num">60,000</td></tr>
+    <tr><td>更新機能の設定</td><td>Studio標準の更新機能の設定、操作説明</td><td class="num">10,000</td></tr>
+    <tr><td>原稿の整理・掲載</td><td>ご提出原稿の整形、写真の加工と配置</td><td class="num">10,000</td></tr>
+    <tr><td>公開設定・計測導入</td><td>独自ドメイン接続、フォーム設置、アクセス解析、検索エンジン登録、Googleマップ初期設定</td><td class="num">5,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">通常価格</td><td class="num">310,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">初回制作事例協力割引</td><td class="num">−140,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">小計 ／ 消費税</td><td class="num">170,000 ／ 17,000</td></tr>
+    <tr class="total"><td colspan="2" style="text-align:right">御見積金額（税込）</td><td class="num">187,000</td></tr>
+  </table>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">10</span>御見積<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">プランB：3rdStage作成版の内訳</p>
+  <h4>プランB：3rdStage作成版</h4>
+  <table>
+    <tr><th style="width:44%">項目</th><th>内容</th><th class="num" style="width:16%">金額（税別）</th></tr>
+    <tr><td>ディレクション・要件定義・サイト設計</td><td>お打ち合わせ、サイト構成の設計</td><td class="num">30,000</td></tr>
+    <tr><td>デザイン制作</td><td>トップページ、下層ページ共通デザイン</td><td class="num">55,000</td></tr>
+    <tr><td>サイト構築（全6ページ）</td><td>ゼロからの構築、スマホ・タブレット対応、表示速度の最適化</td><td class="num">55,000</td></tr>
+    <tr><td><b>更新システムの構築・接続</b></td><td>教室のみなさまが更新できる管理画面の設計・接続・自動反映の仕組み</td><td class="num">20,000</td></tr>
+    <tr><td>原稿の整理・掲載</td><td>ご提出原稿の整形、写真の加工と配置</td><td class="num">10,000</td></tr>
+    <tr><td>公開設定・計測導入</td><td>公開環境の構築、独自ドメイン接続、SSL、フォーム設置、アクセス解析、検索エンジン登録、Googleマップ初期設定</td><td class="num">10,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">通常価格</td><td class="num">328,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">初回制作事例協力割引</td><td class="num">−148,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">小計 ／ 消費税</td><td class="num">180,000 ／ 18,000</td></tr>
     <tr class="total"><td colspan="2" style="text-align:right">御見積金額（税込）</td><td class="num">198,000</td></tr>
   </table>
 
   <div class="key">
-    <div class="t">■ 通常価格からのお値引きについて</div>
-    同等の内容の通常価格は <b>328,000円（税別）</b> ですが、今回は
-    <b>「初回制作事例協力割引」として148,000円をお値引き</b>し、180,000円（税別）でご提案しております。<br><br>
-    つきましては、恐れ入りますが以下の3点にご協力いただけますと幸いです。<br>
-    ① 完成したサイトを<b>当社の制作実績として紹介させていただくこと</b><br>
+    <div class="t">■ お値引きについて</div>
+    今回は<b>「初回制作事例協力割引」</b>を適用しております。つきましては、恐れ入りますが以下の3点にご協力いただけますと幸いです。<br>
+    ① 完成したサイトを<b>3rdStageの制作実績として紹介させていただくこと</b><br>
     ② 公開1〜2か月後に<b>ご感想（お客様の声）をお聞かせいただくこと</b><br>
     ③ 公開3か月後に<b>お問い合わせ件数の変化をお知らせいただくこと</b>（数値の公開可否は改めてご相談します）
   </div>
-
-  <h4>お支払い条件</h4>
-  <table>
-    <tr><th style="width:26%">着手金</th><td>99,000円（税込）— ご発注時</td></tr>
-    <tr><th>残金</th><td>99,000円（税込）— 公開後、ご請求日の翌月末までにお支払い</td></tr>
-    <tr><th>見積有効期限</th><td>発行日（2026年9月16日）より30日間</td></tr>
-  </table>
-
 </section>
 
+<!-- ===== 11 維持費・支払条件 ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">05</span>御見積<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
-  <p class="sub">公開後にかかる年間の維持費</p>
-  <h4>年間の維持費（別途・貴教室名義でのご契約となります）</h4>
-  <table>
-    <tr><th style="width:40%">項目</th><th class="num" style="width:22%">年額</th><th>備考</th></tr>
-    <tr><td>独自ドメイン</td><td class="num">1,500〜4,500円</td><td>ご希望の文字列によって変わります</td></tr>
-    <tr><td>サイト運用サービス（年払い）</td><td class="num">約47,760円</td><td>暗号化・サーバー・更新機能を含む</td></tr>
-    <tr><td>LINE公式アカウント</td><td class="num">0円〜</td><td>配信数が一定を超えた場合のみ有料</td></tr>
-    <tr class="total"><td>年間合計の目安</td><td class="num">約50,000〜53,000円</td><td></td></tr>
+  <h3 class="sec"><span class="num">11</span>年間の維持費とお支払い条件</h3>
+  <p class="sub">公開後にかかり続ける費用の比較</p>
+
+  <table class="vs">
+    <tr><th style="width:34%">項目</th><th>プランA：Studio版</th><th>プランB：3rdStage作成版</th></tr>
+    <tr><td>独自ドメイン</td><td class="c">1,500〜4,500円／年</td><td class="c">1,500〜4,500円／年</td></tr>
+    <tr><td>サイトの置き場所・暗号化</td><td class="c">Studio料金に含まれる</td><td class="c ok">0円（無料枠）</td></tr>
+    <tr><td>更新機能（CMS）</td><td class="c">Studio料金に含まれる</td><td class="c ok">0円（無料枠）</td></tr>
+    <tr><td>問い合わせフォーム</td><td class="c">Studio料金に含まれる</td><td class="c ok">0円（無料枠）</td></tr>
+    <tr><td>Studio Businessプラン</td><td class="c mid">47,760円／年</td><td class="c">－</td></tr>
+    <tr><td>LINE公式アカウント</td><td class="c">0円〜</td><td class="c">0円〜</td></tr>
+    <tr class="total"><td><b>年間合計</b></td><td class="c"><b>約50,000円</b></td><td class="c"><b>約5,000円</b></td></tr>
+    <tr><td><b>現在（年11,000円）との差</b></td><td class="c mid">約39,000円の増加</td><td class="c ok">約6,000円の減少</td></tr>
   </table>
 
   <div class="note">
-    <div class="t">■ 維持費が現在より上がる点について（正直にお伝えします）</div>
-    現在のサービスは年額11,000円ですので、<b>年間で約4万円の増加</b>となります。この点は先にお伝えしておきます。<br><br>
-    増える約4万円に対して、<b>月謝7,000円の生徒さんがお一人、1年間続けてくださると約84,000円</b>です。
-    つまり<b>体験申込が年に1件増えるだけで十分に回収できる</b>金額とお考えいただければと思います。<br><br>
-    また、これらは<b>すべて貴教室名義でご契約いただきます。</b>当社が代理で保有することはありません。
-    万一、将来的に別の制作会社にご依頼される場合でも、<b>ドメインもサイトのデータも、そのまま貴教室にお残りします。</b>
-    現在のように「解約するとサイトが消える」状態には二度とならないよう設計しています。
+    <div class="t">■ いずれのプランでも、契約はすべて貴教室名義です</div>
+    ドメインも各種サービスも、<b>貴教室名義でご契約いただきます。</b>3rdStageが代理で保有することはありません。<br>
+    万一、将来的に別の制作会社にご依頼される場合でも、<b>ドメインは必ず貴教室にお残りします。</b>
+    現在のように「解約するとサイトごと消える」状態には二度とならないよう設計しています。<br>
+    （なおプランBでは、これに加えて<b>ホームページのデータ一式もお渡しします。</b>）
+  </div>
+
+  <h4>お支払い条件（プラン共通）</h4>
+  <table>
+    <tr><th style="width:26%">着手金</th><td>御見積金額の50% — ご発注時（プランA 93,500円／プランB 99,000円）</td></tr>
+    <tr><th>残金</th><td>御見積金額の50% — 公開後、ご請求日の翌月末までにお支払い</td></tr>
+    <tr><th>ご契約形態</th><td><b>買い切り</b>（月額の保守契約はございません）</td></tr>
+    <tr><th>見積有効期限</th><td>発行日（2026年9月16日）より30日間</td></tr>
+  </table>
+
+  <div class="note">
+    <div class="t">■ 買い切りについて</div>
+    今回は月額の保守契約をいただかない<b>買い切り</b>でのご提案です。公開後は、<b>毎月の支払いは発生しません。</b><br>
+    ・<b>公開後1か月間</b>：不具合の修正は無償で対応いたします<br>
+    ・<b>それ以降</b>：修正・追加のご依頼はその都度お見積となります（軽微な修正 5,000円〜／ページ追加 15,000円〜）<br>
+    お知らせ・料金・写真・コーチの更新は、いずれのプランでも<b>ご自身で行えるため費用はかかりません。</b>
   </div>
 </section>
 
-<!-- ===== 06 含まれないもの ===== -->
+<!-- ===== 12 含まれないもの ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">06</span>本見積に含まれないもの／オプション</h3>
+  <h3 class="sec"><span class="num">12</span>本見積に含まれないもの／オプション</h3>
   <p class="sub">のちのトラブルを防ぐため、範囲を明確にしております</p>
 
   <h4>本見積に含まれないもの</h4>
   <table>
     <tr><th style="width:34%">項目</th><th>ご説明</th></tr>
-    <tr><td>原稿（文章）の作成</td><td>各コースの内容・料金・ルールなどの文章は、<b>ご提供いただいた内容をもとに</b>整形・推敲いたします。ゼロからの執筆は含まれません（後述のヒアリングシートをご用意します）</td></tr>
+    <tr><td>原稿（文章）の作成</td><td>各コースの内容・料金・ルールなどの文章は、<b>ご提供いただいた内容をもとに</b>整形・推敲いたします。ゼロからの執筆は含まれません（別途ヒアリングシートをご用意します）</td></tr>
     <tr><td>写真の撮影</td><td>お手元の写真をご提供いただく前提です。撮影が必要な場合はオプションをご覧ください</td></tr>
     <tr><td>ロゴの新規制作</td><td>現在のロゴをそのまま使用します</td></tr>
-    <tr><td>予約管理・月謝決済システム</td><td>今回は見送り、フォームとLINEで運用します（将来的に必要になった段階で改めてご提案します）</td></tr>
-    <tr><td>公開後の更新作業</td><td>お知らせは貴教室で更新いただけます。それ以外の更新代行をご希望の場合は保守契約をご検討ください</td></tr>
+    <tr><td>予約管理・月謝決済システム</td><td>今回は見送り、フォームとLINEで運用します（将来必要になった段階で改めてご提案します）</td></tr>
+    <tr><td>公開1か月経過後の修正・更新</td><td>買い切りのため、その都度のお見積となります</td></tr>
     <tr><td>7ページ目以降の追加</td><td>1ページあたり15,000円（税別）で承ります</td></tr>
+    <tr><td>年間維持費（ドメイン等）</td><td>貴教室名義でのご契約となります</td></tr>
   </table>
 
   <h4>オプション（ご希望に応じて）</h4>
@@ -413,16 +715,14 @@
       <td>レッスン風景とコーチの写真を撮影。<b>いちばんおすすめのオプションです</b></td></tr>
     <tr><td>コース個別ページの追加</td><td class="num">15,000円／ページ</td><td>特定コースを詳しく紹介したい場合</td></tr>
     <tr><td>ロゴ制作</td><td class="num">30,000〜80,000円</td><td>ロゴを新しくされる場合</td></tr>
-    <tr><td>保守・更新代行</td><td class="num">月5,000円〜</td><td>お知らせ以外の更新、不具合対応、月1回の更新枠</td></tr>
   </table>
 
   <div class="key">
     <div class="t">■ 写真撮影のオプションを、特におすすめする理由</div>
     体操教室のサイトは、<b>写真の印象がそのままサイトの印象になります。</b>
-    お子さまが跳び箱を跳ぶ瞬間、コーチが笑顔で補助をしている場面——こうした写真が1枚あるかないかで、
-    保護者さまが受ける印象は大きく変わります。
+    お子さまが跳び箱を跳ぶ瞬間、コーチが笑顔で補助をしている場面——こうした写真が1枚あるかないかで、保護者さまが受ける印象は大きく変わります。
     ご予算を抑えるため、<b>プロには2〜3時間だけお願いし、レッスン風景とコーチのお写真に絞って撮影</b>する形をご提案しています。
-    器具・外観・駐車場などは当社で撮影いたしますので、追加費用はかかりません。
+    器具・外観・駐車場などは3rdStageで撮影いたしますので、追加費用はかかりません。
   </div>
 
   <h4>修正回数について</h4>
@@ -433,127 +733,108 @@
   <p class="small">※ 上記を超える修正は1回あたり10,000円（税別）にて承ります。制作をスムーズに進めるための目安であり、誤字脱字や明らかな不具合の修正は回数に含めません。公開後1か月間は無償で対応いたします。</p>
 </section>
 
-<!-- ===== 07 スケジュール ===== -->
+<!-- ===== 13 スケジュール ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">07</span>制作スケジュール</h3>
-  <p class="sub">ご発注から公開まで、約6週間</p>
+  <h3 class="sec"><span class="num">13</span>制作スケジュール</h3>
+  <p class="sub">プランAは約6週間、プランBは約8週間です</p>
 
   <figure>
-    <figcaption>図3. 制作スケジュール<br><span>オレンジ色の作業が、貴教室にお願いする部分です。</span></figcaption>
-    <svg viewBox="0 0 700 386" role="img" aria-label="ご発注から公開までの6週間のスケジュール">
-      <rect x="0" y="0" width="700" height="386" fill="#fcfcfb"/>
-      <g font-size="9.5" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
-        <text x="235.8" y="38">1週目</text><text x="317.5" y="38">2週目</text><text x="399.2" y="38">3週目</text>
-        <text x="480.8" y="38">4週目</text><text x="562.5" y="38">5週目</text><text x="644.2" y="38">6週目</text>
-      </g>
+    <figcaption>図5. 納期の比較<br><span>差の2週間は、更新システムの構築と公開環境の設定にあてる時間です。</span></figcaption>
+    <svg viewBox="0 0 700 186" role="img" aria-label="プランAとプランBの納期の比較">
+      <rect x="0" y="0" width="700" height="186" fill="#fcfcfb"/>
       <g stroke="#e8e6de" stroke-width="1">
-        <line x1="195" y1="44" x2="195" y2="338"/><line x1="276.7" y1="44" x2="276.7" y2="338"/>
-        <line x1="358.3" y1="44" x2="358.3" y2="338"/><line x1="440" y1="44" x2="440" y2="338"/>
-        <line x1="521.7" y1="44" x2="521.7" y2="338"/><line x1="603.3" y1="44" x2="603.3" y2="338"/>
-        <line x1="685" y1="44" x2="685" y2="338"/>
+        <line x1="130" y1="24" x2="130" y2="132"/><line x1="199" y1="24" x2="199" y2="132"/>
+        <line x1="268" y1="24" x2="268" y2="132"/><line x1="337" y1="24" x2="337" y2="132"/>
+        <line x1="406" y1="24" x2="406" y2="132"/><line x1="475" y1="24" x2="475" y2="132"/>
+        <line x1="544" y1="24" x2="544" y2="132"/><line x1="613" y1="24" x2="613" y2="132"/>
+        <line x1="682" y1="24" x2="682" y2="132"/>
       </g>
-      <rect x="196.5" y="50"  width="78.7"  height="16" rx="4" fill="#1baf7a"/>
-      <rect x="196.5" y="83"  width="160.4" height="16" rx="4" fill="#2a78d6"/>
-      <rect x="196.5" y="116" width="242"   height="16" rx="4" fill="#eb6834"/>
-      <rect x="278.2" y="149" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
-      <rect x="278.2" y="182" width="242"   height="16" rx="4" fill="#2a78d6"/>
-      <rect x="359.8" y="215" width="242"   height="16" rx="4" fill="#2a78d6"/>
-      <rect x="523.2" y="248" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
-      <rect x="523.2" y="281" width="160.4" height="16" rx="4" fill="#1baf7a"/>
-      <rect x="604.8" y="314" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
-      <text x="443" y="128" font-size="9.5" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">★ ここがいちばん大切です</text>
+      <rect x="131" y="38" width="412" height="28" rx="5" fill="#1baf7a"/>
+      <text x="337" y="57" font-size="10" fill="#ffffff" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">6週間で公開</text>
+      <rect x="131" y="86" width="412" height="28" rx="5" fill="#2a78d6"/>
+      <rect x="546" y="86" width="135" height="28" rx="5" fill="#eb6834"/>
+      <text x="337" y="105" font-size="10" fill="#ffffff" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">同じ工程</text>
+      <text x="613" y="105" font-size="9" fill="#ffffff" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">＋2週間</text>
       <g font-size="10.5" fill="#1a1a18" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">
-        <text x="182" y="62">① お打ち合わせ</text>
-        <text x="182" y="95">② サイト構成の設計</text>
-        <text x="182" y="128">③ 原稿・写真のご準備</text>
-        <text x="182" y="161">④ ドメイン取得・初期設定</text>
-        <text x="182" y="194">⑤ デザイン制作</text>
-        <text x="182" y="227">⑥ サイト構築</text>
-        <text x="182" y="260">⑦ 原稿の掲載・実機確認</text>
-        <text x="182" y="293">⑧ ご確認・修正（2回まで）</text>
-        <text x="182" y="326">⑨ 公開・各種設定</text>
+        <text x="122" y="56">プランA（Studio版）</text><text x="122" y="104">プランB（3rdStage作成版）</text>
       </g>
-      <line x1="195" y1="338" x2="685" y2="338" stroke="#a9a79d" stroke-width="1"/>
-      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
-        <rect x="195" y="360" width="22" height="10" rx="3" fill="#2a78d6"/><text x="223" y="369">当社の作業</text>
-        <rect x="320" y="360" width="22" height="10" rx="3" fill="#eb6834"/><text x="348" y="369">貴教室にお願いする作業</text>
-        <rect x="490" y="360" width="22" height="10" rx="3" fill="#1baf7a"/><text x="518" y="369">お打ち合わせ・ご確認</text>
+      <line x1="130" y1="132" x2="682" y2="132" stroke="#a9a79d" stroke-width="1"/>
+      <g font-size="9" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="130" y="147">着手</text><text x="199" y="147">1週</text><text x="268" y="147">2週</text><text x="337" y="147">3週</text>
+        <text x="406" y="147">4週</text><text x="475" y="147">5週</text><text x="544" y="147">6週</text><text x="613" y="147">7週</text><text x="682" y="147">8週</text>
       </g>
+      <text x="546" y="170" font-size="9.5" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">更新システムの構築</text>
+      <text x="546" y="182" font-size="9.5" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">＋公開環境の設定</text>
     </svg>
   </figure>
 
-</section>
+  <h4>工程の内容（プラン共通）</h4>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:26%">工程</th><th style="width:13%">担当</th><th>やること</th></tr>
+    <tr><td>①</td><td>お打ち合わせ</td><td>両者</td><td>目的・掲載方針の確認、ヒアリングシートの記入（60〜90分）</td></tr>
+    <tr><td>②</td><td>サイト構成の設計</td><td>3rdStage</td><td>6ページの構成と掲載内容の確定</td></tr>
+    <tr><td>③</td><td><b>原稿・写真のご準備</b></td><td><b>貴教室</b></td><td>ヒアリングシートのご記入、写真のご提供</td></tr>
+    <tr><td>④</td><td>ドメイン取得・初期設定</td><td>3rdStage</td><td>独自ドメインの取得（貴教室名義）</td></tr>
+    <tr><td>⑤</td><td>デザイン制作</td><td>3rdStage</td><td>トップページ＋下層テンプレート</td></tr>
+    <tr><td>⑥</td><td>サイト構築</td><td>3rdStage</td><td>全6ページの構築、スマホ対応</td></tr>
+    <tr><td>⑦</td><td>原稿の掲載・実機確認</td><td>3rdStage</td><td>文章・写真の反映、スマートフォン実機での確認</td></tr>
+    <tr><td>⑧</td><td>ご確認・修正</td><td>両者</td><td>デザイン2回・原稿2回まで</td></tr>
+    <tr><td>⑨</td><td>公開・各種設定</td><td>3rdStage</td><td>公開、アクセス解析、検索エンジン登録、Googleマップ更新、旧サイトへの移転告知</td></tr>
+    <tr style="background:#fdeee7"><td>＋</td><td><b>更新システムの構築<br>・公開環境の設定</b></td><td>3rdStage</td>
+      <td><b>プランBのみ</b>。管理画面の設計、自動反映の仕組み、公開環境の構築と動作確認</td></tr>
+  </table>
 
-<section class="page">
-  <h3 class="sec"><span class="num">07</span>制作スケジュール<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
-  <p class="sub">ご準備のお願いと、公開時期のご提案</p>
   <div class="warn">
     <div class="t">■ 貴教室にお願いするのは、実質「③ 原稿・写真のご準備」だけです</div>
-    そのかわり、ここが遅れると<b>④以降のすべての作業が後ろにずれてしまいます。</b><br>
+    そのかわり、ここが遅れると<b>④以降のすべての作業が後ろにずれてしまいます。</b>
     ご負担を減らすため、<b>記入していただくだけで原稿が完成するヒアリングシート</b>を別途ご用意します。
     ご多忙かと存じますので、お打ち合わせの場で一緒に埋めていく形でも構いません。
   </div>
-
-  <div class="key">
-    <div class="t">■ 公開時期について（ぜひご検討ください）</div>
-    体操教室への入会が増えるのは<b>4月（新年度）</b>と<b>夏休み前後</b>で、保護者さまが検索を始めるのは<b>1〜3月</b>です。<br><br>
-    <b>12月中旬〜1月上旬に公開できれば、いちばん需要が高まる時期をまるごと取りにいけます。</b>
-    そこから6週間を逆算すると、<b>着手は10月中旬〜11月上旬まで</b>。<br>
-    現在9月中旬ですので、<b>今ご判断いただければ、新年度の入会シーズンに間に合います。</b>
-  </div>
 </section>
 
-<!-- ===== 08 次のステップ ===== -->
+<!-- ===== 14 次のステップ ===== -->
 <section class="page">
-  <h3 class="sec"><span class="num">08</span>次のステップ</h3>
+  <h3 class="sec"><span class="num">14</span>次のステップ</h3>
   <p class="sub">ご発注いただいた場合の進め方</p>
 
+  <div class="key">
+    <div class="t">■ 公開時期について（プラン選びの判断材料）</div>
+    体操教室への入会が増えるのは<b>4月（新年度）</b>と<b>夏休み前後</b>で、保護者さまが検索を始めるのは<b>1〜3月</b>です。
+    <b>12月中旬〜1月上旬に公開できれば、いちばん需要が高まる時期をまるごと取りにいけます。</b><br><br>
+    逆算すると、<b>プランA（6週間）なら11月上旬まで、プランB（8週間）なら10月中旬まで</b>に着手できれば間に合います。
+    現在9月中旬ですので、<b>どちらのプランでも十分に間に合う時期</b>です。
+  </div>
+
   <table>
-    <tr><th style="width:8%">順</th><th style="width:28%">やること</th><th style="width:16%">どちらが</th><th>内容</th></tr>
-    <tr><td>1</td><td>ご検討・ご判断</td><td>貴教室</td><td>本ご提案の内容と金額をご確認ください。ご不明な点はお気軽にご質問ください</td></tr>
-    <tr><td>2</td><td>お打ち合わせ（60〜90分）</td><td>両者</td><td>目的の確認、掲載方針（料金公開・顔出しの可否）の決定、ヒアリングシートの記入</td></tr>
-    <tr><td>3</td><td>ご発注・着手金のお支払い</td><td>貴教室</td><td>99,000円（税込）</td></tr>
-    <tr><td>4</td><td>原稿・写真のご準備</td><td>貴教室</td><td>ヒアリングシートのご記入、写真のご提供（2週間以内を目安にお願いします）</td></tr>
-    <tr><td>5</td><td>制作</td><td>当社</td><td>デザイン・構築・掲載（約4週間）</td></tr>
+    <tr><th style="width:8%">順</th><th style="width:30%">やること</th><th style="width:16%">どちらが</th><th>内容</th></tr>
+    <tr><td>1</td><td><b>プランのご選択</b></td><td>貴教室</td><td>プランA（早さ重視）かプランB（維持費重視）かをお決めください</td></tr>
+    <tr><td>2</td><td>お打ち合わせ（60〜90分）</td><td>両者</td><td>目的の確認、掲載方針の決定、ヒアリングシートの記入</td></tr>
+    <tr><td>3</td><td>ご発注・着手金のお支払い</td><td>貴教室</td><td>御見積金額の50%</td></tr>
+    <tr><td>4</td><td>原稿・写真のご準備</td><td>貴教室</td><td>2週間以内を目安にお願いします</td></tr>
+    <tr><td>5</td><td>制作</td><td>3rdStage</td><td>デザイン・構築・掲載</td></tr>
     <tr><td>6</td><td>ご確認・修正</td><td>両者</td><td>実際の画面をご覧いただき、修正（2回まで）</td></tr>
-    <tr><td>7</td><td>公開</td><td>当社</td><td>公開、各種設定、更新方法のご説明</td></tr>
+    <tr><td>7</td><td>公開・操作説明</td><td>3rdStage</td><td>公開、各種設定、更新方法のご説明</td></tr>
   </table>
 
-</section>
-
-<section class="page">
-  <h3 class="sec"><span class="num">08</span>次のステップ<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
-  <p class="sub">お打ち合わせまでに、ご確認いただきたいこと</p>
   <h4>お打ち合わせまでに、お考えいただきたいこと</h4>
-  <p>お打ち合わせをスムーズに進めるため、以下について事前にお考えいただけますと幸いです。
-  （お答えが決まっていなくても構いません。一緒に整理させていただきます）</p>
   <table>
-    <tr><th style="width:36%">ご質問</th><th>補足</th></tr>
+    <tr><th style="width:38%">ご質問</th><th>補足</th></tr>
+    <tr><td><b>プランAとプランB、どちらをご希望ですか</b></td><td>迷われる場合は、お打ち合わせで一緒に整理します</td></tr>
     <tr><td><b>いちばんの目的はどれですか</b></td>
       <td>① 体験申込を増やす　② 特定コースの空きを埋める　③ 園・学校からの出張指導を増やす　④ コーチの採用　⑤ 在籍の保護者さまへの情報提供</td></tr>
-    <tr><td><b>いま、どのコース・曜日に空きがありますか</b></td><td>空きのあるコースを目立たせる構成にできます</td></tr>
-    <tr><td><b>料金をサイトに公開してよろしいですか</b></td><td>公開を強くおすすめしています（P.7 参照）</td></tr>
-    <tr><td><b>コーチの顔写真・経歴を掲載してよろしいですか</b></td><td>保護者さまの安心感に直結します</td></tr>
+    <tr><td><b>いま空きがあるコース・曜日はどれですか</b></td><td>空きのあるコースを目立たせる構成にできます</td></tr>
+    <tr><td><b>料金をサイトに公開してよろしいですか</b></td><td>公開を強くおすすめしています</td></tr>
     <tr><td><b>お子さまの顔が写る写真について、保護者さまの書面でのご同意はお取りですか</b></td>
-      <td><b>最も重要な確認事項です。</b>同意書がない場合は、当社でひな形をご用意します</td></tr>
-    <tr><td><b>ロゴのデータ（イラストレーター形式など）はお手元にありますか</b></td><td>なければ、現在のロゴ画像から作成します</td></tr>
-    <tr><td><b>Instagram・LINE公式アカウントはお持ちですか</b></td><td>お持ちでなければ、開設からお手伝いします</td></tr>
-    <tr><td><b>Googleマップの店舗情報の管理権限をお持ちですか</b></td><td>「宮崎市 体操教室」の地図検索対策に必要です</td></tr>
-    <tr><td><b>公開後、更新するのはどなたになりますか</b></td><td>その方に合わせて、更新方法をご説明します</td></tr>
+      <td><b>最も重要な確認事項です。</b>同意書がない場合は、3rdStageでひな形をご用意します</td></tr>
+    <tr><td><b>ロゴのデータ／Instagram・LINE公式アカウントはお持ちですか</b></td><td>ロゴがなければ現在の画像から作成します。SNSはお持ちでなければ開設からお手伝いします</td></tr>
+    <tr><td><b>公開後、更新するのはどなたになりますか</b></td><td>その方に合わせて、操作方法をご説明します</td></tr>
   </table>
-
-  <div class="key">
-    <div class="t">■ 肖像権のご同意について（最も重要なお願い）</div>
-    お子さまのお顔が写る写真をサイトに掲載するには、<b>保護者さまからの書面によるご同意</b>が必要です。<br>
-    まだお取りでない場合は、<b>同意書のひな形を当社でご用意します</b>ので、ご心配はいりません。
-    ご同意をいただけていないお子さまについては、お顔がわからないように処理するか、掲載を見送る運用といたします。<br>
-    ここは、教室の信用に関わる部分ですので、制作を始める前に必ず整理させてください。
-  </div>
 
   <div class="foot">
     本ご提案書の内容は、2026年9月16日時点の調査および市場相場にもとづいております。<br>
+    各サービスの料金・無料枠の内容は、提供各社の都合により変更される場合があります。<br>
     ご不明な点、ご要望の変更などがございましたら、どうぞお気軽にお申し付けください。<br><br>
-    合同会社FLASH体操教室　御中　／　発行日：2026年9月16日　／　見積有効期限：発行日より30日間
+    合同会社FLASH体操教室　御中　／　発行元：3rdStage　／　発行日：2026年9月16日　／　見積有効期限：発行日より30日間
   </div>
 </section>
 

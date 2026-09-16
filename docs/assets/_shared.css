@@ -37,3 +37,6 @@
   figcaption{ font-size:9.6pt; margin-bottom:7px; }
   figcaption span{ color:var(--ink3); font-size:8.6pt; }
   .foot{ font-size:8pt; color:var(--ink3); border-top:1px solid var(--rule); padding-top:7px; margin-top:16px; }
+  .vs th{ text-align:center; }
+  .vs td.c{ text-align:center; }
+  .ok{ color:#0d7a53; } .ng{ color:#b52b2a; } .mid{ color:#b8471d; }
