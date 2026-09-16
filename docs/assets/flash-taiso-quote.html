@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FLASH体操教室 ご提案書・御見積書</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 16mm 14mm; }
+  * { box-sizing: border-box; }
+  :root{
+    --ink:#1a1a18; --ink2:#4a4945; --ink3:#77756c;
+    --rule:#dedcd4; --surface:#fcfcfb; --tint:#f4f3ee;
+    --blue:#2a78d6; --orange:#eb6834; --aqua:#1baf7a; --red:#e34948;
+    --bluebg:#eaf2fd; --orangebg:#fdeee7; --aquabg:#e6f6f0; --redbg:#fdecec;
+  }
+  html,body{margin:0;padding:0;}
+  body{ font-family:"IPAPGothic","IPAGothic","Noto Sans JP",sans-serif; color:var(--ink); background:#fff;
+    font-size:10.2pt; line-height:1.72; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .page{ page-break-after:always; }
+  .page:last-child{ page-break-after:auto; }
+  h3.sec{ font-size:14.5pt; margin:0 0 3px; }
+  h3.sec .num{ color:var(--blue); margin-right:.5em; }
+  .sub{ font-size:9.2pt; color:var(--ink3); margin:0 0 16px; padding-bottom:10px; border-bottom:2px solid var(--rule); }
+  h4{ font-size:11pt; margin:20px 0 7px; padding-left:9px; border-left:4px solid var(--blue); line-height:1.4;}
+  h5{ font-size:10pt; margin:14px 0 5px; color:var(--ink2); }
+  p{ margin:0 0 9px; }
+  ul,ol{ margin:6px 0 10px; padding-left:1.35em; } li{ margin-bottom:4px; }
+  .small{ font-size:8.8pt; color:var(--ink3); line-height:1.65; }
+  table{ border-collapse:collapse; width:100%; font-size:9.2pt; margin:8px 0 12px; }
+  th,td{ border:1px solid var(--rule); padding:5.5px 8px; text-align:left; vertical-align:top; line-height:1.55;}
+  th{ background:var(--tint); font-size:8.8pt; color:var(--ink2); white-space:nowrap; }
+  td.num,th.num{ text-align:right; white-space:nowrap; }
+  tr.total td{ background:var(--bluebg); font-size:10pt; }
+  .note{ background:var(--tint); border:1px solid var(--rule); border-left:4px solid var(--aqua);
+         padding:10px 14px; margin:10px 0 14px; font-size:9pt; line-height:1.75; }
+  .note .t{ font-size:9pt; color:#0d7a53; margin-bottom:3px; }
+  .warn{ background:var(--redbg); border:1px solid #f4c9c9; border-left:4px solid var(--red);
+         padding:10px 14px; margin:10px 0 14px; font-size:9pt; line-height:1.75; }
+  .warn .t{ color:var(--red); margin-bottom:3px; }
+  .key{ background:var(--bluebg); border:1px solid #c6ddf8; border-left:4px solid var(--blue);
+        padding:11px 15px; margin:10px 0 14px; font-size:9.4pt; line-height:1.8; }
+  .key .t{ color:var(--blue); margin-bottom:3px; }
+  figure{ margin:14px 0 6px; } svg{ width:100%; height:auto; display:block; }
+  figcaption{ font-size:9.6pt; margin-bottom:7px; }
+  figcaption span{ color:var(--ink3); font-size:8.6pt; }
+  .foot{ font-size:8pt; color:var(--ink3); border-top:1px solid var(--rule); padding-top:7px; margin-top:16px; }
+  .cover{ padding-top:30mm; }
+  .cover .kicker{ font-size:10pt; color:var(--ink3); letter-spacing:.14em; }
+  .cover h1{ font-size:24pt; line-height:1.45; margin:12px 0 6px; }
+  .cover h2{ font-size:12.5pt; color:var(--ink2); font-weight:normal; margin:0 0 26px; line-height:1.7; }
+  .cover .bar{ height:5px; width:74px; background:var(--blue); margin:24px 0; }
+  .cover .to{ font-size:12pt; border-bottom:1px solid var(--rule); padding-bottom:10px; margin-bottom:22px;}
+  .cover .amt{ background:var(--bluebg); border:1px solid #c6ddf8; padding:16px 20px; margin:22px 0; }
+  .cover .amt .l{ font-size:9.5pt; color:var(--ink2); }
+  .cover .amt .v{ font-size:23pt; color:var(--blue); line-height:1.3; }
+  .cover .amt .v small{ font-size:11pt; }
+  .cover .amt .d{ font-size:9pt; color:var(--ink2); }
+  .cover .from{ font-size:9.5pt; color:var(--ink2); line-height:1.9; margin-top:30px; border-top:1px solid var(--rule); padding-top:14px;}
+  .cover .from b{ display:inline-block; width:7em; color:var(--ink3); font-weight:normal; }
+  .pill{ display:inline-block; font-size:8.5pt; padding:2px 9px; border-radius:10px; background:var(--bluebg); color:#184f95; margin-right:5px;}
+</style>
+</head>
+<body>
+
+<section class="page cover">
+  <div class="kicker">ご提案書 ・ 御見積書</div>
+  <h1>FLASH体操教室<br>公式ホームページ 制作のご提案</h1>
+  <h2>0歳から全国大会まで。<br>その11年の積み重ねが、きちんと伝わるサイトへ。</h2>
+  <div class="bar"></div>
+
+  <div class="to">合同会社FLASH体操教室　御中</div>
+
+  <div class="amt">
+    <div class="l">御見積金額（税込）</div>
+    <div class="v">198,000<small> 円</small></div>
+    <div class="d">制作費 180,000円（税別）＋ 消費税 18,000円　／　納期：ご発注・素材ご提出から約6週間</div>
+  </div>
+
+  <p class="small">
+    <span class="pill">全6ページ</span><span class="pill">スマートフォン対応</span><span class="pill">通信の暗号化（SSL）</span>
+    <span class="pill">独自ドメイン</span><span class="pill">お知らせは自社で更新可能</span><span class="pill">LINE連携</span>
+    <span class="pill">Googleマップ初期設定</span><span class="pill">アクセス解析導入</span>
+  </p>
+
+  <p class="small" style="margin-top:18px">
+    このたびは、ホームページ制作についてご相談をいただき、誠にありがとうございます。<br>
+    貴教室の現状と、宮崎市内の同業他社の状況を調べたうえで、<b>「限られたご予算のなかで、いちばん成果に直結する部分から整える」</b>
+    という方針でご提案をまとめました。ご検討のほど、よろしくお願い申し上げます。
+  </p>
+
+  <div class="from">
+    <div><b>発行日</b>2026年9月16日</div>
+    <div><b>見積有効期限</b>発行日より30日間</div>
+    <div><b>ご担当</b>福田</div>
+  </div>
+</section>
+
+<!-- ===== 01 現状とご提案の方向性 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">01</span>現状と、ご提案の方向性</h3>
+  <p class="sub">なぜ今、作り直しをおすすめするのか</p>
+
+  <p>現在のホームページは、1ページ完結型のサービスをご利用のため、<b>サービスの仕様上どうしても越えられない制約</b>が3つあります。
+  いずれも「作りが悪い」という話ではなく、<b>使っている仕組みの限界</b>です。</p>
+
+  <h4>ご提案の理由 ①　お問い合わせフォームが暗号化されていません</h4>
+  <p>現在のURLは <code>http://</code> で始まっており、通信が暗号化されていない状態です。
+  体験申込フォームでは<b>お子さまのお名前・年齢・保護者さまのご連絡先</b>をご入力いただくため、ここは最優先で対応すべき点だと考えます。
+  ブラウザに「保護されていない通信」という警告が出ることで、申込を途中でやめてしまう方も一定数いらっしゃいます。</p>
+  <div class="note">
+    <div class="t">■ 郵便にたとえると</div>
+    <b>http ＝ ハガキ</b>（途中で誰でも中身が読めます）／<b>https ＝ 封書</b>（宛先にしか読めません）。<br>
+    今は、お子さまのお名前とご連絡先を<b>ハガキで送っていただいている</b>状態です。<br>
+    なお、独自ドメインを取得すれば、暗号化（SSL）は<b>追加費用なしで自動的に付いてきます</b>。
+  </div>
+
+  <h4>ご提案の理由 ②　URLが他社のドメインの一部になっています</h4>
+  <p>現在のURLは、サービス提供会社のドメインの中の一区画という構造です。たとえるなら<b>「自社の土地に建てた家」ではなく「他社ビルの一室を間借り」</b>している状態で、
+  サービスを解約された場合、<b>11年かけて蓄積された検索エンジンからの評価とアクセスが、そのまま消えてしまいます。</b>
+  独自ドメインの費用は年1,500〜4,500円程度です。ここは確保しておくことを強くおすすめします。</p>
+
+  <h4>ご提案の理由 ③　1ページでは、6つのコースを説明しきれません</h4>
+  <p>貴教室には未就園児コースから体操競技・選手コースまで<b>6つのコース</b>がありますが、1ページではコースごとの
+  <b>対象年齢・曜日・時間・料金・持ち物</b>を書き切ることができません。
+  保護者さまがいちばん知りたい「うちの子はどのコース？」「いくら？」「いつ？」に答えられていないことが、
+  お問い合わせに至らない最大の理由になっていると考えられます。</p>
+
+  <div class="key">
+    <div class="t">■ 調査してわかった、貴教室の強み</div>
+    <b>① 0歳から全国大会まで、ひとつの教室で見られる。</b>宮崎市内では希少な体制です。<br>
+    <b>② 幼稚園・保育園への出張指導という実績がある。</b>市内のこども園のお知らせに、年度をまたいで複数回掲載されていました。<br>
+    → この2つは<b>他の教室にはない、そのまま集客につながる材料</b>です。今のサイトでは、どちらもほとんど伝わっていません。
+    新しいサイトでは、この2点を前面に出す構成にします。
+  </div>
+
+  <h4>ご提案の方針</h4>
+  <p>ご予算を踏まえ、<b>「豪華に作る」のではなく「成果に直結する部分から確実に押さえる」</b>方針としました。
+  具体的には、<b>①暗号化と独自ドメインの確保　②6コースを説明しきれるページ構成　③体験申込までの導線（LINE連携・常時表示の予約ボタン）</b>
+  の3点に絞って投資し、装飾的な要素や予約システムなどは今回は見送っています。</p>
+
+  <p class="small">※ 本ご提案は、公開情報にもとづく調査をもとに作成しています。現行サイトの管理画面や契約内容については、
+  お打ち合わせの際に実際の画面を拝見したうえで、最終的な内容を確定させていただきます。</p>
+</section>
+
+<!-- ===== 02 サイト構成 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">02</span>サイト構成（全6ページ）</h3>
+  <p class="sub">どんなページを作るか</p>
+
+  <figure>
+    <figcaption>図1. サイトマップ<br><span>トップページを入口に、目的別の5ページへ分岐します。</span></figcaption>
+    <svg viewBox="0 0 700 348" role="img" aria-label="サイトマップ。トップページから5つの下層ページへ分岐する構成">
+      <rect x="0" y="0" width="700" height="348" fill="#fcfcfb"/>
+      <rect x="250" y="26" width="200" height="46" rx="6" fill="#2a78d6"/>
+      <text x="350" y="49" font-size="12" fill="#ffffff" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">トップページ</text>
+      <text x="350" y="64" font-size="8.5" fill="#cde2fb" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">教室の顔。ここで「体験してみよう」まで運びます</text>
+      <g stroke="#a9a79d" stroke-width="1.2" fill="none">
+        <path d="M350 72 L350 100"/><path d="M70 100 L630 100"/>
+        <path d="M70 100 L70 128"/><path d="M210 100 L210 128"/><path d="M350 100 L350 128"/>
+        <path d="M490 100 L490 128"/><path d="M630 100 L630 128"/>
+      </g>
+      <g fill="#ffffff" stroke="#2a78d6" stroke-width="1.4">
+        <rect x="8" y="128" width="124" height="74" rx="6"/><rect x="148" y="128" width="124" height="74" rx="6"/>
+        <rect x="288" y="128" width="124" height="74" rx="6"/><rect x="428" y="128" width="124" height="74" rx="6"/>
+        <rect x="568" y="128" width="124" height="74" rx="6"/>
+      </g>
+      <g font-size="10.5" fill="#1a1a18" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="70" y="152">コース・料金</text><text x="210" y="152">コーチ紹介</text>
+        <text x="350" y="152">園・学校向け</text><text x="350" y="167">出張指導</text>
+        <text x="490" y="152">よくあるご質問</text><text x="630" y="152">体験申込・</text><text x="630" y="167">お問い合わせ</text>
+      </g>
+      <g font-size="8" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="70" y="172">6コースの対象年齢</text><text x="70" y="184">曜日・時間・料金</text>
+        <text x="210" y="172">経歴・資格</text><text x="210" y="184">指導方針</text>
+        <text x="350" y="184">法人向けの新しい入口</text>
+        <text x="490" y="172">保護者さまの</text><text x="490" y="184">不安をここで解消</text>
+        <text x="630" y="184">申込フォーム</text>
+      </g>
+      <rect x="8" y="228" width="684" height="104" rx="8" fill="#f4f3ee" stroke="#dedcd4"/>
+      <text x="26" y="250" font-size="10" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">サイト全体から連携する外部サービス（すべて無料で開始できます）</text>
+      <g fill="#ffffff" stroke="#1baf7a" stroke-width="1.4">
+        <rect x="26" y="262" width="204" height="54" rx="6"/><rect x="248" y="262" width="204" height="54" rx="6"/>
+        <rect x="470" y="262" width="204" height="54" rx="6"/>
+      </g>
+      <g font-size="10" fill="#1a1a18" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="128" y="283">LINE公式アカウント</text><text x="350" y="283">Googleマップ</text><text x="572" y="283">Instagram</text>
+      </g>
+      <g font-size="8" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="128" y="300">体験予約・振替連絡・休講のお知らせ</text>
+        <text x="350" y="300">「宮崎市 体操教室」の地図検索対策</text>
+        <text x="572" y="300">レッスンの短い動画で認知を広げる</text>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="key">
+    <div class="t">■ 「園・学校向け 出張指導」ページを入れている理由</div>
+    園の先生が外部指導を探すときは、まず検索されます。そのときに<b>「出張指導に対応しています／実績はこちらです」</b>というページがないと、
+    実績があっても候補に入りません。すでにお取引のある園からのご紹介も受けやすくなります。<br>
+    月謝収入と違い<b>法人契約は単価が高く収入が安定する</b>ため、1ページ分の投資として最も効果が見込める箇所だと考えています。
+  </div>
+
+  <div class="note">
+    <div class="t">■ 「よくあるご質問」ページを入れている理由</div>
+    「運動が苦手でも大丈夫ですか」「駐車場はありますか」「きょうだい割引はありますか」——
+    こうしたご質問にサイトで先に答えておくことで、<b>お問い合わせのお電話が減り、指導に集中していただけます。</b>
+    同時に、不安が解消された状態でお問い合わせが来るため、体験から入会につながりやすくなります。
+  </div>
+</section>
+
+<!-- ===== 03 トップページ構成 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">03</span>トップページの構成</h3>
+  <p class="sub">上から順に、どんな情報を並べるか</p>
+
+  <figure>
+    <figcaption>図2. トップページの構成イメージと、スマートフォンでの見え方<br>
+      <span>上から下へ読み進めるうちに、自然と「体験に申し込む」までたどり着く並び順にしています。</span></figcaption>
+    <svg viewBox="0 0 700 452" role="img" aria-label="トップページの構成イメージとスマートフォン表示">
+      <rect x="0" y="0" width="700" height="452" fill="#fcfcfb"/>
+      <text x="20" y="20" font-size="9.5" fill="#77756c" font-family="IPAPGothic,IPAGothic,sans-serif">パソコンでの表示（上から下へ）</text>
+      <!-- blocks -->
+      <g stroke="#2a78d6" stroke-width="1.3" fill="#eaf2fd">
+        <rect x="20" y="30" width="410" height="64" rx="5"/>
+      </g>
+      <g stroke="#c6ddf8" stroke-width="1.3" fill="#ffffff">
+        <rect x="20" y="102" width="410" height="40" rx="5"/>
+        <rect x="20" y="150" width="410" height="56" rx="5"/>
+        <rect x="20" y="214" width="410" height="40" rx="5"/>
+        <rect x="20" y="262" width="410" height="40" rx="5"/>
+        <rect x="20" y="310" width="410" height="40" rx="5"/>
+      </g>
+      <g stroke="#eb6834" stroke-width="1.3" fill="#fdeee7">
+        <rect x="20" y="358" width="410" height="48" rx="5"/>
+      </g>
+      <g font-size="10" fill="#1a1a18" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="34" y="50">① ファーストビュー</text>
+        <text x="34" y="122">② お知らせ</text>
+        <text x="34" y="170">③ コース紹介（6コース）</text>
+        <text x="34" y="234">④ FLASHが選ばれる理由</text>
+        <text x="34" y="282">⑤ 料金のご案内</text>
+        <text x="34" y="330">⑥ コーチ紹介</text>
+        <text x="34" y="378">⑦ 無料体験のお申し込み</text>
+      </g>
+      <g font-size="8.2" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="34" y="65">「0歳から全国大会まで。宮崎・佐土原の体操教室」</text>
+        <text x="34" y="78">＋レッスン写真＋「無料体験を予約」ボタン</text>
+        <text x="34" y="135">教室側で更新できます（休講・体験会・大会結果など）</text>
+        <text x="34" y="184">対象年齢がひと目でわかるカード表示。詳細は</text>
+        <text x="34" y="196">コース・料金ページへ</text>
+        <text x="34" y="247">11年の実績／0歳〜全国大会の一貫指導／少人数指導</text>
+        <text x="34" y="295">入会金・月謝を明示（非公開は離脱の最大要因です）</text>
+        <text x="34" y="343">顔写真・経歴・お子さまへのメッセージ</text>
+        <text x="34" y="391">フォーム＋LINE＋電話の3経路。アクセス・駐車場も併記</text>
+      </g>
+      <!-- phone -->
+      <text x="490" y="20" font-size="9.5" fill="#77756c" font-family="IPAPGothic,IPAGothic,sans-serif">スマートフォンでの表示</text>
+      <rect x="490" y="30" width="170" height="368" rx="20" fill="#ffffff" stroke="#a9a79d" stroke-width="1.6"/>
+      <rect x="500" y="46" width="150" height="336" rx="6" fill="#f4f3ee"/>
+      <rect x="500" y="46" width="150" height="76" rx="6" fill="#eaf2fd"/>
+      <text x="575" y="80" font-size="8.5" fill="#184f95" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">ファーストビュー</text>
+      <text x="575" y="95" font-size="7.5" fill="#4a4945" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">キャッチコピー＋写真</text>
+      <g fill="#ffffff" stroke="#dedcd4">
+        <rect x="508" y="132" width="134" height="34" rx="4"/><rect x="508" y="174" width="134" height="34" rx="4"/>
+        <rect x="508" y="216" width="134" height="34" rx="4"/><rect x="508" y="258" width="134" height="34" rx="4"/>
+      </g>
+      <g font-size="7.5" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="575" y="153">お知らせ</text><text x="575" y="195">コース紹介</text>
+        <text x="575" y="237">選ばれる理由</text><text x="575" y="279">料金</text>
+      </g>
+      <rect x="500" y="344" width="150" height="38" rx="6" fill="#eb6834"/>
+      <text x="575" y="368" font-size="10" fill="#ffffff" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">無料体験を予約</text>
+      <text x="575" y="418" font-size="8.5" fill="#eb6834" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">↑ 画面をどこまでスクロールしても</text>
+      <text x="575" y="431" font-size="8.5" fill="#eb6834" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">下部に固定表示されます</text>
+    </svg>
+  </figure>
+
+</section>
+
+<!-- ===== 04 各ページ掲載内容 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">04</span>各ページの掲載内容</h3>
+  <p class="sub">それぞれのページに何を載せるか</p>
+
+  <table>
+    <tr><th style="width:20%">ページ</th><th>掲載内容</th><th style="width:22%">ねらい</th></tr>
+    <tr><td><b>トップページ</b></td>
+      <td>キャッチコピー、レッスン写真、お知らせ、6コースの一覧、選ばれる理由、料金の概要、コーチ紹介、体験申込</td>
+      <td>教室の全体像を伝え、体験申込まで運ぶ</td></tr>
+    <tr><td><b>コース・料金</b></td>
+      <td>6コースそれぞれの対象年齢／曜日・時間／定員／<b>入会金・月謝・年会費・保険料</b>／持ち物・服装／振替のルール</td>
+      <td>「うちの子はどのコース？いくら？」に答える。<b>最も読まれるページになります</b></td></tr>
+    <tr><td><b>コーチ紹介</b></td>
+      <td>お名前・顔写真・選手歴・保有資格・指導歴・お子さまへのメッセージ</td>
+      <td>「誰に預けるのか」が見えることで、安心して申し込める</td></tr>
+    <tr><td><b>園・学校向け<br>出張指導</b></td>
+      <td>出張指導の内容・対象・実施までの流れ・これまでの実績（掲載許可をいただいた園名）・お問い合わせ先</td>
+      <td><b>法人契約という新しい収入の入口</b>をつくる</td></tr>
+    <tr><td><b>よくあるご質問</b></td>
+      <td>運動が苦手でも大丈夫か／見学はできるか／何歳から通えるか／きょうだい割引／振替／駐車場／発表会 など10〜15問</td>
+      <td>不安を先に解消し、問い合わせ電話の件数を減らす</td></tr>
+    <tr><td><b>体験申込・<br>お問い合わせ</b></td>
+      <td>申込フォーム（ご希望のコース・曜日を選択式に）／LINEでの申込／電話／アクセス・駐車場のご案内</td>
+      <td>申込のハードルを下げる。<b>3つの経路を用意します</b></td></tr>
+  </table>
+
+  <h4>すべてのページに共通する仕組み</h4>
+  <div class="key">
+    <div class="t">■ スマートフォンでの「固定ボタン」について</div>
+    保護者さまの閲覧は、ほとんどがスマートフォンです。
+    「申し込もう」と思った瞬間に申込ボタンが画面になければ、そのまま離脱してしまいます。<br>
+    そこで<b>画面下部に「無料体験を予約」ボタンを常時固定</b>し、どのページのどこを見ていても1タップで申込へ進めるようにします。
+    費用はかかりませんが、お問い合わせ数に直結する部分です。
+  </div>
+  <div class="note">
+    <div class="t">■ 料金は、ぜひ公開させてください</div>
+    習い事選びにおいて「料金が書かれていない」は、保護者さまが検討をやめる最大の理由のひとつです。<br>
+    宮崎市内の同業他社も、会場別の日時と料金を掲載しています。<b>公開していないこと自体が、比較の土俵から外れる原因</b>になります。
+    もし「コースが複雑で書きにくい」ということであれば、表の形にまとめるところをこちらでお手伝いします。
+  </div>
+
+  <div class="note">
+    <div class="t">■ お知らせは、教室のみなさまご自身で更新できます</div>
+    休講のお知らせ、体験会の告知、大会の結果報告などは、<b>専門知識なしで更新できる仕組み</b>を入れてお渡しします。
+    公開後に操作方法をご説明しますので、毎回制作会社に依頼して費用が発生する、ということはありません。
+  </div>
+</section>
+
+<!-- ===== 05 御見積 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">05</span>御見積</h3>
+  <p class="sub">制作費の内訳</p>
+
+  <table>
+    <tr><th style="width:26%">項目</th><th>内容</th><th class="num" style="width:16%">金額（税別）</th></tr>
+    <tr><td>ディレクション・<br>要件定義・サイト設計</td>
+      <td>お打ち合わせ、サイト構成の設計、掲載内容の整理</td><td class="num">35,000</td></tr>
+    <tr><td>デザイン制作</td>
+      <td>トップページ、および下層ページ共通デザインの作成</td><td class="num">55,000</td></tr>
+    <tr><td>サイト構築（全6ページ）</td>
+      <td>ページの構築、スマートフォン・タブレット対応、お知らせ更新機能の設定</td><td class="num">60,000</td></tr>
+    <tr><td>原稿の整理・掲載</td>
+      <td>ご提出いただいた原稿の整形・推敲、写真の加工と配置</td><td class="num">15,000</td></tr>
+    <tr><td>公開設定</td>
+      <td>独自ドメインの接続、通信の暗号化（SSL）設定、お問い合わせフォーム設置、
+        アクセス解析の導入、検索エンジンへの登録、SNS共有時のサムネイル設定、Googleマップの初期設定</td><td class="num">15,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">小計</td><td class="num">180,000</td></tr>
+    <tr><td colspan="2" style="text-align:right">消費税（10%）</td><td class="num">18,000</td></tr>
+    <tr class="total"><td colspan="2" style="text-align:right">御見積金額（税込）</td><td class="num">198,000</td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ 通常価格からのお値引きについて</div>
+    同等の内容の通常価格は <b>328,000円（税別）</b> ですが、今回は
+    <b>「初回制作事例協力割引」として148,000円をお値引き</b>し、180,000円（税別）でご提案しております。<br><br>
+    つきましては、恐れ入りますが以下の3点にご協力いただけますと幸いです。<br>
+    ① 完成したサイトを<b>当社の制作実績として紹介させていただくこと</b><br>
+    ② 公開1〜2か月後に<b>ご感想（お客様の声）をお聞かせいただくこと</b><br>
+    ③ 公開3か月後に<b>お問い合わせ件数の変化をお知らせいただくこと</b>（数値の公開可否は改めてご相談します）
+  </div>
+
+  <h4>お支払い条件</h4>
+  <table>
+    <tr><th style="width:26%">着手金</th><td>99,000円（税込）— ご発注時</td></tr>
+    <tr><th>残金</th><td>99,000円（税込）— 公開後、ご請求日の翌月末までにお支払い</td></tr>
+    <tr><th>見積有効期限</th><td>発行日（2026年9月16日）より30日間</td></tr>
+  </table>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">05</span>御見積<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">公開後にかかる年間の維持費</p>
+  <h4>年間の維持費（別途・貴教室名義でのご契約となります）</h4>
+  <table>
+    <tr><th style="width:40%">項目</th><th class="num" style="width:22%">年額</th><th>備考</th></tr>
+    <tr><td>独自ドメイン</td><td class="num">1,500〜4,500円</td><td>ご希望の文字列によって変わります</td></tr>
+    <tr><td>サイト運用サービス（年払い）</td><td class="num">約47,760円</td><td>暗号化・サーバー・更新機能を含む</td></tr>
+    <tr><td>LINE公式アカウント</td><td class="num">0円〜</td><td>配信数が一定を超えた場合のみ有料</td></tr>
+    <tr class="total"><td>年間合計の目安</td><td class="num">約50,000〜53,000円</td><td></td></tr>
+  </table>
+
+  <div class="note">
+    <div class="t">■ 維持費が現在より上がる点について（正直にお伝えします）</div>
+    現在のサービスは年額11,000円ですので、<b>年間で約4万円の増加</b>となります。この点は先にお伝えしておきます。<br><br>
+    増える約4万円に対して、<b>月謝7,000円の生徒さんがお一人、1年間続けてくださると約84,000円</b>です。
+    つまり<b>体験申込が年に1件増えるだけで十分に回収できる</b>金額とお考えいただければと思います。<br><br>
+    また、これらは<b>すべて貴教室名義でご契約いただきます。</b>当社が代理で保有することはありません。
+    万一、将来的に別の制作会社にご依頼される場合でも、<b>ドメインもサイトのデータも、そのまま貴教室にお残りします。</b>
+    現在のように「解約するとサイトが消える」状態には二度とならないよう設計しています。
+  </div>
+</section>
+
+<!-- ===== 06 含まれないもの ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">06</span>本見積に含まれないもの／オプション</h3>
+  <p class="sub">のちのトラブルを防ぐため、範囲を明確にしております</p>
+
+  <h4>本見積に含まれないもの</h4>
+  <table>
+    <tr><th style="width:34%">項目</th><th>ご説明</th></tr>
+    <tr><td>原稿（文章）の作成</td><td>各コースの内容・料金・ルールなどの文章は、<b>ご提供いただいた内容をもとに</b>整形・推敲いたします。ゼロからの執筆は含まれません（後述のヒアリングシートをご用意します）</td></tr>
+    <tr><td>写真の撮影</td><td>お手元の写真をご提供いただく前提です。撮影が必要な場合はオプションをご覧ください</td></tr>
+    <tr><td>ロゴの新規制作</td><td>現在のロゴをそのまま使用します</td></tr>
+    <tr><td>予約管理・月謝決済システム</td><td>今回は見送り、フォームとLINEで運用します（将来的に必要になった段階で改めてご提案します）</td></tr>
+    <tr><td>公開後の更新作業</td><td>お知らせは貴教室で更新いただけます。それ以外の更新代行をご希望の場合は保守契約をご検討ください</td></tr>
+    <tr><td>7ページ目以降の追加</td><td>1ページあたり15,000円（税別）で承ります</td></tr>
+  </table>
+
+  <h4>オプション（ご希望に応じて）</h4>
+  <table>
+    <tr><th style="width:44%">項目</th><th class="num" style="width:22%">金額（税別）</th><th>内容</th></tr>
+    <tr><td><b>写真撮影（2〜3時間）</b></td><td class="num">15,000〜40,000円</td>
+      <td>レッスン風景とコーチの写真を撮影。<b>いちばんおすすめのオプションです</b></td></tr>
+    <tr><td>コース個別ページの追加</td><td class="num">15,000円／ページ</td><td>特定コースを詳しく紹介したい場合</td></tr>
+    <tr><td>ロゴ制作</td><td class="num">30,000〜80,000円</td><td>ロゴを新しくされる場合</td></tr>
+    <tr><td>保守・更新代行</td><td class="num">月5,000円〜</td><td>お知らせ以外の更新、不具合対応、月1回の更新枠</td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ 写真撮影のオプションを、特におすすめする理由</div>
+    体操教室のサイトは、<b>写真の印象がそのままサイトの印象になります。</b>
+    お子さまが跳び箱を跳ぶ瞬間、コーチが笑顔で補助をしている場面——こうした写真が1枚あるかないかで、
+    保護者さまが受ける印象は大きく変わります。
+    ご予算を抑えるため、<b>プロには2〜3時間だけお願いし、レッスン風景とコーチのお写真に絞って撮影</b>する形をご提案しています。
+    器具・外観・駐車場などは当社で撮影いたしますので、追加費用はかかりません。
+  </div>
+
+  <h4>修正回数について</h4>
+  <table>
+    <tr><th style="width:34%">デザインの修正</th><td>2回まで</td></tr>
+    <tr><th>原稿・写真の差し替え</th><td>2回まで</td></tr>
+  </table>
+  <p class="small">※ 上記を超える修正は1回あたり10,000円（税別）にて承ります。制作をスムーズに進めるための目安であり、誤字脱字や明らかな不具合の修正は回数に含めません。公開後1か月間は無償で対応いたします。</p>
+</section>
+
+<!-- ===== 07 スケジュール ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">07</span>制作スケジュール</h3>
+  <p class="sub">ご発注から公開まで、約6週間</p>
+
+  <figure>
+    <figcaption>図3. 制作スケジュール<br><span>オレンジ色の作業が、貴教室にお願いする部分です。</span></figcaption>
+    <svg viewBox="0 0 700 386" role="img" aria-label="ご発注から公開までの6週間のスケジュール">
+      <rect x="0" y="0" width="700" height="386" fill="#fcfcfb"/>
+      <g font-size="9.5" fill="#77756c" text-anchor="middle" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="235.8" y="38">1週目</text><text x="317.5" y="38">2週目</text><text x="399.2" y="38">3週目</text>
+        <text x="480.8" y="38">4週目</text><text x="562.5" y="38">5週目</text><text x="644.2" y="38">6週目</text>
+      </g>
+      <g stroke="#e8e6de" stroke-width="1">
+        <line x1="195" y1="44" x2="195" y2="338"/><line x1="276.7" y1="44" x2="276.7" y2="338"/>
+        <line x1="358.3" y1="44" x2="358.3" y2="338"/><line x1="440" y1="44" x2="440" y2="338"/>
+        <line x1="521.7" y1="44" x2="521.7" y2="338"/><line x1="603.3" y1="44" x2="603.3" y2="338"/>
+        <line x1="685" y1="44" x2="685" y2="338"/>
+      </g>
+      <rect x="196.5" y="50"  width="78.7"  height="16" rx="4" fill="#1baf7a"/>
+      <rect x="196.5" y="83"  width="160.4" height="16" rx="4" fill="#2a78d6"/>
+      <rect x="196.5" y="116" width="242"   height="16" rx="4" fill="#eb6834"/>
+      <rect x="278.2" y="149" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
+      <rect x="278.2" y="182" width="242"   height="16" rx="4" fill="#2a78d6"/>
+      <rect x="359.8" y="215" width="242"   height="16" rx="4" fill="#2a78d6"/>
+      <rect x="523.2" y="248" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
+      <rect x="523.2" y="281" width="160.4" height="16" rx="4" fill="#1baf7a"/>
+      <rect x="604.8" y="314" width="78.7"  height="16" rx="4" fill="#2a78d6"/>
+      <text x="443" y="128" font-size="9.5" fill="#eb6834" font-family="IPAPGothic,IPAGothic,sans-serif">★ ここがいちばん大切です</text>
+      <g font-size="10.5" fill="#1a1a18" text-anchor="end" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <text x="182" y="62">① お打ち合わせ</text>
+        <text x="182" y="95">② サイト構成の設計</text>
+        <text x="182" y="128">③ 原稿・写真のご準備</text>
+        <text x="182" y="161">④ ドメイン取得・初期設定</text>
+        <text x="182" y="194">⑤ デザイン制作</text>
+        <text x="182" y="227">⑥ サイト構築</text>
+        <text x="182" y="260">⑦ 原稿の掲載・実機確認</text>
+        <text x="182" y="293">⑧ ご確認・修正（2回まで）</text>
+        <text x="182" y="326">⑨ 公開・各種設定</text>
+      </g>
+      <line x1="195" y1="338" x2="685" y2="338" stroke="#a9a79d" stroke-width="1"/>
+      <g font-size="9.5" fill="#4a4945" font-family="IPAPGothic,IPAGothic,sans-serif">
+        <rect x="195" y="360" width="22" height="10" rx="3" fill="#2a78d6"/><text x="223" y="369">当社の作業</text>
+        <rect x="320" y="360" width="22" height="10" rx="3" fill="#eb6834"/><text x="348" y="369">貴教室にお願いする作業</text>
+        <rect x="490" y="360" width="22" height="10" rx="3" fill="#1baf7a"/><text x="518" y="369">お打ち合わせ・ご確認</text>
+      </g>
+    </svg>
+  </figure>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">07</span>制作スケジュール<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">ご準備のお願いと、公開時期のご提案</p>
+  <div class="warn">
+    <div class="t">■ 貴教室にお願いするのは、実質「③ 原稿・写真のご準備」だけです</div>
+    そのかわり、ここが遅れると<b>④以降のすべての作業が後ろにずれてしまいます。</b><br>
+    ご負担を減らすため、<b>記入していただくだけで原稿が完成するヒアリングシート</b>を別途ご用意します。
+    ご多忙かと存じますので、お打ち合わせの場で一緒に埋めていく形でも構いません。
+  </div>
+
+  <div class="key">
+    <div class="t">■ 公開時期について（ぜひご検討ください）</div>
+    体操教室への入会が増えるのは<b>4月（新年度）</b>と<b>夏休み前後</b>で、保護者さまが検索を始めるのは<b>1〜3月</b>です。<br><br>
+    <b>12月中旬〜1月上旬に公開できれば、いちばん需要が高まる時期をまるごと取りにいけます。</b>
+    そこから6週間を逆算すると、<b>着手は10月中旬〜11月上旬まで</b>。<br>
+    現在9月中旬ですので、<b>今ご判断いただければ、新年度の入会シーズンに間に合います。</b>
+  </div>
+</section>
+
+<!-- ===== 08 次のステップ ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">08</span>次のステップ</h3>
+  <p class="sub">ご発注いただいた場合の進め方</p>
+
+  <table>
+    <tr><th style="width:8%">順</th><th style="width:28%">やること</th><th style="width:16%">どちらが</th><th>内容</th></tr>
+    <tr><td>1</td><td>ご検討・ご判断</td><td>貴教室</td><td>本ご提案の内容と金額をご確認ください。ご不明な点はお気軽にご質問ください</td></tr>
+    <tr><td>2</td><td>お打ち合わせ（60〜90分）</td><td>両者</td><td>目的の確認、掲載方針（料金公開・顔出しの可否）の決定、ヒアリングシートの記入</td></tr>
+    <tr><td>3</td><td>ご発注・着手金のお支払い</td><td>貴教室</td><td>99,000円（税込）</td></tr>
+    <tr><td>4</td><td>原稿・写真のご準備</td><td>貴教室</td><td>ヒアリングシートのご記入、写真のご提供（2週間以内を目安にお願いします）</td></tr>
+    <tr><td>5</td><td>制作</td><td>当社</td><td>デザイン・構築・掲載（約4週間）</td></tr>
+    <tr><td>6</td><td>ご確認・修正</td><td>両者</td><td>実際の画面をご覧いただき、修正（2回まで）</td></tr>
+    <tr><td>7</td><td>公開</td><td>当社</td><td>公開、各種設定、更新方法のご説明</td></tr>
+  </table>
+
+</section>
+
+<section class="page">
+  <h3 class="sec"><span class="num">08</span>次のステップ<span style="font-size:10pt;color:#77756c;margin-left:.6em">（続き）</span></h3>
+  <p class="sub">お打ち合わせまでに、ご確認いただきたいこと</p>
+  <h4>お打ち合わせまでに、お考えいただきたいこと</h4>
+  <p>お打ち合わせをスムーズに進めるため、以下について事前にお考えいただけますと幸いです。
+  （お答えが決まっていなくても構いません。一緒に整理させていただきます）</p>
+  <table>
+    <tr><th style="width:36%">ご質問</th><th>補足</th></tr>
+    <tr><td><b>いちばんの目的はどれですか</b></td>
+      <td>① 体験申込を増やす　② 特定コースの空きを埋める　③ 園・学校からの出張指導を増やす　④ コーチの採用　⑤ 在籍の保護者さまへの情報提供</td></tr>
+    <tr><td><b>いま、どのコース・曜日に空きがありますか</b></td><td>空きのあるコースを目立たせる構成にできます</td></tr>
+    <tr><td><b>料金をサイトに公開してよろしいですか</b></td><td>公開を強くおすすめしています（P.7 参照）</td></tr>
+    <tr><td><b>コーチの顔写真・経歴を掲載してよろしいですか</b></td><td>保護者さまの安心感に直結します</td></tr>
+    <tr><td><b>お子さまの顔が写る写真について、保護者さまの書面でのご同意はお取りですか</b></td>
+      <td><b>最も重要な確認事項です。</b>同意書がない場合は、当社でひな形をご用意します</td></tr>
+    <tr><td><b>ロゴのデータ（イラストレーター形式など）はお手元にありますか</b></td><td>なければ、現在のロゴ画像から作成します</td></tr>
+    <tr><td><b>Instagram・LINE公式アカウントはお持ちですか</b></td><td>お持ちでなければ、開設からお手伝いします</td></tr>
+    <tr><td><b>Googleマップの店舗情報の管理権限をお持ちですか</b></td><td>「宮崎市 体操教室」の地図検索対策に必要です</td></tr>
+    <tr><td><b>公開後、更新するのはどなたになりますか</b></td><td>その方に合わせて、更新方法をご説明します</td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ 肖像権のご同意について（最も重要なお願い）</div>
+    お子さまのお顔が写る写真をサイトに掲載するには、<b>保護者さまからの書面によるご同意</b>が必要です。<br>
+    まだお取りでない場合は、<b>同意書のひな形を当社でご用意します</b>ので、ご心配はいりません。
+    ご同意をいただけていないお子さまについては、お顔がわからないように処理するか、掲載を見送る運用といたします。<br>
+    ここは、教室の信用に関わる部分ですので、制作を始める前に必ず整理させてください。
+  </div>
+
+  <div class="foot">
+    本ご提案書の内容は、2026年9月16日時点の調査および市場相場にもとづいております。<br>
+    ご不明な点、ご要望の変更などがございましたら、どうぞお気軽にお申し付けください。<br><br>
+    合同会社FLASH体操教室　御中　／　発行日：2026年9月16日　／　見積有効期限：発行日より30日間
+  </div>
+</section>
+
+</body>
+</html>

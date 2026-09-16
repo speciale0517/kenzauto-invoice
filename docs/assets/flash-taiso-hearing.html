@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FLASH体操教室 ヒアリングシート</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 16mm 14mm; }
+  * { box-sizing: border-box; }
+  :root{
+    --ink:#1a1a18; --ink2:#4a4945; --ink3:#77756c;
+    --rule:#dedcd4; --surface:#fcfcfb; --tint:#f4f3ee;
+    --blue:#2a78d6; --orange:#eb6834; --aqua:#1baf7a; --red:#e34948;
+    --bluebg:#eaf2fd; --orangebg:#fdeee7; --aquabg:#e6f6f0; --redbg:#fdecec;
+  }
+  html,body{margin:0;padding:0;}
+  body{ font-family:"IPAPGothic","IPAGothic","Noto Sans JP",sans-serif; color:var(--ink); background:#fff;
+    font-size:10.2pt; line-height:1.72; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .page{ page-break-after:always; }
+  .page:last-child{ page-break-after:auto; }
+  h3.sec{ font-size:14.5pt; margin:0 0 3px; }
+  h3.sec .num{ color:var(--blue); margin-right:.5em; }
+  .sub{ font-size:9.2pt; color:var(--ink3); margin:0 0 16px; padding-bottom:10px; border-bottom:2px solid var(--rule); }
+  h4{ font-size:11pt; margin:20px 0 7px; padding-left:9px; border-left:4px solid var(--blue); line-height:1.4;}
+  h5{ font-size:10pt; margin:14px 0 5px; color:var(--ink2); }
+  p{ margin:0 0 9px; }
+  ul,ol{ margin:6px 0 10px; padding-left:1.35em; } li{ margin-bottom:4px; }
+  .small{ font-size:8.8pt; color:var(--ink3); line-height:1.65; }
+  table{ border-collapse:collapse; width:100%; font-size:9.2pt; margin:8px 0 12px; }
+  th,td{ border:1px solid var(--rule); padding:5.5px 8px; text-align:left; vertical-align:top; line-height:1.55;}
+  th{ background:var(--tint); font-size:8.8pt; color:var(--ink2); white-space:nowrap; }
+  td.num,th.num{ text-align:right; white-space:nowrap; }
+  tr.total td{ background:var(--bluebg); font-size:10pt; }
+  .note{ background:var(--tint); border:1px solid var(--rule); border-left:4px solid var(--aqua);
+         padding:10px 14px; margin:10px 0 14px; font-size:9pt; line-height:1.75; }
+  .note .t{ font-size:9pt; color:#0d7a53; margin-bottom:3px; }
+  .warn{ background:var(--redbg); border:1px solid #f4c9c9; border-left:4px solid var(--red);
+         padding:10px 14px; margin:10px 0 14px; font-size:9pt; line-height:1.75; }
+  .warn .t{ color:var(--red); margin-bottom:3px; }
+  .key{ background:var(--bluebg); border:1px solid #c6ddf8; border-left:4px solid var(--blue);
+        padding:11px 15px; margin:10px 0 14px; font-size:9.4pt; line-height:1.8; }
+  .key .t{ color:var(--blue); margin-bottom:3px; }
+  figure{ margin:14px 0 6px; } svg{ width:100%; height:auto; display:block; }
+  figcaption{ font-size:9.6pt; margin-bottom:7px; }
+  figcaption span{ color:var(--ink3); font-size:8.6pt; }
+  .foot{ font-size:8pt; color:var(--ink3); border-top:1px solid var(--rule); padding-top:7px; margin-top:16px; }
+  .cb{ display:inline-block; width:11px; height:11px; border:1.2px solid #8a887e; margin-right:5px; vertical-align:-1px; background:#fff;}
+  .cbl{ display:inline-block; margin-right:16px; white-space:nowrap; font-size:9.2pt;}
+  td.w{ background:#fff; height:30px; }
+  td.w2{ background:#fff; height:52px; }
+  td.w3{ background:#fff; height:74px; }
+  .hdr{ display:flex; align-items:flex-end; justify-content:space-between; border-bottom:2px solid var(--blue); padding-bottom:8px; margin-bottom:6px;}
+  .hdr h1{ font-size:19pt; margin:0; }
+  .hdr .r{ font-size:9pt; color:var(--ink3); text-align:right; line-height:1.6;}
+  .lead{ font-size:9.4pt; line-height:1.8; }
+  .stepbox{ border:1px solid var(--rule); background:var(--surface); padding:12px 16px; margin:12px 0; font-size:9.2pt; line-height:1.8;}
+  .due{ background:var(--orangebg); border:1px solid #f6cdb8; padding:10px 14px; font-size:9.4pt; margin:12px 0;}
+  .due b{ color:#b8471d; }
+  .sign{ border:1px solid var(--rule); padding:12px 14px; margin-top:10px; font-size:9.2pt;}
+  .q{ font-size:9.6pt; margin:14px 0 4px; }
+  .q b{ color:var(--blue); margin-right:.4em; }
+  .hint{ font-size:8.5pt; color:var(--ink3); margin:0 0 5px; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- ===== 表紙／使い方 ===== -->
+<section class="page">
+  <div class="hdr">
+    <h1>ヒアリングシート</h1>
+    <div class="r">FLASH体操教室 公式ホームページ制作<br>2026年9月16日版</div>
+  </div>
+  <p class="lead" style="margin-top:14px">
+    合同会社FLASH体操教室　御中<br><br>
+    このシートにご記入いただいた内容が、<b>そのままホームページの原稿になります。</b><br>
+    文章として整える作業はこちらで行いますので、<b>箇条書きや単語だけでも構いません。</b>
+    「わからない」「決まっていない」という欄は空欄のままで結構です。お打ち合わせの際に一緒に整理いたします。
+  </p>
+
+  <div class="due">
+    <b>ご提出の目安：ご発注日から2週間以内</b><br>
+    このシートと写真がそろった時点で、デザイン制作に着手いたします。
+    恐れ入りますが、ご提出が遅れますと公開日も同じだけ後ろにずれますので、あらかじめご了承ください。
+  </div>
+
+  <div class="stepbox">
+    <b>ご記入いただく項目</b><br>
+    A. 教室の基本情報　／　B. ホームページの目的　／　C. 掲載の方針　／　D. コースの詳細（最重要）<br>
+    E. 料金　／　F. コーチのご紹介　／　G. よくあるご質問　／　H. 園・学校への出張指導<br>
+    I. 写真のご準備　／　J. お子さまの写真掲載について　／　K. 各種アカウント　／　L. お客様の声・実績
+  </div>
+
+  <div class="stepbox">
+    <b>ご提出方法</b><br>
+    ・このシート：印刷してご記入いただき、写真に撮ってお送りいただく形で構いません（LINE可）<br>
+    ・写真データ：LINE、メール、またはUSBメモリ等でお預かりします。<b>圧縮せず、できるだけ元のサイズ</b>でお願いします<br>
+    ・既存のチラシ・入会申込書・会員規約：お手元にあれば現物またはコピーをお貸しください
+  </div>
+
+  <div class="key">
+    <div class="t">■ 先にお伝えしておきたいこと</div>
+    このシートの中で<b>いちばん重要なのは「D. コースの詳細」と「J. お子さまの写真掲載について」</b>の2つです。<br>
+    Dは、保護者さまがサイトで最も読む部分です。Jは、教室の信用に関わる部分です。<br>
+    お時間が取れない場合は、まずこの2つだけでもご記入ください。
+  </div>
+
+  <div class="sign">
+    ご記入者お名前　<span style="display:inline-block;border-bottom:1px solid #b8b7b0;width:180px">&nbsp;</span>　　
+    ご記入日　<span style="display:inline-block;border-bottom:1px solid #b8b7b0;width:150px">&nbsp;</span>
+  </div>
+</section>
+
+<!-- ===== A〜C ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">A</span>教室の基本情報</h3>
+  <p class="sub">サイトの「教室概要」「アクセス」ページに掲載します</p>
+  <table>
+    <tr><th style="width:30%">正式名称</th><td class="w">合同会社FLASH体操教室</td></tr>
+    <tr><th>教室の住所</th><td class="w">宮崎市佐土原町下那珂 中溝2711-74　←ご確認ください</td></tr>
+    <tr><th>代表者名</th><td class="w"></td></tr>
+    <tr><th>設立年</th><td class="w">2015年　←ご確認ください</td></tr>
+    <tr><th>電話番号</th><td class="w">080-5252-5766　←掲載してよろしいですか　<span class="cbl"><span class="cb"></span>はい</span><span class="cbl"><span class="cb"></span>別番号にする</span></td></tr>
+    <tr><th>メールアドレス</th><td class="w"></td></tr>
+    <tr><th>受付時間</th><td class="w">例：平日10:00〜19:00（レッスン中は出られない場合があります）</td></tr>
+    <tr><th>駐車場</th><td class="w">有／無　・　台数　　　　台　・　場所の説明</td></tr>
+    <tr><th>最寄り・目印</th><td class="w">例：〇〇から車で5分、△△の向かい</td></tr>
+    <tr><th>教室の会場</th><td class="w">佐土原の1拠点のみ　／　他にもある（　　　　　　　　　　　　　　　　　　　）</td></tr>
+  </table>
+
+  <h3 class="sec" style="margin-top:22px"><span class="num">B</span>ホームページの目的</h3>
+  <p class="sub">いちばん叶えたいことを1つ選んでください（複数可）</p>
+  <p>
+    <span class="cbl"><span class="cb"></span>体験申込を増やしたい</span>
+    <span class="cbl"><span class="cb"></span>空いているコースを埋めたい</span><br>
+    <span class="cbl"><span class="cb"></span>園・学校からの出張指導を増やしたい</span>
+    <span class="cbl"><span class="cb"></span>コーチを採用したい</span><br>
+    <span class="cbl"><span class="cb"></span>在籍の保護者さまへの連絡をラクにしたい</span>
+    <span class="cbl"><span class="cb"></span>その他（　　　　　　　　　　　　　　　）</span>
+  </p>
+  <table>
+    <tr><th style="width:44%">現在、月に何件くらいお問い合わせがありますか</th><td class="w">約　　　　件／月</td></tr>
+    <tr><th>そのうち何件が入会に至りますか</th><td class="w">約　　　　件／月</td></tr>
+    <tr><th>いま空きがあるコース・曜日はどれですか</th><td class="w2"></td></tr>
+    <tr><th>逆に、満員のコースはありますか</th><td class="w">（満員のコースは目立たせない構成にします）</td></tr>
+  </table>
+
+</section>
+
+<!-- ===== D コース ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">C</span>掲載の方針</h3>
+  <p class="sub">掲載してよいかどうかのご判断をお願いします</p>
+  <table>
+    <tr><th style="width:56%">確認事項</th><th>ご回答</th></tr>
+    <tr><td><b>入会金・月謝をサイトに公開してよろしいですか</b><br><span class="small">公開を強くおすすめしています。非公開は問い合わせが減る最大の要因です</span></td>
+      <td class="w"><span class="cbl"><span class="cb"></span>公開する</span><span class="cbl"><span class="cb"></span>相談したい</span></td></tr>
+    <tr><td>コーチの顔写真・経歴を掲載してよろしいですか</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>はい</span><span class="cbl"><span class="cb"></span>いいえ</span></td></tr>
+    <tr><td>大会の成績を掲載してよろしいですか</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>はい</span><span class="cbl"><span class="cb"></span>いいえ</span></td></tr>
+    <tr><td>指導実績のある園・学校名を掲載してよろしいですか<br><span class="small">※ 園・学校側の掲載許可も別途必要になります</span></td>
+      <td class="w"><span class="cbl"><span class="cb"></span>はい</span><span class="cbl"><span class="cb"></span>いいえ</span></td></tr>
+  </table>
+
+  <h3 class="sec" style="margin-top:24px"><span class="num">D</span>コースの詳細　<span style="font-size:10pt;color:#eb6834">★最重要</span></h3>
+  <p class="sub">「コース・料金」ページになります。保護者さまが最も読む部分です</p>
+
+  <table style="font-size:8.6pt">
+    <tr>
+      <th style="width:17%">コース名</th><th style="width:12%">対象年齢</th><th style="width:20%">曜日・時間</th>
+      <th style="width:9%">定員</th><th style="width:13%">月謝</th><th>持ち物・服装</th>
+    </tr>
+    <tr><td class="w2">未就園児コース</td><td class="w2">0〜3歳</td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2">キッズコース</td><td class="w2">3歳〜小学生</td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2">アクティブコース</td><td class="w2">小学生</td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2">アクロバットコース</td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2">体操競技・育成コース</td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2">体操競技・選手コース</td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+  </table>
+
+  <p class="q"><b>Q.</b>各コースを「ひとことで言うと」どんなコースですか</p>
+  <p class="hint">例：未就園児コース＝「親子で楽しみながら、体を動かす感覚を育てるコース」／保護者さまはこの一文でコースを選びます</p>
+  <table style="font-size:9pt">
+    <tr><th style="width:26%">未就園児</th><td class="w"></td></tr>
+    <tr><th>キッズ</th><td class="w"></td></tr>
+    <tr><th>アクティブ</th><td class="w"></td></tr>
+    <tr><th>アクロバット</th><td class="w"></td></tr>
+    <tr><th>体操競技・育成</th><td class="w"></td></tr>
+    <tr><th>体操競技・選手</th><td class="w"></td></tr>
+  </table>
+</section>
+
+<!-- ===== E 料金・F コーチ ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">E</span>料金</h3>
+  <p class="sub">コース料金以外にかかる費用を教えてください</p>
+  <table>
+    <tr><th style="width:34%">入会金</th><td class="w">　　　　　　　円　（きょうだい割引：有／無　→　内容　　　　　　　　　　　）</td></tr>
+    <tr><th>年会費</th><td class="w">　　　　　　　円／年</td></tr>
+    <tr><th>スポーツ保険料</th><td class="w">　　　　　　　円／年</td></tr>
+    <tr><th>ユニフォーム・体操服</th><td class="w">必要／不要　・　　　　　　　円</td></tr>
+    <tr><th>その他の費用</th><td class="w">例：発表会参加費、大会エントリー費など</td></tr>
+    <tr><th>お支払い方法</th><td class="w"><span class="cbl"><span class="cb"></span>月謝袋（現金）</span><span class="cbl"><span class="cb"></span>口座振替</span><span class="cbl"><span class="cb"></span>その他</span></td></tr>
+    <tr><th>振替（お休みしたとき）</th><td class="w2">できる／できない　・　ルール：</td></tr>
+    <tr><th>退会の手続き</th><td class="w">例：退会希望月の前月◯日までにご連絡</td></tr>
+  </table>
+
+  <h3 class="sec" style="margin-top:24px"><span class="num">F</span>コーチのご紹介</h3>
+  <p class="sub">「誰に預けるのか」が見えることは、保護者さまの安心に直結します</p>
+  <p class="hint">2〜3名分のご記入をおすすめします。ご経歴は書ける範囲で構いません。</p>
+
+  <table style="font-size:9pt">
+    <tr><th style="width:22%">お名前</th><td class="w"></td><td class="w" style="width:26%">ふりがな</td></tr>
+    <tr><th>役職・担当コース</th><td class="w" colspan="2"></td></tr>
+    <tr><th>ご経歴（選手歴など）</th><td class="w2" colspan="2"></td></tr>
+    <tr><th>保有資格</th><td class="w" colspan="2"></td></tr>
+    <tr><th>指導歴</th><td class="w" colspan="2">　　　　年</td></tr>
+    <tr><th>お子さま・保護者さまへ<br>ひとこと</th><td class="w3" colspan="2"></td></tr>
+  </table>
+
+  <table style="font-size:9pt">
+    <tr><th style="width:22%">お名前</th><td class="w"></td><td class="w" style="width:26%">ふりがな</td></tr>
+    <tr><th>役職・担当コース</th><td class="w" colspan="2"></td></tr>
+    <tr><th>ご経歴（選手歴など）</th><td class="w2" colspan="2"></td></tr>
+    <tr><th>保有資格</th><td class="w" colspan="2"></td></tr>
+    <tr><th>指導歴</th><td class="w" colspan="2">　　　　年</td></tr>
+    <tr><th>お子さま・保護者さまへ<br>ひとこと</th><td class="w2" colspan="2"></td></tr>
+  </table>
+</section>
+
+<!-- ===== G FAQ ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">G</span>よくあるご質問</h3>
+  <p class="sub">保護者さまから実際によく聞かれることを教えてください</p>
+
+  <p class="hint">下記はよくある質問の例です。<b>実際に聞かれる質問に○</b>をつけ、答えをご記入ください。
+  ここに書いた内容が、そのまま「よくあるご質問」ページになります。</p>
+
+  <table style="font-size:9pt">
+    <tr><th style="width:4%">○</th><th style="width:40%">ご質問</th><th>お答え</th></tr>
+    <tr><td class="w"></td><td>運動が苦手でも大丈夫ですか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>何歳から通えますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>見学はできますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>体験は何回まで受けられますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>途中入会はできますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>きょうだい割引はありますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>お休みしたときの振替はできますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>駐車場はありますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>保護者の付き添いは必要ですか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>発表会や大会はありますか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>どんな服装で行けばよいですか</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>（自由記入）</td><td class="w"></td></tr>
+    <tr><td class="w"></td><td>（自由記入）</td><td class="w"></td></tr>
+  </table>
+</section>
+
+<!-- ===== H 出張指導 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">H</span>園・学校への出張指導について</h3>
+  <p class="sub">法人向けの新しい入口になるページです</p>
+
+  <div class="key">
+    <div class="t">■ このページを作る理由</div>
+    調査したところ、市内のこども園のお知らせに<b>貴教室の指導記事が年度をまたいで複数回</b>掲載されていました。
+    すでに実績がおありなのに、サイトにその入口がありません。<br>
+    園の先生が外部指導を探すときはまず検索されるため、<b>「対応しています」というページがないと候補に入りません。</b>
+    月謝収入と違い法人契約は単価が高く安定するため、1ページ分の投資として最も効果が見込める箇所です。
+  </div>
+
+  <table>
+    <tr><th style="width:36%">出張指導は継続して行っていますか</th>
+      <td class="w"><span class="cbl"><span class="cb"></span>はい</span><span class="cbl"><span class="cb"></span>依頼があれば</span><span class="cbl"><span class="cb"></span>現在は行っていない</span></td></tr>
+    <tr><th>これまでの実績（園・学校名）</th><td class="w3">※掲載には先方の許可が必要です。名前を伏せた記載も可能です</td></tr>
+    <tr><th>対応できる範囲</th><td class="w">例：幼稚園・保育園・小学校・学童／宮崎市内、〇〇市まで</td></tr>
+    <tr><th>1回あたりの時間・人数</th><td class="w">例：45分×2クラス、1クラス20名程度まで</td></tr>
+    <tr><th>費用の考え方</th><td class="w2">例：1回◯◯円〜（人数・回数により応相談）／サイトには「応相談」でも可</td></tr>
+    <tr><th>必要な設備・持ち込み器具</th><td class="w2"></td></tr>
+    <tr><th>ご依頼から実施までの流れ</th><td class="w3">例：お問い合わせ → 内容のご相談 → お見積 → 日程調整 → 実施</td></tr>
+    <tr><th>この指導で大切にしていること</th><td class="w3">※ここが園の先生に最も響く部分です</td></tr>
+  </table>
+</section>
+
+<!-- ===== I 写真 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">I</span>写真のご準備</h3>
+  <p class="sub">サイトの印象は、写真でほぼ決まります</p>
+
+  <p class="hint">下記のうち、<b>お手元にあるものにチェック</b>をお願いします。
+  ない場合はこちらで撮影しますので、チェックがなくても問題ありません。目安として全体で40〜60枚あると充実します。</p>
+
+  <h4>レッスンの様子（最重要）</h4>
+  <p>
+    <span class="cbl"><span class="cb"></span>未就園児コース（親子）</span>
+    <span class="cbl"><span class="cb"></span>キッズコース</span>
+    <span class="cbl"><span class="cb"></span>アクティブコース</span><br>
+    <span class="cbl"><span class="cb"></span>アクロバットコース</span>
+    <span class="cbl"><span class="cb"></span>体操競技・育成</span>
+    <span class="cbl"><span class="cb"></span>体操競技・選手</span><br>
+    <span class="cbl"><span class="cb"></span>コーチが補助をしている場面</span>
+    <span class="cbl"><span class="cb"></span>子どもたちの笑顔</span>
+  </p>
+
+  <h4>器具</h4>
+  <p>
+    <span class="cbl"><span class="cb"></span>マット</span><span class="cbl"><span class="cb"></span>とび箱</span>
+    <span class="cbl"><span class="cb"></span>鉄棒</span><span class="cbl"><span class="cb"></span>平均台</span>
+    <span class="cbl"><span class="cb"></span>トランポリン</span><span class="cbl"><span class="cb"></span>つり輪</span>
+  </p>
+
+  <h4>教室・設備</h4>
+  <p>
+    <span class="cbl"><span class="cb"></span>建物の外観</span><span class="cbl"><span class="cb"></span>入口</span>
+    <span class="cbl"><span class="cb"></span>駐車場</span><span class="cbl"><span class="cb"></span>練習場全体</span><br>
+    <span class="cbl"><span class="cb"></span>保護者の待機スペース</span><span class="cbl"><span class="cb"></span>更衣室</span>
+    <span class="cbl"><span class="cb"></span>お手洗い</span>
+  </p>
+
+  <h4>人・実績</h4>
+  <p>
+    <span class="cbl"><span class="cb"></span>コーチの顔写真（1人ずつ）</span>
+    <span class="cbl"><span class="cb"></span>コーチ全員の集合写真</span><br>
+    <span class="cbl"><span class="cb"></span>大会・試合の様子</span>
+    <span class="cbl"><span class="cb"></span>表彰・メダル・賞状</span>
+    <span class="cbl"><span class="cb"></span>発表会</span><br>
+    <span class="cbl"><span class="cb"></span>園への出張指導の様子</span>
+    <span class="cbl"><span class="cb"></span>ロゴのデータ（.ai / .svg / 高解像度の画像）</span>
+  </p>
+
+  <div class="note">
+    <div class="t">■ 写真をお送りいただくときのお願い</div>
+    ・<b>LINEで送る場合は「オリジナル画質」でお願いします。</b>通常送信だと画質が落ち、サイトに載せるとぼやけてしまいます<br>
+    ・迷ったら<b>多めに</b>お送りください。こちらで選びます<br>
+    ・暗い写真・逆光の写真も、ある程度は補正できますのでお送りください
+  </div>
+
+  <table>
+    <tr><th style="width:40%">プロによる撮影（オプション）をご希望ですか</th>
+      <td class="w"><span class="cbl"><span class="cb"></span>希望する</span><span class="cbl"><span class="cb"></span>希望しない</span><span class="cbl"><span class="cb"></span>相談したい</span></td></tr>
+    <tr><th>撮影に適したレッスンの曜日・時間</th><td class="w">（子どもたちが多く、活気のある回をお選びください）</td></tr>
+  </table>
+</section>
+
+<!-- ===== J 肖像権 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">J</span>お子さまの写真掲載について　<span style="font-size:10pt;color:#eb6834">★最重要</span></h3>
+  <p class="sub">教室の信用に関わるため、制作を始める前に必ず整理させてください</p>
+
+  <div class="warn">
+    <div class="t">■ なぜ重要か</div>
+    お子さまのお顔が写る写真をホームページに掲載するには、<b>保護者さまからの書面によるご同意</b>が必要です。<br>
+    口頭のご了承だけで掲載してしまうと、後日「聞いていない」というお申し出があった際に、
+    <b>教室側が対応に追われることになります。</b>ここは費用の問題ではなく、教室を守るための手続きです。
+  </div>
+
+  <table>
+    <tr><th style="width:48%">確認事項</th><th>ご回答</th></tr>
+    <tr><td><b>保護者さまから書面でのご同意を取得済みですか</b></td>
+      <td class="w"><span class="cbl"><span class="cb"></span>取得済み</span><span class="cbl"><span class="cb"></span>口頭のみ</span><span class="cbl"><span class="cb"></span>まだ</span></td></tr>
+    <tr><td>同意書のひな形は必要ですか</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>必要</span><span class="cbl"><span class="cb"></span>不要</span></td></tr>
+    <tr><td>ご同意をいただけていないお子さまがいる場合の方針</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>掲載しない</span><span class="cbl"><span class="cb"></span>顔をぼかす</span><span class="cbl"><span class="cb"></span>後ろ姿のみ使う</span></td></tr>
+    <tr><td>入会時の書類に、写真掲載の同意欄はありますか</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>ある</span><span class="cbl"><span class="cb"></span>ない</span></td></tr>
+  </table>
+
+  <div class="key">
+    <div class="t">■ 同意書のひな形をご用意しています</div>
+    まだお取りでない場合、<b>そのまま印刷して配布できる同意書のひな形を別紙でお渡しします。</b>ご心配はいりません。<br>
+    今後の入会手続きの書類にも同意欄を追加しておくと、次回以降は自動的にご同意が集まる仕組みになります。
+    その文案もあわせてご提案します。
+  </div>
+
+  <h3 class="sec" style="margin-top:24px"><span class="num">K</span>各種アカウント・管理権限</h3>
+  <p class="sub">お持ちかどうかの確認です。なければ開設からお手伝いします</p>
+  <table>
+    <tr><th style="width:40%">項目</th><th>ご回答</th></tr>
+    <tr><td>現在のホームページ（KITENN）の管理画面のID・パスワード</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>ある</span><span class="cbl"><span class="cb"></span>ない・不明</span></td></tr>
+    <tr><td>Googleマップの店舗情報の管理権限（オーナー登録）</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>ある</span><span class="cbl"><span class="cb"></span>ない・不明</span></td></tr>
+    <tr><td>Instagramアカウント</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>ある（@　　　　　　　　）</span><span class="cbl"><span class="cb"></span>ない</span></td></tr>
+    <tr><td>LINE公式アカウント</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>ある</span><span class="cbl"><span class="cb"></span>ない</span></td></tr>
+    <tr><td>教室として使えるメールアドレス</td>
+      <td class="w"><span class="cbl"><span class="cb"></span>ある</span><span class="cbl"><span class="cb"></span>ない</span></td></tr>
+    <tr><td>ご希望のドメイン名（サイトのURL）</td>
+      <td class="w">例：flash-gym.jp　／　おまかせでも構いません</td></tr>
+    <tr><td>公開後、更新を担当される方</td><td class="w">お名前：</td></tr>
+  </table>
+</section>
+
+<!-- ===== L お客様の声 ===== -->
+<section class="page">
+  <h3 class="sec"><span class="num">L</span>保護者さまの声・実績</h3>
+  <p class="sub">第三者の言葉は、教室ご自身の説明より説得力があります</p>
+
+  <p class="hint">在籍の保護者さまに「よろしければ一言いただけますか」とお願いしてみてください。3〜6件あると効果的です。
+  お名前はイニシャルや「小2 男子の保護者さま」といった形でも構いません。<b>掲載の許可は必ずお取りください。</b></p>
+
+  <table style="font-size:9pt">
+    <tr><th style="width:24%">お名前（イニシャル可）</th><th style="width:16%">お子さまの学年</th><th>お声</th></tr>
+    <tr><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+    <tr><td class="w2"></td><td class="w2"></td><td class="w2"></td></tr>
+  </table>
+
+  <p class="hint" style="margin-top:12px">聞き方の例：<br>
+  「通わせる前に不安だったことはありますか」「通ってみてお子さまに変化はありましたか」
+  「どんなご家庭におすすめしたいですか」——この3つを聞くと、そのまま使える言葉が返ってきやすいです。</p>
+
+  <h4>大会・試合の実績</h4>
+  <table style="font-size:9pt">
+    <tr><th style="width:16%">年度</th><th style="width:34%">大会名</th><th style="width:18%">種目</th><th>結果</th></tr>
+    <tr><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+    <tr><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+    <tr><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+    <tr><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+  </table>
+
+  <h4>最後に：このサイトで、いちばん伝えたいことは何ですか</h4>
+  <p class="hint">トップページのいちばん上に載せるキャッチコピーを考えるために使わせていただきます。
+  うまくまとまっていなくて構いません。思いつくままにお書きください。</p>
+  <table><tr><td class="w3" style="height:110px"></td></tr></table>
+
+  <div class="foot">
+    ご記入ありがとうございました。<br>
+    ご不明な点、書きにくい項目などございましたら、お気軽にご連絡ください。お打ち合わせの際に一緒に整理いたします。<br><br>
+    FLASH体操教室 公式ホームページ制作　ヒアリングシート　／　2026年9月16日版
+  </div>
+</section>
+
+</body>
+</html>
