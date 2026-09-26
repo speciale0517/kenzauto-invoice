@@ -1,4 +1,16 @@
 #!/bin/sh
+# CLAUDE.mdの変更履歴が肥大化していないか警告する（commitは止めない）
+if [ -f "CLAUDE.md" ]; then
+  ROWS=$(awk '/^## 変更履歴/{f=1;next} /^## /{f=0} f && /^\| *20[0-9][0-9]-[0-9][0-9]-[0-9][0-9] *\|/{c++} END{print c+0}' CLAUDE.md)
+  THRESHOLD=20
+  if [ "$ROWS" -gt "$THRESHOLD" ]; then
+    echo ""
+    echo "⚠️  CLAUDE.mdの変更履歴が${ROWS}件になっています(閾値${THRESHOLD}件)。"
+    echo "   古い履歴をCLAUDE.md.history.mdへアーカイブ分離することを検討してください。"
+    echo ""
+  fi
+fi
+
 # tests/ があるプロジェクトだけ、commit前にPlaywrightで検証する
 if [ -f "playwright.config.js" ] && [ -d "node_modules" ]; then
   npx playwright test
