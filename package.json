@@ -1,0 +1,12 @@
+{
+  "name": "kenzauto-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ケンズオート単体の検証スクリプト(Playwright)。アプリ本体はindex.htmlのみで完結し、これは検証専用の付随ファイル",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

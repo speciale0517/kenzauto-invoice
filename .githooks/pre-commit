@@ -1,0 +1,14 @@
+#!/bin/sh
+# tests/ があるプロジェクトだけ、commit前にPlaywrightで検証する
+if [ -f "playwright.config.js" ] && [ -d "node_modules" ]; then
+  npx playwright test
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ Playwrightテストが失敗しました。commitを中止します。"
+    echo "   修正するか、緊急時のみ git commit --no-verify で回避できます。"
+    exit 1
+  fi
+elif [ -f "playwright.config.js" ]; then
+  echo "⚠️  tests/ はありますが node_modules がありません(npm install未実行)。今回のcommitはテスト未実行のまま進みます。"
+fi
+exit 0
